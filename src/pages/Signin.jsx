@@ -2,6 +2,7 @@ import { Button, Container, Grid, TextField, Typography } from "@mui/material";
 import axios from "axios";
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import cryptoJS from "crypto-js";
 
 export default function Signin() {
   const navigate = useNavigate();
@@ -10,7 +11,6 @@ export default function Signin() {
   const [password, setPassword] = React.useState("");
 
   function fetchSignInData() {
-    console.log(username);
     axios
       .post(
         "http://103.174.115.58:3000/v1/sign-in",
@@ -26,8 +26,19 @@ export default function Signin() {
       )
       .then((res) => {
         if (res.status === 200) {
+          let encrpyt = cryptoJS.AES.encrypt(
+            res.data.accessToken,
+            `${import.meta.env.VITE_KEY_ENCRYPT}`
+          );
+
+          localStorage.setItem("token", encrpyt);
           navigate("/");
-          localStorage.setItem("token", res.data.accessToken);
+          // Example -> Decrypt
+          // var decrypted = cryptoJS.AES.decrypt(
+          //   encrypted,
+          //   `${proces.env.KEY_ENCRYPT}`
+          // );
+          // console.log(decrypted.toString(cryptoJS.enc.Utf8));
         }
       });
   }
