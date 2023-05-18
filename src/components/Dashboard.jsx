@@ -1,72 +1,81 @@
-import * as React from 'react';
-import PropTypes from 'prop-types';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import CssBaseline from '@mui/material/CssBaseline';
-import Divider from '@mui/material/Divider';
-import Drawer from '@mui/material/Drawer';
-import IconButton from '@mui/material/IconButton';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import MailIcon from '@mui/icons-material/Mail';
-import MenuIcon from '@mui/icons-material/Menu';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import imgIcon from '../assets/icon.jpg';
-import { Avatar, Grid } from '@mui/material';
+import * as React from "react";
+import PropTypes from "prop-types";
+import AppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import CssBaseline from "@mui/material/CssBaseline";
+import Divider from "@mui/material/Divider";
+import Drawer from "@mui/material/Drawer";
+import IconButton from "@mui/material/IconButton";
+import InboxIcon from "@mui/icons-material/MoveToInbox";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import MailIcon from "@mui/icons-material/Mail";
+import MenuIcon from "@mui/icons-material/Menu";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import { Avatar, Grid } from "@mui/material";
 const drawerWidth = 240;
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import Absensi from '../pages/Absensi';
-import Guru from '../pages/Guru';
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import Absensi from "../pages/Absensi";
+import Guru from "../pages/Guru";
+import cryptoJS from "crypto-js";
 
 function ResponsiveDrawer(props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [data, setData] = React.useState([]);
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
   const navigate = useNavigate();
   const [changeNav, setChangeNav] = React.useState(0);
 
   React.useEffect(() => {
     async function fetchDataRefresh() {
+      const decrypt = cryptoJS.AES.decrypt(
+        token,
+        `${import.meta.env.VITE_KEY_ENCRYPT}`
+      );
       await axios
-        .get('http://103.174.115.58:3000/v1/refresh-token', {
+        .get("http://103.174.115.58:3000/v1/refresh-token", {
           headers: {
-            'x-access-token': token,
+            "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
           },
         })
         .then((res) => {
-          setData(res.data.data);
+          if (res.status === 200) {
+            setData(res.data.data);
+          } else {
+            navigate("/sign-in");
+            localStorage.removeItem("token");
+          }
         });
     }
     fetchDataRefresh();
   }, []);
 
   function logout() {
-    localStorage.removeItem('token');
-    navigate('/sign-in');
+    localStorage.removeItem("token");
+    navigate("/sign-in");
   }
 
   let menu = [
     {
       id: 1,
-      name: 'Home',
-      url: '/',
+      name: "Home",
+      url: "/",
     },
     {
       id: 2,
-      name: 'Guru',
-      url: '/guru',
+      name: "Guru",
+      url: "/guru",
     },
     {
       id: 3,
-      name: 'Absensi',
-      url: '/absensi',
+      name: "Absensi",
+      url: "/absensi",
     },
   ];
 
@@ -109,7 +118,7 @@ function ResponsiveDrawer(props) {
     window !== undefined ? () => window().document.body : undefined;
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <AppBar
         position="fixed"
@@ -124,15 +133,15 @@ function ResponsiveDrawer(props) {
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' } }}
+            sx={{ mr: 2, display: { sm: "none" } }}
           >
             <MenuIcon />
           </IconButton>
           <div
             style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              width: '100%',
+              display: "flex",
+              justifyContent: "space-between",
+              width: "100%",
             }}
           >
             <Typography variant="h6" noWrap component="div">
@@ -140,8 +149,8 @@ function ResponsiveDrawer(props) {
             </Typography>
             <div
               style={{
-                display: 'flex',
-                alignItems: 'center',
+                display: "flex",
+                alignItems: "center",
               }}
             >
               <span
@@ -175,9 +184,9 @@ function ResponsiveDrawer(props) {
             keepMounted: true, // Better open performance on mobile.
           }}
           sx={{
-            display: { xs: 'block', sm: 'none' },
-            '& .MuiDrawer-paper': {
-              boxSizing: 'border-box',
+            display: { xs: "block", sm: "none" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
               width: drawerWidth,
             },
           }}
@@ -187,9 +196,9 @@ function ResponsiveDrawer(props) {
         <Drawer
           variant="permanent"
           sx={{
-            display: { xs: 'none', sm: 'block' },
-            '& .MuiDrawer-paper': {
-              boxSizing: 'border-box',
+            display: { xs: "none", sm: "block" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
               width: drawerWidth,
             },
           }}
@@ -201,9 +210,9 @@ function ResponsiveDrawer(props) {
       <Box
         component="main"
         sx={{
-          backgroundColor: '#F0F0F4',
+          backgroundColor: "#F0F0F4",
           flexGrow: 1,
-          height: '100vh',
+          height: "100vh",
           p: 3,
           width: { sm: `calc(100% - ${drawerWidth}px)` },
         }}
