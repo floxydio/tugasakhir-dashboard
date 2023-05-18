@@ -20,23 +20,34 @@ import imgIcon from "../assets/icon.jpg";
 import { Avatar, Grid } from "@mui/material";
 const drawerWidth = 240;
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function ResponsiveDrawer(props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [data, setData] = React.useState([]);
   const token = localStorage.getItem("token");
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     async function fetchDataRefresh() {
-      await axios.get("http://103.174.115.58:3000/v1/refresh-token", {
-        headers: {
-          "x-access-token": token,
-        },
-      });
+      await axios
+        .get("http://103.174.115.58:3000/v1/refresh-token", {
+          headers: {
+            "x-access-token": token,
+          },
+        })
+        .then((res) => {
+          setData(res.data.data);
+        });
     }
     fetchDataRefresh();
   }, []);
+
+  function logout() {
+    localStorage.removeItem("token");
+    navigate("/sign-in");
+  }
 
   let menu = [
     {
@@ -131,9 +142,10 @@ function ResponsiveDrawer(props) {
                   marginRight: 10,
                 }}
               >
-                Dio Okta Rovelino
+                {data.nama}
               </span>
               <Avatar
+                onClick={() => logout()}
                 alt="Remy Sharp"
                 src="https://randomuser.me/api/portraits/men/27.jpg"
               />
