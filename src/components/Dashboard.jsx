@@ -19,10 +19,24 @@ import Typography from "@mui/material/Typography";
 import imgIcon from "../assets/icon.jpg";
 import { Avatar, Grid } from "@mui/material";
 const drawerWidth = 240;
+import axios from "axios";
 
 function ResponsiveDrawer(props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [data, setData] = React.useState([]);
+  const token = localStorage.getItem("token");
+
+  React.useEffect(() => {
+    async function fetchDataRefresh() {
+      await axios.get("http://103.174.115.58:3000/v1/refresh-token", {
+        headers: {
+          "x-access-token": token,
+        },
+      });
+    }
+    fetchDataRefresh();
+  }, []);
 
   let menu = [
     {
