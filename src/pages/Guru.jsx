@@ -61,7 +61,7 @@ export default function Guru() {
   };
 
   const findGuru = () => {
-    axios.get("http://103.174.115.58:3000/v1/guru").then((result) => {
+    axios.get("http://192.168.50.110:3000/v1/guru").then((result) => {
       console.log(result.data.data);
       setGuru(result.data.data);
     });
@@ -71,7 +71,7 @@ export default function Guru() {
     e.preventDefault();
 
     await axios
-      .post("http://103.174.115.58:3000/v1/guru", {
+      .post("http://192.168.50.110:3000/v1/guru", {
         nama: nama,
         mengajar: mengajar,
         statusguru: statusguru,
