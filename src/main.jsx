@@ -4,8 +4,6 @@ import App from "./App.jsx";
 import {
   createBrowserRouter,
   RouterProvider,
-  Route,
-  Link,
 } from "react-router-dom";
 import Signin from "./pages/Signin.jsx";
 

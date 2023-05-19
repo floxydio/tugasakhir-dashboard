@@ -23,6 +23,7 @@ import { useNavigate } from "react-router-dom";
 import Absensi from "../pages/Absensi";
 import Guru from "../pages/Guru";
 import cryptoJS from "crypto-js";
+import imgIcon from "../assets/icon.jpg";
 
 function ResponsiveDrawer(props) {
   const { window } = props;
@@ -87,13 +88,14 @@ function ResponsiveDrawer(props) {
     <div>
       {/* <img
         src={imgIcon}
-        width={100}
+        width={80}
         style={{
           display: "block",
           marginLeft: "auto",
           marginRight: "auto",
         }}
       /> */}
+      <p style={{ textAlign: "center" }}>Dashboard Admin</p>
       <Divider />
       <List>
         {menu.map((text, index) => (
@@ -103,7 +105,11 @@ function ResponsiveDrawer(props) {
             disablePadding
           >
             <ListItemButton>
-              <ListItemIcon>
+              <ListItemIcon
+                sx={{
+                  color: "white",
+                }}
+              >
                 {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
               </ListItemIcon>
               <ListItemText primary={text.name} />
@@ -121,8 +127,12 @@ function ResponsiveDrawer(props) {
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <AppBar
+        elevation={0}
         position="fixed"
         sx={{
+          boxShadow: "0 4px 5px -6px #222",
+          backgroundColor: "#FFFFFF",
+          color: "black",
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           ml: { sm: `${drawerWidth}px` },
         }}
@@ -171,7 +181,10 @@ function ResponsiveDrawer(props) {
       </AppBar>
       <Box
         component="nav"
-        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+        sx={{
+          width: { sm: drawerWidth },
+          flexShrink: { sm: 0 },
+        }}
         aria-label="mailbox folders"
       >
         {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
@@ -194,6 +207,12 @@ function ResponsiveDrawer(props) {
           {drawer}
         </Drawer>
         <Drawer
+          PaperProps={{
+            sx: {
+              backgroundColor: "#343A40",
+              color: "white",
+            },
+          }}
           variant="permanent"
           sx={{
             display: { xs: "none", sm: "block" },
@@ -210,7 +229,7 @@ function ResponsiveDrawer(props) {
       <Box
         component="main"
         sx={{
-          backgroundColor: "#F0F0F4",
+          backgroundColor: "#F4F6F9",
           flexGrow: 1,
           height: "100vh",
           p: 3,

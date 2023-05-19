@@ -14,22 +14,22 @@ export default function App() {
   const navigate = useNavigate();
   const [loading, setLoading] = React.useState(true);
 
-  function checkLogin() {
-    if (localStorage.getItem("token") === null) {
-      setTimeout(() => {
-        navigate("/sign-in");
-        setLoading(false);
-      }, 2000);
-    } else {
-      setTimeout(() => {
-        setLoading(false);
-      }, 2000);
-    }
-  }
-
   React.useEffect(() => {
+    function checkLogin() {
+      if (localStorage.getItem("token") === null) {
+        setTimeout(() => {
+          navigate("/sign-in");
+          setLoading(false);
+        }, 2000);
+      } else {
+        setTimeout(() => {
+          setLoading(false);
+        }, 2000);
+      }
+    }
+
     checkLogin();
-  }, []);
+  }, [navigate]);
   return (
     <>
       {loading ? (
