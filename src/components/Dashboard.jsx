@@ -180,7 +180,7 @@ function ResponsiveDrawer(props) {
               <Avatar
                 onClick={() => logout()}
                 alt="Remy Sharp"
-                src="https://randomuser.me/api/portraits/men/27.jpg"
+                src="https://randomuser.me/api/portraits/men/94.jpg"
               />
             </div>
           </div>
