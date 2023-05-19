@@ -13,7 +13,7 @@ import {
   Modal,
   TextField,
   FormControl,
-  FormLabel,
+  Typography,
 } from '@mui/material';
 
 const textFieldStyle = {
@@ -39,62 +39,60 @@ export default function Guru() {
   const [rating, setRating] = useState('');
   const [guru, setGuru] = useState([]);
   const [open, setOpen] = useState(false);
-  const [validation, setValidation] = useState({});
-  const [value, setValue] = useState('');
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleInputRating = (e) => {
-    setRating(e.target.value);
-  };
-
-  const handleInputStatusGuru = (e) => {
-    setStatusguru(e.target.value);
-  };
-
-  const handleInput = (event) => {
-    setValue(event.target.value.replace(/[^0-9]/g, ''));
-    if (value > 2) {
-      setValue('2');
-    }
-  };
-
-  const findGuru = () => {
-    axios.get('http://103.174.115.58:3000/v1/guru').then((result) => {
-      console.log(result.data.data);
-      setGuru(result.data.data);
-    });
-  };
-
-  const guruPost = async (e) => {
-    e.preventDefault();
-
-    await axios
-      .post('http://103.174.115.58:3000/v1/guru', {
-        nama: nama,
-        mengajar: mengajar,
-        statusguru: statusguru,
-        rating: rating,
-      })
-      .then(() => {
-        history.pushState();
-      })
-      .catch((err) => {
-        setValidation(err.response.data);
-      });
-  };
-
   useEffect(() => {
+    async function findGuru() {
+      await axios.get('http://103.174.115.58:3000/v1/guru').then((result) => {
+        console.log(result.data.data);
+        setGuru(result.data.data);
+      });
+    }
     findGuru();
   }, []);
 
+  async function checkData(e) {
+    e.preventDefault();
+    alert(mengajar);
+    await axios
+      .post(
+        'http://103.174.115.58:3000/v1/guru',
+        {
+          nama: nama,
+          mengajar: mengajar,
+          status_guru: parseInt(statusguru),
+          rating: parseInt(rating),
+        },
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        }
+      )
+      .then((res) => {
+        if ((res.status === 200) | (res.status === 201)) {
+          console.log('Response: ', res);
+        }
+      });
+  }
+
   return (
     <>
+      <Button
+        onClick={handleOpen}
+        style={{
+          float: 'right',
+        }}
+      >
+        Click Here
+      </Button>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
+              <TableCell>No</TableCell>
               <TableCell>Nama</TableCell>
               <TableCell>Mengajar</TableCell>
               <TableCell>Status Guru</TableCell>
@@ -103,28 +101,47 @@ export default function Guru() {
           </TableHead>
           <TableBody>
             {guru.map((row) => {
-              <TableRow
-                key={row.id}
-                sx={{ '&:last-child td, &:lastchild th': { border: 0 } }}
-              >
-                <TableCell align="left">{row.nama}</TableCell>
-                <TableCell align="left">{row.mengajar}</TableCell>
-                <TableCell align="left">{row.status_guru}</TableCell>
-                <TableCell align="left">{row.rating}</TableCell>
-              </TableRow>;
+              return (
+                <TableRow
+                  key={row.id}
+                  sx={{ '&:last-child td, &:lastchild th': { border: 0 } }}
+                >
+                  <TableCell component="th" scope="row">
+                    {row.id}
+                  </TableCell>
+                  <TableCell align="left">{row.nama}</TableCell>
+                  <TableCell align="left">{row.mengajar}</TableCell>
+                  <TableCell align="left">{row.status_guru}</TableCell>
+                  <TableCell align="left">{row.rating}</TableCell>
+                </TableRow>
+              );
             })}
           </TableBody>
         </Table>
       </TableContainer>
-      <Button onClick={handleOpen}>Click Here</Button>
+
       <Modal open={open} onClose={handleClose}>
         <Box sx={boxStyle} component="form" noValidate autoComplete="off">
-          <form onSubmit={guruPost}>
+          <Typography
+            style={{
+              textAlign: 'center',
+              marginBottom: 10,
+            }}
+          >
+            Masukan Data
+          </Typography>
+          <form
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
             <FormControl>
               <TextField
                 required
                 id="outlined"
                 label="Nama"
+                type="text"
                 onChange={(e) => setNama(e.target.value)}
                 style={textFieldStyle}
               />
@@ -132,15 +149,8 @@ export default function Guru() {
                 required
                 id="outlined"
                 label="Mengajar"
+                type="text"
                 onChange={(e) => setMengajar(e.target.value)}
-                style={textFieldStyle}
-              />
-              <TextField
-                required
-                id="outlined-number-rating"
-                label="Rating"
-                type="number"
-                onChange={[handleInput, handleInputRating]}
                 style={textFieldStyle}
               />
               <TextField
@@ -148,10 +158,20 @@ export default function Guru() {
                 id="outlined-number-status_aktif"
                 label="Status Guru"
                 type="number"
-                onChange={[handleInput, handleInputStatusGuru]}
+                onChange={(e) => setStatusguru(e.target.value)}
                 style={textFieldStyle}
               />
-              <button type="submit">Submit</button>
+              <TextField
+                required
+                id="outlined-number-rating"
+                label="Rating"
+                type="number"
+                onChange={(e) => setRating(e.target.value)}
+                style={textFieldStyle}
+              />
+              <button onClick={(e) => checkData(e)} type="submit">
+                Submit
+              </button>
             </FormControl>
           </form>
         </Box>
