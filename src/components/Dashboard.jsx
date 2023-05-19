@@ -24,6 +24,7 @@ import Absensi from "../pages/Absensi";
 import Guru from "../pages/Guru";
 import cryptoJS from "crypto-js";
 import imgIcon from "../assets/icon.jpg";
+import Mapel from "../pages/Mapel";
 
 function ResponsiveDrawer(props) {
   const { window } = props;
@@ -40,7 +41,7 @@ function ResponsiveDrawer(props) {
         `${import.meta.env.VITE_KEY_ENCRYPT}`
       );
       await axios
-        .get("http://192.168.50.110:3000/v1/refresh-token", {
+        .get("http://103.174.115.58:3000/v1/refresh-token", {
           headers: {
             "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
           },
@@ -77,6 +78,11 @@ function ResponsiveDrawer(props) {
       id: 3,
       name: "Absensi",
       url: "/absensi",
+    },
+    {
+      id: 4,
+      name: "Mapel",
+      url: "/mapel",
     },
   ];
 
@@ -243,6 +249,7 @@ function ResponsiveDrawer(props) {
         <Toolbar />
         {changeNav == 2 ? <Guru /> : null}
         {changeNav == 3 ? <Absensi /> : null}
+        {changeNav == 4 ? <Mapel /> : null}
       </Box>
     </Box>
   );
