@@ -40,7 +40,7 @@ function ResponsiveDrawer(props) {
         `${import.meta.env.VITE_KEY_ENCRYPT}`
       );
       await axios
-        .get('http://103.174.115.58:3000/v1/refresh-token', {
+        .get("http://192.168.50.110:3000/v1/refresh-token", {
           headers: {
             'x-access-token': decrypt.toString(cryptoJS.enc.Utf8),
           },
@@ -95,9 +95,13 @@ function ResponsiveDrawer(props) {
           marginRight: "auto",
         }}
       /> */}
-      <p style={{ textAlign: 'center' }}>Dashboard Admin</p>
-      <Divider />
-      <List>
+      <p style={{ textAlign: "center" }}>INISS</p>
+
+      <List
+        sx={{
+          marginTop: 10,
+        }}
+      >
         {menu.map((text, index) => (
           <ListItem
             key={text.id}
@@ -216,8 +220,8 @@ function ResponsiveDrawer(props) {
         <Drawer
           PaperProps={{
             sx: {
-              backgroundColor: '#343A40',
-              color: 'white',
+              backgroundColor: "#000000",
+              color: "white",
             },
           }}
           variant="permanent"

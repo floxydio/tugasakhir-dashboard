@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 import {
   Box,
   Table,
@@ -13,76 +13,35 @@ import {
   Modal,
   TextField,
   FormControl,
-} from "@mui/material";
+  Typography,
+} from '@mui/material';
 
 const textFieldStyle = {
   marginBottom: 10,
 };
 
 const boxStyle = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
   width: 400,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
   boxShadow: 24,
   p: 4,
 };
 
 export default function Guru() {
-  const [nama, setNama] = useState("");
-  const [mengajar, setMengajar] = useState("");
-  const [statusguru, setStatusguru] = useState("");
-  const [rating, setRating] = useState("");
+  const [nama, setNama] = useState('');
+  const [mengajar, setMengajar] = useState('');
+  const [statusguru, setStatusguru] = useState('');
+  const [rating, setRating] = useState('');
   const [guru, setGuru] = useState([]);
   const [open, setOpen] = useState(false);
-  const [validation, setValidation] = useState({});
-  const [value, setValue] = useState("");
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
-  const handleInputRating = (e) => {
-    setRating(e.target.value);
-  };
-
-  const handleInputStatusGuru = (e) => {
-    setStatusguru(e.target.value);
-  };
-
-  const handleInput = (event) => {
-    setValue(event.target.value.replace(/[^0-9]/g, ""));
-    if (value > 2) {
-      setValue("2");
-    }
-  };
-
-  const findGuru = () => {
-    axios.get("http://103.174.115.58:3000/v1/guru").then((result) => {
-      console.log(result.data.data);
-      setGuru(result.data.data);
-    });
-  };
-
-  const guruPost = async (e) => {
-    e.preventDefault();
-
-    await axios
-      .post("http://103.174.115.58:3000/v1/guru", {
-        nama: nama,
-        mengajar: mengajar,
-        statusguru: statusguru,
-        rating: rating,
-      })
-      .then(() => {
-        history.pushState();
-      })
-      .catch((err) => {
-        setValidation(err.response.data);
-      });
-  };
 
   useEffect(() => {
     async function findGuru() {
@@ -160,7 +119,6 @@ export default function Guru() {
           </TableBody>
         </Table>
       </TableContainer>
-
       <Modal open={open} onClose={handleClose}>
         <Box sx={boxStyle} component="form" noValidate autoComplete="off">
           <Typography
