@@ -30,7 +30,7 @@ export default function Absensi() {
   //   setOrderBy(value);
   //   async function getAbsenFilterOrderBy() {
   //     await axios
-  //       .get("http://192.168.50.110:3000/v1/absen", {
+  //       .get("http://103.174.115.58:3000/v1/absen", {
   //         params: {
   //           orderby: orderBy,
   //         },
@@ -46,7 +46,7 @@ export default function Absensi() {
   //   setFilterMonth(value);
   //   async function getAbsenFilterMonth() {
   //     await axios
-  //       .get("http://192.168.50.110:3000/v1/absen", {
+  //       .get("http://103.174.115.58:3000/v1/absen", {
   //         params: {
   //           month: month,
   //           orderby: orderBy,
@@ -79,7 +79,7 @@ export default function Absensi() {
     }
     async function getAbsenFilterOrderBy() {
       await axios
-        .get("http://192.168.50.110:3000/v1/absen", {
+        .get("http://103.174.115.58:3000/v1/absen", {
           params: params,
         })
         .then((res) => {
@@ -92,7 +92,7 @@ export default function Absensi() {
   React.useEffect(() => {
     async function getAbsen() {
       setLoading(true);
-      await axios.get("http://192.168.50.110:3000/v1/absen").then((res) => {
+      await axios.get("http://103.174.115.58:3000/v1/absen").then((res) => {
         setAbsenData(res.data.data);
         setLoading(false);
       });
