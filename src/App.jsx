@@ -20,11 +20,11 @@ export default function App() {
         setTimeout(() => {
           navigate("/sign-in");
           setLoading(false);
-        }, 2000);
+        }, 1000);
       } else {
         setTimeout(() => {
           setLoading(false);
-        }, 2000);
+        }, 1000);
       }
     }
 
