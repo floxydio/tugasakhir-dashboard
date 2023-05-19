@@ -85,13 +85,13 @@ export default function Absensi() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {absenData.map((row) => (
+            {absenData.map((row, i) => (
               <TableRow
                 key={row.id}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
                 <TableCell component="th" scope="row">
-                  {row.id}
+                  {i + 1}
                 </TableCell>
                 <TableCell align="right">{row.user_id}</TableCell>
                 <TableCell align="right">{row.guru_id}</TableCell>
