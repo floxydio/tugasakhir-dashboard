@@ -7,10 +7,16 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import axios from "axios";
-import { DownloadTableExcel } from "react-export-table-to-excel";
 import BarLoader from "react-spinners/BarLoader.js";
 import { MonthModels } from "../models/Month_models";
-import { Button } from "@mui/material";
+import {
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+} from "@mui/material";
+import "../style/absensi.css";
 const override = (React.CSSProperties = {
   transform: "translate(-50%, -50%)",
   top: "50%",
@@ -25,39 +31,6 @@ export default function Absensi() {
   const [month, setFilterMonth] = React.useState("");
   const tableRef = React.useRef(null);
   const [loading, setLoading] = React.useState(false);
-
-  // function handleFilterData(value) {
-  //   setOrderBy(value);
-  //   async function getAbsenFilterOrderBy() {
-  //     await axios
-  //       .get("http://103.174.115.58:3000/v1/absen", {
-  //         params: {
-  //           orderby: orderBy,
-  //         },
-  //       })
-  //       .then((res) => {
-  //         setAbsenData(res.data.data);
-  //       });
-  //   }
-  //   getAbsenFilterOrderBy();
-  // }
-
-  // function handleFilterByMonth(value) {
-  //   setFilterMonth(value);
-  //   async function getAbsenFilterMonth() {
-  //     await axios
-  //       .get("http://103.174.115.58:3000/v1/absen", {
-  //         params: {
-  //           month: month,
-  //           orderby: orderBy,
-  //         },
-  //       })
-  //       .then((res) => {
-  //         setAbsenData(res.data.data);
-  //       });
-  //   }
-  //   getAbsenFilterMonth();
-  // }
 
   function filterData() {
     let params = {};
@@ -98,58 +71,67 @@ export default function Absensi() {
       });
     }
     getAbsen();
-    setGetMonth(new Date().getMonth());
+    setGetMonth(new Date().getMonth() + 1);
   }, []);
 
   return (
     <>
-      <DownloadTableExcel
-        filename="absensi"
-        sheet="absensi"
-        currentTableRef={tableRef.current}
-      >
-        <button> Export excel </button>
-      </DownloadTableExcel>
-      <div
-        style={{
-          float: "right",
-        }}
-      >
-        <select
-          value={month}
-          onChange={(e) => setFilterMonth(e.target.value)}
-          style={{
-            padding: "10px",
-            marginBottom: 30,
-            marginRight: 20,
-          }}
-        >
-          {MonthModels.map((e) => (
-            <option key={e.value} value={e.value}>
-              {e.name}
-            </option>
-          ))}
-        </select>
-        <select
-          value={orderBy}
-          onChange={(e) => setOrderBy(e.target.value)}
-          style={{
-            padding: "10px",
-            marginBottom: 30,
-          }}
-        >
-          <option value="DESC">Filter by Descending</option>
-          <option value="ASC">Filter by Ascending</option>
-        </select>
+      <div className="filter_style">
         <Button
+          className="btn_absen"
           sx={{
-            marginLeft: 5,
+            marginTop: 1,
           }}
           onClick={filterData}
           variant="contained"
         >
-          Filter
+          Absen Manual
         </Button>
+        <div>
+          <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+            <InputLabel id="demo-simple-select-label">Bulan</InputLabel>
+            <Select
+              sx={{
+                height: 40,
+              }}
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={month === "" ? getMonth : month}
+              label="Bulan"
+              onChange={(e) => setFilterMonth(e.target.value)}
+            >
+              {MonthModels.map((e) => (
+                <MenuItem value={e.value}>{e.name}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+            <InputLabel id="demo-simple-select-label">Filter</InputLabel>
+            <Select
+              sx={{
+                height: 40,
+              }}
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={orderBy}
+              label="Filter"
+              onChange={(e) => setOrderBy(e.target.value)}
+            >
+              <MenuItem value="DESC">Filter by Descending</MenuItem>
+              <MenuItem value="ASC">Filter by Ascending</MenuItem>
+            </Select>
+          </FormControl>
+
+          <Button
+            sx={{
+              marginTop: 1,
+            }}
+            onClick={filterData}
+            variant="contained"
+          >
+            Filter
+          </Button>
+        </div>
       </div>
       {loading ? (
         <BarLoader

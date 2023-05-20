@@ -13,7 +13,7 @@ export default function Signin() {
   function fetchSignInData() {
     axios
       .post(
-        'http://103.174.115.58:3000/v1/sign-in',
+        "http://103.174.115.58:3000/v1/sign-in",
         {
           username: username,
           password: password,
@@ -47,7 +47,10 @@ export default function Signin() {
       <Container
         maxWidth="sm"
         style={{
-          height: '100vh',
+          transform: "translate(-50%, -50%)",
+          top: "50%",
+          left: "50%",
+          position: "absolute",
         }}
       >
         <Typography
