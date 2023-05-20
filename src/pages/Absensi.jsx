@@ -16,6 +16,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  TextField,
 } from "@mui/material";
 import "../style/absensi.css";
 import Box from "@mui/material/Box";
@@ -50,8 +51,14 @@ export default function Absensi() {
   const tableRef = React.useRef(null);
   const [loading, setLoading] = React.useState(false);
   const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const [editId, setEditId] = React.useState("");
+  const [editNamaGuru, setNamaGuru] = React.useState("");
+  function handleOpen(id, namaGuru) {
+    setEditId(id);
+    setNamaGuru(namaGuru);
+    setOpen(true);
+  }
 
   function filterData() {
     let params = {};
@@ -81,6 +88,10 @@ export default function Absensi() {
         });
     }
     getAbsenFilterOrderBy();
+  }
+
+  function submitEdit() {
+    console.log(editId);
   }
 
   React.useEffect(() => {
@@ -115,12 +126,10 @@ export default function Absensi() {
           aria-describedby="modal-modal-description"
         >
           <Box sx={style}>
-            <Typography id="modal-modal-title" variant="h6" component="h2">
-              Text in a modal
-            </Typography>
-            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-              Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-            </Typography>
+            <TextField value={editNamaGuru}></TextField>
+            <Button onClick={submitEdit} variant="contained">
+              Submit
+            </Button>
           </Box>
         </Modal>
         <div>
@@ -229,7 +238,7 @@ export default function Absensi() {
                       sx={{
                         marginTop: 1,
                       }}
-                      onClick={handleOpen}
+                      onClick={() => handleOpen(row.id, row.nama_guru)}
                       variant="contained"
                     >
                       Edit
