@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import BarLoader from 'react-spinners/BarLoader.js';
+import { RatingModels } from '../models/Rating_models';
 import {
   Box,
   Table,
@@ -14,11 +16,16 @@ import {
   TextField,
   FormControl,
   Typography,
+  InputLabel,
+  Select,
+  MenuItem,
+  Chip,
 } from '@mui/material';
-import BarLoader from 'react-spinners/BarLoader.js';
 
 const textFieldStyle = {
   marginBottom: 10,
+  marginTop: 10,
+  width: 350,
 };
 
 const boxStyle = {
@@ -26,7 +33,7 @@ const boxStyle = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 400,
+  width: 500,
   bgcolor: 'background.paper',
   border: '2px solid #000',
   boxShadow: 24,
@@ -45,32 +52,31 @@ export default function Guru() {
   const [mengajar, setMengajar] = useState('');
   const [statusguru, setStatusguru] = useState('');
   const [rating, setRating] = useState('');
-  const [statusGuru, setStatusGuru] = useState('');
   const [guru, setGuru] = useState([]);
+  const [getRating, setGetRating] = useState(0);
   const [open, setOpen] = useState(false);
   const [orderBy, setOrderBy] = useState('DESC');
   const [loading, setLoading] = useState(false);
+  const [edit, setEdit] = useState("Edit")
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   function filterData() {
     let params = {};
-    if (rating === '' && statusGuru === '' && orderBy !== '') {
+    console.log(orderBy);
+    console.log(rating);
+    if (rating === '' && orderBy !== '') {
       params = {
-        orderBy: orderBy,
+        orderby: orderBy,
       };
-    } else if (rating !== '' && statusGuru === '' && orderBy !== '') {
+      console.log('lari ke 1');
+    } else if (rating !== '' && orderBy !== '') {
       params = {
         rating: rating,
-        orderBy: orderBy,
+        orderby: orderBy,
       };
-    } else if (rating !== '' && statusGuru !== '' && orderBy !== '') {
-      params = {
-        statusguru: statusGuru,
-        rating: rating,
-        orderBy: orderBy,
-      };
+      console.log('lari ke 2');
     }
     async function getDataGuruFilterOrderBy() {
       await axios
@@ -103,8 +109,8 @@ export default function Guru() {
         {
           nama: nama,
           mengajar: mengajar,
-          status_guru: parseInt(statusguru),
-          rating: parseInt(rating),
+          status_guru: statusguru,
+          rating: rating,
         },
         {
           headers: {
@@ -121,17 +127,37 @@ export default function Guru() {
 
   return (
     <>
-      <select
+      <FormControl sx={{ m: 1, minWidth: 120, bottom: 8 }} size="small">
+        <InputLabel id="demo-simple-select-label">Rating</InputLabel>
+        <Select
+          sx={{
+            height: 40,
+          }}
+          labelId="demo-simple-select-label"
+          id="demo-simple-select"
+          value={rating === '' ? getRating : rating}
+          label="Rating"
+          onChange={(e) => setRating(e.target.value)}
+        >
+          {RatingModels.map((e) => (
+            <MenuItem value={e.value} key={e.value}>
+              {e.rating}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <Select
         value={orderBy}
-        onChange={((e) => setOrderBy(e.target.value), console.log('DiPencet'))}
+        onChange={(e) => setOrderBy(e.target.value)}
         style={{
           padding: '10px',
           marginBottom: 30,
+          height: 40,
         }}
       >
         <option value="DESC">Filter by Descending</option>
         <option value="ASC">Filter by Ascending</option>
-      </select>
+      </Select>
       <Button sx={{ marginLeft: 3 }} onClick={filterData} variant="contained">
         Filter
       </Button>
@@ -141,7 +167,7 @@ export default function Guru() {
           float: 'right',
         }}
       >
-        Click Here
+        Tambah Guru
       </Button>
       {loading ? (
         <BarLoader
@@ -163,6 +189,7 @@ export default function Guru() {
                   <TableCell>Mengajar</TableCell>
                   <TableCell>Status Guru</TableCell>
                   <TableCell>Rating</TableCell>
+                  <TableCell>Edit</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -177,8 +204,15 @@ export default function Guru() {
                       </TableCell>
                       <TableCell align="left">{row.nama}</TableCell>
                       <TableCell align="left">{row.mengajar}</TableCell>
-                      <TableCell align="left">{row.status_guru}</TableCell>
+                      <TableCell align="left">
+                        {row.status_guru === 1 ? (
+                          <Chip label={'Active'} color="success" />
+                        ) : (
+                          <Chip label={'Inactive'} color="error" />
+                        )}
+                      </TableCell>
                       <TableCell align="left">{row.rating}</TableCell>
+                      <TableCell>HAHAHA</TableCell>
                     </TableRow>
                   );
                 })}
@@ -193,7 +227,7 @@ export default function Guru() {
                   marginBottom: 10,
                 }}
               >
-                Masukan Data
+                Masukkan Data Guru
               </Typography>
               <form
                 style={{
@@ -234,7 +268,19 @@ export default function Guru() {
                     onChange={(e) => setRating(e.target.value)}
                     style={textFieldStyle}
                   />
-                  <button onClick={(e) => checkData(e)} type="submit">
+                  <button
+                    onClick={(e) => checkData(e)}
+                    type="submit"
+                    style={{
+                      marginTop: 20,
+                      height: 45,
+                      backgroundColor: 'blue',
+                      color: 'white',
+                      fontWeight: 'bold',
+                      borderColor: 'transparent',
+                      borderRadius: 20,
+                    }}
+                  >
                     Submit
                   </button>
                 </FormControl>
