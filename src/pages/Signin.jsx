@@ -47,7 +47,10 @@ export default function Signin() {
       <Container
         maxWidth="sm"
         style={{
-          height: "100vh",
+          transform: "translate(-50%, -50%)",
+          top: "50%",
+          left: "50%",
+          position: "absolute",
         }}
       >
         <Typography
