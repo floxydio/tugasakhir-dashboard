@@ -5,3 +5,8 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
 })
+
+
+// Bedanya Vite sama React yg diinstall manual
+// Vite -> Plugin untuk mempermudah install
+// Manual -> Lemot Loading 
