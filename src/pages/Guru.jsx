@@ -48,9 +48,6 @@ const override = {
 };
 
 export default function Guru() {
-  const [nama, setNama] = useState('');
-  const [mengajar, setMengajar] = useState('');
-  const [statusguru, setStatusguru] = useState('');
   const [rating, setRating] = useState('');
   const [guru, setGuru] = useState([]);
   const [getRating, setGetRating] = useState(0);
@@ -58,7 +55,7 @@ export default function Guru() {
   const [openEditData, setOpenEditData] = useState(false);
   const [orderBy, setOrderBy] = useState('DESC');
   const [loading, setLoading] = useState(false);
-  const [editId, setEditId] = useState('Edit');
+  const [editId, setEditId] = useState('');
   const [editNamaGuru, setEditNamaGuru] = useState('');
   const [editNamaMengajar, setEditNamaMengajar] = useState('');
   const [editStatusGuru, setEditStatusGuru] = useState('');
@@ -81,10 +78,6 @@ export default function Guru() {
     setOpenEditData(true);
   }
   const handleCloseEdit = () => setOpenEditData(false);
-
-  function handleEditNama(e) {
-    setNewNama({ ...newNama, [e.target.name]: e.target.value });
-  }
 
   function filterData() {
     let params = {};
@@ -150,14 +143,16 @@ export default function Guru() {
 
   async function handleEdit(e) {
     e.preventDefault();
+    console.log('Masuk Handle Edit nya');
+    console.log(editId);
     await axios
       .put(
-        'http://103.174.115.58:3000/v1/edit-guru/:id',
+        `http://103.174.115.58:3000/v1/edit-guru/${editId}`,
         {
-          nama: nama,
-          mengajar: mengajar,
-          status_guru: statusguru,
-          rating: rating,
+          nama: editNamaGuru,
+          mengajar: editNamaMengajar,
+          status_guru: editStatusGuru,
+          rating: editRatingGuru,
         },
         {
           headers: {
@@ -166,10 +161,23 @@ export default function Guru() {
         }
       )
       .then((res) => {
-        if ((res.status === 200) | (res.status === 201)) {
+        if (res.status === 200 || res.status === 201) {
+          setOpenEditData(false);
+          async function findGuru() {
+            await axios
+              .get('http://103.174.115.58:3000/v1/guru')
+              .then((result) => {
+                setGuru(result.data.data);
+                setLoading(false);
+              });
+          }
+          findGuru();
+
           console.log('Response: ', res);
         }
       });
+
+    console.log('Kalo Ini Keliatan Arti nya Bisa');
   }
 
   return (
@@ -306,7 +314,7 @@ export default function Guru() {
                     id="outlined"
                     label="Nama"
                     type="text"
-                    onChange={(e) => setNama(e.target.value)}
+                    onChange={(e) => setNewNama(e.target.value)}
                     style={textFieldStyle}
                   />
                   <TextField
@@ -314,7 +322,7 @@ export default function Guru() {
                     id="outlined"
                     label="Mengajar"
                     type="text"
-                    onChange={(e) => setMengajar(e.target.value)}
+                    onChange={(e) => setNewMengajar(e.target.value)}
                     style={textFieldStyle}
                   />
                   <TextField
@@ -322,7 +330,7 @@ export default function Guru() {
                     id="outlined-number-status_aktif"
                     label="Status Guru"
                     type="number"
-                    onChange={(e) => setStatusguru(e.target.value)}
+                    onChange={(e) => setNewStatusGuru(e.target.value)}
                     style={textFieldStyle}
                   />
                   <TextField
@@ -330,7 +338,7 @@ export default function Guru() {
                     id="outlined-number-rating"
                     label="Rating"
                     type="number"
-                    onChange={(e) => setRating(e.target.value)}
+                    onChange={(e) => setNewRating(e.target.value)}
                     style={textFieldStyle}
                   />
                   <button
@@ -381,7 +389,7 @@ export default function Guru() {
                     type="text"
                     style={textFieldStyle}
                     value={editNamaGuru}
-                    onChange={handleEditNama}
+                    onChange={(e) => setEditNamaGuru(e.target.value)}
                   />
                   <TextField
                     required
@@ -390,7 +398,7 @@ export default function Guru() {
                     type="text"
                     style={textFieldStyle}
                     value={editNamaMengajar}
-                    onChange={(e) => setNewMengajar(e.target.value)}
+                    onChange={(e) => setEditNamaMengajar(e.target.value)}
                   />
                   <TextField
                     required
@@ -399,7 +407,7 @@ export default function Guru() {
                     type="number"
                     style={textFieldStyle}
                     value={editStatusGuru}
-                    onChange={(e) => setNewStatusGuru(e.target.value)}
+                    onChange={(e) => setEditStatusGuru(e.target.value)}
                   />
                   <TextField
                     required
@@ -408,10 +416,10 @@ export default function Guru() {
                     type="number"
                     value={editRatingGuru}
                     style={textFieldStyle}
-                    onChange={(e) => setNewRating(e.target.value)}
+                    onChange={(e) => setEditRatingGuru(e.target.value)}
                   />
                   <button
-                    onClick={(e) => handleEdit(e)}
+                    onClick={handleEdit}
                     type="submit"
                     style={{
                       marginTop: 20,
