@@ -54,13 +54,37 @@ export default function Guru() {
   const [rating, setRating] = useState('');
   const [guru, setGuru] = useState([]);
   const [getRating, setGetRating] = useState(0);
-  const [open, setOpen] = useState(false);
+  const [openTambahGuru, setOpenTambahGuru] = useState(false);
+  const [openEditData, setOpenEditData] = useState(false);
   const [orderBy, setOrderBy] = useState('DESC');
   const [loading, setLoading] = useState(false);
-  const [edit, setEdit] = useState("Edit")
+  const [editId, setEditId] = useState('Edit');
+  const [editNamaGuru, setEditNamaGuru] = useState('');
+  const [editNamaMengajar, setEditNamaMengajar] = useState('');
+  const [editStatusGuru, setEditStatusGuru] = useState('');
+  const [editRatingGuru, setEditRatingGuru] = useState('');
+  const [newNama, setNewNama] = useState('');
+  const [newMengajar, setNewMengajar] = useState('');
+  const [newStatusGuru, setNewStatusGuru] = useState('');
+  const [newRating, setNewRating] = useState('');
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleOpen = () => setOpenTambahGuru(true);
+  const handleClose = () => setOpenTambahGuru(false);
+
+  // const handleOpenEdit = () => setOpenEditData(true);
+  function handleOpenEdit(id, namaGuru, namaMengajar, status_guru, rating) {
+    setEditId(id);
+    setEditNamaGuru(namaGuru);
+    setEditNamaMengajar(namaMengajar);
+    setEditStatusGuru(status_guru);
+    setEditRatingGuru(rating);
+    setOpenEditData(true);
+  }
+  const handleCloseEdit = () => setOpenEditData(false);
+
+  function handleEditNama(e) {
+    setNewNama({ ...newNama, [e.target.name]: e.target.value });
+  }
 
   function filterData() {
     let params = {};
@@ -102,10 +126,33 @@ export default function Guru() {
 
   async function checkData(e) {
     e.preventDefault();
-    alert(mengajar);
     await axios
       .post(
         'http://103.174.115.58:3000/v1/guru',
+        {
+          nama: newNama,
+          mengajar: newMengajar,
+          status_guru: newStatusGuru,
+          rating: newRating,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        }
+      )
+      .then((res) => {
+        if ((res.status === 200) | (res.status === 201)) {
+          console.log('Response: ', res);
+        }
+      });
+  }
+
+  async function handleEdit(e) {
+    e.preventDefault();
+    await axios
+      .put(
+        'http://103.174.115.58:3000/v1/edit-guru/:id',
         {
           nama: nama,
           mengajar: mengajar,
@@ -212,14 +259,32 @@ export default function Guru() {
                         )}
                       </TableCell>
                       <TableCell align="left">{row.rating}</TableCell>
-                      <TableCell>HAHAHA</TableCell>
+                      <TableCell align="left">
+                        <Button
+                          onClick={() =>
+                            handleOpenEdit(
+                              row.id,
+                              row.nama,
+                              row.mengajar,
+                              row.status_guru,
+                              row.rating
+                            )
+                          }
+                          style={{
+                            float: 'right',
+                          }}
+                          variant="contained"
+                        >
+                          Edit
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   );
                 })}
               </TableBody>
             </Table>
           </TableContainer>
-          <Modal open={open} onClose={handleClose}>
+          <Modal open={openTambahGuru} onClose={handleClose}>
             <Box sx={boxStyle} component="form" noValidate autoComplete="off">
               <Typography
                 style={{
@@ -270,6 +335,83 @@ export default function Guru() {
                   />
                   <button
                     onClick={(e) => checkData(e)}
+                    type="submit"
+                    style={{
+                      marginTop: 20,
+                      height: 45,
+                      backgroundColor: 'blue',
+                      color: 'white',
+                      fontWeight: 'bold',
+                      borderColor: 'transparent',
+                      borderRadius: 20,
+                    }}
+                  >
+                    Submit
+                  </button>
+                </FormControl>
+              </form>
+            </Box>
+          </Modal>
+          <Modal
+            open={openEditData}
+            onClose={handleCloseEdit}
+            arial-aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+            <Box sx={boxStyle} component="form" noValidate autoComplete="off">
+              <Typography
+                style={{
+                  textAlign: 'center',
+                  marginBottom: 10,
+                }}
+              >
+                Edit Data
+              </Typography>
+              <form
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                }}
+              >
+                <FormControl>
+                  <TextField
+                    required
+                    id="outlined"
+                    label="Nama"
+                    type="text"
+                    style={textFieldStyle}
+                    value={editNamaGuru}
+                    onChange={handleEditNama}
+                  />
+                  <TextField
+                    required
+                    id="outlined"
+                    label="Mengajar"
+                    type="text"
+                    style={textFieldStyle}
+                    value={editNamaMengajar}
+                    onChange={(e) => setNewMengajar(e.target.value)}
+                  />
+                  <TextField
+                    required
+                    id="outlined-number-status_aktif"
+                    label="Status Guru"
+                    type="number"
+                    style={textFieldStyle}
+                    value={editStatusGuru}
+                    onChange={(e) => setNewStatusGuru(e.target.value)}
+                  />
+                  <TextField
+                    required
+                    id="outlined-number-rating"
+                    label="Rating"
+                    type="number"
+                    value={editRatingGuru}
+                    style={textFieldStyle}
+                    onChange={(e) => setNewRating(e.target.value)}
+                  />
+                  <button
+                    onClick={(e) => handleEdit(e)}
                     type="submit"
                     style={{
                       marginTop: 20,
