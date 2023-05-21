@@ -54,9 +54,39 @@ export default function Absensi() {
   const handleClose = () => setOpen(false);
   const [editId, setEditId] = React.useState("");
   const [editNamaGuru, setNamaGuru] = React.useState("");
-  function handleOpen(id, namaGuru) {
+  const [editNamaUser, setEditNamaUser] = React.useState("");
+  const [editPelajaran, setEditPelajaran] = React.useState("");
+  const [editNomorKelas, setEditNomorkelas] = React.useState("");
+  const [editKeterangan, setEditKeterangan] = React.useState("");
+  const [editAlasan, setEditAlasan] = React.useState("");
+  const [editHari, setEditHari] = React.useState("");
+  const [editBulan, setEditBulan] = React.useState("");
+  const [editTahun, setEditTahun] = React.useState("");
+  const [editWaktu, setEditWaktu] = React.useState("");
+  function handleOpen(
+    id,
+    namaUser,
+    namaGuru,
+    pelajaran,
+    nomorKelas,
+    keterangan,
+    alasan,
+    hari,
+    bulan,
+    tahun,
+    waktu
+  ) {
     setEditId(id);
+    setEditNamaUser(namaUser);
     setNamaGuru(namaGuru);
+    setEditPelajaran(pelajaran);
+    setEditNomorkelas(nomorKelas);
+    setEditKeterangan(keterangan);
+    setEditAlasan(alasan);
+    setEditHari(hari);
+    setEditBulan(bulan);
+    setEditTahun(tahun);
+    setEditWaktu(waktu);
     setOpen(true);
   }
 
@@ -119,19 +149,7 @@ export default function Absensi() {
         >
           Absen Manual
         </Button>
-        <Modal
-          open={open}
-          onClose={handleClose}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
-        >
-          <Box sx={style}>
-            <TextField value={editNamaGuru}></TextField>
-            <Button onClick={submitEdit} variant="contained">
-              Submit
-            </Button>
-          </Box>
-        </Modal>
+
         <div>
           <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
             <InputLabel id="demo-simple-select-label">Bulan</InputLabel>
@@ -238,7 +256,21 @@ export default function Absensi() {
                       sx={{
                         marginTop: 1,
                       }}
-                      onClick={() => handleOpen(row.id, row.nama_guru)}
+                      onClick={() =>
+                        handleOpen(
+                          row.id,
+                          row.nama_user,
+                          row.nama_guru,
+                          row.pelajaran_nama,
+                          row.nomor_kelas,
+                          row.keterangan,
+                          row.reason,
+                          row.day,
+                          row.month,
+                          row.year,
+                          row.time
+                        )
+                      }
                       variant="contained"
                     >
                       Edit
@@ -246,6 +278,38 @@ export default function Absensi() {
                   </TableCell>
                 </TableRow>
               ))}
+              <Modal
+                open={open}
+                onClose={handleClose}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+              >
+                <Box sx={style}>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Typography variant="h5" sx={{ textAlign: "center" }}>
+                      Edit Data
+                    </Typography>
+                    <TextField
+                      value={editNamaGuru}
+                      onChange={(e) => setNamaGuru(e.target.value)}
+                    ></TextField>
+                    <Button
+                      style={{
+                        marginTop: 30,
+                      }}
+                      onClick={submitEdit}
+                      variant="contained"
+                    >
+                      Submit
+                    </Button>
+                  </div>
+                </Box>
+              </Modal>
             </TableBody>
           </Table>
         </TableContainer>

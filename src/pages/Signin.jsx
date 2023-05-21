@@ -1,14 +1,14 @@
-import { Button, Container, TextField, Typography } from '@mui/material';
-import axios from 'axios';
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import cryptoJS from 'crypto-js';
+import { Button, Container, TextField, Typography } from "@mui/material";
+import axios from "axios";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import cryptoJS from "crypto-js";
 
 export default function Signin() {
   const navigate = useNavigate();
 
-  const [username, setUsername] = React.useState('');
-  const [password, setPassword] = React.useState('');
+  const [username, setUsername] = React.useState("");
+  const [password, setPassword] = React.useState("");
 
   function fetchSignInData() {
     axios
@@ -20,7 +20,7 @@ export default function Signin() {
         },
         {
           headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            "Content-Type": "application/x-www-form-urlencoded",
           },
         }
       )
@@ -30,9 +30,8 @@ export default function Signin() {
             res.data.accessToken,
             `${import.meta.env.VITE_KEY_ENCRYPT}`
           );
-
-          localStorage.setItem('token', encrpyt);
-          navigate('/');
+          localStorage.setItem("token", encrpyt);
+          navigate("/");
           // Example -> Decrypt
           // var decrypted = cryptoJS.AES.decrypt(
           //   encrypted,
@@ -42,6 +41,7 @@ export default function Signin() {
         }
       });
   }
+
   return (
     <>
       <Container
@@ -56,7 +56,7 @@ export default function Signin() {
         <Typography
           variant="h5"
           style={{
-            textAlign: 'center',
+            textAlign: "center",
           }}
         >
           Sign In Your Account
@@ -64,10 +64,10 @@ export default function Signin() {
         <div
           className="input__form"
           style={{
-            marginTop: '50px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1rem',
+            marginTop: "50px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "1rem",
           }}
         >
           <TextField
@@ -87,7 +87,7 @@ export default function Signin() {
             onClick={() => fetchSignInData()}
             variant="contained"
             style={{
-              marginTop: '40px',
+              marginTop: "40px",
             }}
           >
             Sign In
