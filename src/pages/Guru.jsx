@@ -293,7 +293,7 @@ export default function Guru() {
             </Table>
           </TableContainer>
           <Modal open={openTambahGuru} onClose={handleClose}>
-            <Box sx={boxStyle} component="form" noValidate autoComplete="off">
+            <Box sx={boxStyle} noValidate autoComplete="off">
               <Typography
                 style={{
                   textAlign: 'center',
@@ -366,7 +366,7 @@ export default function Guru() {
             arial-aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
           >
-            <Box sx={boxStyle} component="form" noValidate autoComplete="off">
+            <Box sx={boxStyle} autoComplete="off">
               <Typography
                 style={{
                   textAlign: 'center',
