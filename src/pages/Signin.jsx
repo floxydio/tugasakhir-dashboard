@@ -30,15 +30,8 @@ export default function Signin() {
             res.data.accessToken,
             `${import.meta.env.VITE_KEY_ENCRYPT}`
           );
-          console.log(res.data.accessToken);
           localStorage.setItem("token", encrpyt);
           navigate("/");
-          // Example -> Decrypt
-          // var decrypted = cryptoJS.AES.decrypt(
-          //   encrypted,
-          //   `${proces.env.KEY_ENCRYPT}`
-          // );
-          // console.log(decrypted.toString(cryptoJS.enc.Utf8));
         }
       });
   }

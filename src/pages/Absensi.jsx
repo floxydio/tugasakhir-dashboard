@@ -70,7 +70,12 @@ export default function Absensi() {
   const [editValueKelas, setDataValueKelas] = React.useState("");
   const [editValuePelajaran, setDataValuePelajaran] = React.useState("");
 
-  function handleOpen(
+  const dataKeterangan = [
+    { id: 1, value: "ABSEN" },
+    { id: 2, value: "IZIN" },
+  ];
+
+  async function handleOpen(
     id,
     namaUser,
     namaGuru,
@@ -95,7 +100,6 @@ export default function Absensi() {
     setEditTahun(tahun);
     setEditWaktu(waktu);
     setOpen(true);
-    console.log(nomorKelas);
 
     async function getGuru() {
       setLoading(true);
@@ -105,33 +109,45 @@ export default function Absensi() {
           setDataValueGuru(
             res.data.data.find((item) => item.nama === namaGuru)
           );
+          setNamaGuru(res.data.data.find((item) => item.nama === namaGuru));
           setDataGuru(res.data.data);
           setLoading(false);
         });
     }
     async function getPelajaran() {
+      setLoading(true);
       await axios
         .get("http://103.174.115.58:3000/v1/find-pelajaran")
         .then(function (res) {
           setDataValuePelajaran(
             res.data.data.find((item) => item.nama === pelajaran)
           );
+          setEditPelajaran(
+            res.data.data.find((item) => item.nama === pelajaran)
+          );
           setDataPelajaran(res.data.data);
+          setLoading(false);
         });
     }
     async function getKelas() {
+      setLoading(true);
+
       await axios
         .get("http://103.174.115.58:3000/v1/kelas")
         .then(function (res) {
           setDataValueKelas(
             res.data.data.find((item) => item.nomor === nomorKelas)
           );
+          setEditNomorkelas(
+            res.data.data.find((item) => item.nomor === nomorKelas)
+          );
           setDataKelas(res.data.data);
+          setLoading(false);
         });
     }
-    getGuru();
-    getPelajaran();
-    getKelas();
+    await getGuru();
+    await getPelajaran();
+    await getKelas();
   }
 
   function filterData() {
@@ -164,8 +180,61 @@ export default function Absensi() {
     getAbsenFilterOrderBy();
   }
 
-  function submitEdit() {
-    console.log(editId);
+  async function submitEdit() {
+    let formData = {};
+    if (editKeterangan === "IZIN") {
+      formData = {
+        guru_id: editNamaGuru.id === undefined ? editNamaGuru : editNamaGuru.id,
+        pelajaran_id:
+          editPelajaran.id === undefined ? editPelajaran : editPelajaran.id,
+        kelas_id:
+          editNomorKelas.nomor === undefined
+            ? editNomorKelas
+            : editNomorKelas.nomor,
+        keterangan: editKeterangan,
+        reason: editAlasan,
+        day: editHari,
+        month: editBulan,
+        year: editTahun,
+        time: editWaktu,
+      };
+    } else {
+      formData = {
+        guru_id: editNamaGuru.id === undefined ? editNamaGuru : editNamaGuru.id,
+        pelajaran_id:
+          editPelajaran.id === undefined ? editPelajaran : editPelajaran.id,
+        kelas_id:
+          editNomorKelas.nomor === undefined
+            ? editNomorKelas
+            : editNomorKelas.nomor,
+        keterangan: editKeterangan,
+        reason: "-",
+        day: editHari,
+        month: editBulan,
+        year: editTahun,
+        time: editWaktu,
+      };
+    }
+
+    await axios
+      .put(`http://103.174.115.58:3000/v1/edit-absen/${editId}`, formData, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      })
+      .then((res) => {
+        if(res.status === 200) {
+          handleClose();
+          async function getAbsen() {
+            setLoading(true);
+            await axios.get("http://103.174.115.58:3000/v1/absen").then((res) => {
+              setAbsenData(res.data.data);
+              setLoading(false);
+            });
+          }
+          getAbsen();
+        }
+      });
   }
 
   React.useEffect(() => {
@@ -338,16 +407,24 @@ export default function Absensi() {
                     }}
                   >
                     <Typography variant="h5" sx={{ textAlign: "center" }}>
-                      Edit Data
+                      Ubah Data Absen
                     </Typography>
                     <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                      <InputLabel id="demo-simple-select-label">
+                        Nama Guru
+                      </InputLabel>
                       <Select
                         sx={{
                           height: 40,
                         }}
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
-                        value={editValueGuru.id}
+                        label="Nama Guru"
+                        value={
+                          editNamaGuru.id === undefined
+                            ? editNamaGuru
+                            : editNamaGuru.id
+                        }
                         onChange={(e) => setNamaGuru(e.target.value)}
                       >
                         {dataGuru.map((e) => (
@@ -358,13 +435,22 @@ export default function Absensi() {
                       </Select>
                     </FormControl>
                     <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                      <InputLabel id="demo-simple-select-label">
+                        Mata Pelajaran
+                      </InputLabel>
+
                       <Select
                         sx={{
                           height: 40,
                         }}
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
-                        value={editValuePelajaran.id}
+                        label="Mata Pelajaran"
+                        value={
+                          editPelajaran.id === undefined
+                            ? editPelajaran
+                            : editPelajaran.id
+                        }
                         onChange={(e) => setEditPelajaran(e.target.value)}
                       >
                         {dataPelajaran.map((e) => (
@@ -375,13 +461,21 @@ export default function Absensi() {
                       </Select>
                     </FormControl>
                     <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                      <InputLabel id="demo-simple-select-label">
+                        Nomor Kelas
+                      </InputLabel>
                       <Select
                         sx={{
                           height: 40,
                         }}
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
-                        value={editValueKelas.nomor}
+                        label="Nomor Kelas"
+                        value={
+                          editNomorKelas.nomor === undefined
+                            ? editNomorKelas
+                            : editNomorKelas.nomor
+                        }
                         onChange={(e) => setEditNomorkelas(e.target.value)}
                       >
                         {dataKelas.map((e) => (
@@ -391,7 +485,69 @@ export default function Absensi() {
                         ))}
                       </Select>
                     </FormControl>
-
+                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                      <InputLabel id="demo-simple-select-label">
+                        Keterangan
+                      </InputLabel>
+                      <Select
+                        sx={{
+                          height: 40,
+                        }}
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        label="Keterangan"
+                        value={editKeterangan}
+                        onChange={(e) => setEditKeterangan(e.target.value)}
+                      >
+                        {dataKeterangan.map((e) => (
+                          <MenuItem key={e.id} value={e.value}>
+                            {e.value}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    {editKeterangan === "IZIN" ? (
+                      <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                        <TextField
+                          size="small"
+                          id="outlined"
+                          label="Alasan"
+                          type="text"
+                          value={editAlasan}
+                          onChange={(e) => setEditAlasan(e.target.value)}
+                        />
+                      </FormControl>
+                    ) : null}
+                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                      <TextField
+                        size="small"
+                        id="outlined"
+                        label="Tanggal"
+                        type="text"
+                        value={editHari}
+                        onChange={(e) => setEditHari(e.target.value)}
+                      />
+                    </FormControl>
+                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                      <TextField
+                        size="small"
+                        id="outlined"
+                        label="Bulan"
+                        type="text"
+                        value={editBulan}
+                        onChange={(e) => setEditBulan(e.target.value)}
+                      />
+                    </FormControl>
+                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                      <TextField
+                        size="small"
+                        id="outlined"
+                        label="Tahun"
+                        type="text"
+                        value={editTahun}
+                        onChange={(e) => setEditTahun(e.target.value)}
+                      />
+                    </FormControl>
                     <Button
                       style={{
                         marginTop: 30,
