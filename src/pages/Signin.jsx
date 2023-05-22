@@ -30,6 +30,7 @@ export default function Signin() {
             res.data.accessToken,
             `${import.meta.env.VITE_KEY_ENCRYPT}`
           );
+          console.log(res.data.accessToken);
           localStorage.setItem("token", encrpyt);
           navigate("/");
           // Example -> Decrypt

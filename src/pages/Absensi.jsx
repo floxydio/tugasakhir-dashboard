@@ -63,6 +63,13 @@ export default function Absensi() {
   const [editBulan, setEditBulan] = React.useState("");
   const [editTahun, setEditTahun] = React.useState("");
   const [editWaktu, setEditWaktu] = React.useState("");
+  const [dataGuru, setDataGuru] = React.useState([]);
+  const [dataPelajaran, setDataPelajaran] = React.useState([]);
+  const [dataKelas, setDataKelas] = React.useState([]);
+  const [editValueGuru, setDataValueGuru] = React.useState("");
+  const [editValueKelas, setDataValueKelas] = React.useState("");
+  const [editValuePelajaran, setDataValuePelajaran] = React.useState("");
+
   function handleOpen(
     id,
     namaUser,
@@ -88,6 +95,43 @@ export default function Absensi() {
     setEditTahun(tahun);
     setEditWaktu(waktu);
     setOpen(true);
+    console.log(nomorKelas);
+
+    async function getGuru() {
+      setLoading(true);
+      await axios
+        .get("http://103.174.115.58:3000/v1/guru")
+        .then(function (res) {
+          setDataValueGuru(
+            res.data.data.find((item) => item.nama === namaGuru)
+          );
+          setDataGuru(res.data.data);
+          setLoading(false);
+        });
+    }
+    async function getPelajaran() {
+      await axios
+        .get("http://103.174.115.58:3000/v1/find-pelajaran")
+        .then(function (res) {
+          setDataValuePelajaran(
+            res.data.data.find((item) => item.nama === pelajaran)
+          );
+          setDataPelajaran(res.data.data);
+        });
+    }
+    async function getKelas() {
+      await axios
+        .get("http://103.174.115.58:3000/v1/kelas")
+        .then(function (res) {
+          setDataValueKelas(
+            res.data.data.find((item) => item.nomor === nomorKelas)
+          );
+          setDataKelas(res.data.data);
+        });
+    }
+    getGuru();
+    getPelajaran();
+    getKelas();
   }
 
   function filterData() {
@@ -164,7 +208,9 @@ export default function Absensi() {
               onChange={(e) => setFilterMonth(e.target.value)}
             >
               {MonthModels.map((e) => (
-                <MenuItem value={e.value}>{e.name}</MenuItem>
+                <MenuItem key={e.value} value={e.value}>
+                  {e.name}
+                </MenuItem>
               ))}
             </Select>
           </FormControl>
@@ -294,10 +340,58 @@ export default function Absensi() {
                     <Typography variant="h5" sx={{ textAlign: "center" }}>
                       Edit Data
                     </Typography>
-                    <TextField
-                      value={editNamaGuru}
-                      onChange={(e) => setNamaGuru(e.target.value)}
-                    ></TextField>
+                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                      <Select
+                        sx={{
+                          height: 40,
+                        }}
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        value={editValueGuru.id}
+                        onChange={(e) => setNamaGuru(e.target.value)}
+                      >
+                        {dataGuru.map((e) => (
+                          <MenuItem key={e.id} value={e.id}>
+                            {e.nama}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                      <Select
+                        sx={{
+                          height: 40,
+                        }}
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        value={editValuePelajaran.id}
+                        onChange={(e) => setEditPelajaran(e.target.value)}
+                      >
+                        {dataPelajaran.map((e) => (
+                          <MenuItem key={e.id} value={e.id}>
+                            {e.nama}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                      <Select
+                        sx={{
+                          height: 40,
+                        }}
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        value={editValueKelas.nomor}
+                        onChange={(e) => setEditNomorkelas(e.target.value)}
+                      >
+                        {dataKelas.map((e) => (
+                          <MenuItem key={e.id} value={e.nomor}>
+                            Nomor Kelas : {e.nomor}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+
                     <Button
                       style={{
                         marginTop: 30,
