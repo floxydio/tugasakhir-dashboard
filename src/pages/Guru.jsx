@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import BarLoader from 'react-spinners/BarLoader.js';
 import { RatingModels } from '../models/Rating_models';
+import { GuruModels } from '../models/Guru_models';
 import {
   Box,
   Table,
@@ -25,7 +26,6 @@ import {
 const textFieldStyle = {
   marginBottom: 10,
   marginTop: 10,
-  width: 350,
 };
 
 const boxStyle = {
@@ -68,7 +68,6 @@ export default function Guru() {
   const handleOpen = () => setOpenTambahGuru(true);
   const handleClose = () => setOpenTambahGuru(false);
 
-  // const handleOpenEdit = () => setOpenEditData(true);
   function handleOpenEdit(id, namaGuru, namaMengajar, status_guru, rating) {
     setEditId(id);
     setEditNamaGuru(namaGuru);
@@ -81,19 +80,15 @@ export default function Guru() {
 
   function filterData() {
     let params = {};
-    console.log(orderBy);
-    console.log(rating);
     if (rating === '' && orderBy !== '') {
       params = {
         orderby: orderBy,
       };
-      console.log('lari ke 1');
     } else if (rating !== '' && orderBy !== '') {
       params = {
         rating: rating,
         orderby: orderBy,
       };
-      console.log('lari ke 2');
     }
     async function getDataGuruFilterOrderBy() {
       await axios
@@ -108,6 +103,7 @@ export default function Guru() {
   }
 
   useEffect(() => {
+    setLoading(true);
     async function findGuru() {
       await axios.get('http://103.174.115.58:3000/v1/guru').then((result) => {
         setGuru(result.data.data);
@@ -119,32 +115,24 @@ export default function Guru() {
 
   async function checkData(e) {
     e.preventDefault();
-    await axios
-      .post(
-        'http://103.174.115.58:3000/v1/guru',
-        {
-          nama: newNama,
-          mengajar: newMengajar,
-          status_guru: newStatusGuru,
-          rating: newRating,
+    await axios.post(
+      'http://103.174.115.58:3000/v1/guru',
+      {
+        nama: newNama,
+        mengajar: newMengajar,
+        status_guru: newStatusGuru,
+        rating: newRating,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
-        {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-        }
-      )
-      .then((res) => {
-        if ((res.status === 200) | (res.status === 201)) {
-          console.log('Response: ', res);
-        }
-      });
+      }
+    );
   }
 
   async function handleEdit(e) {
     e.preventDefault();
-    console.log('Masuk Handle Edit nya');
-    console.log(editId);
     await axios
       .put(
         `http://103.174.115.58:3000/v1/edit-guru/${editId}`,
@@ -172,12 +160,8 @@ export default function Guru() {
               });
           }
           findGuru();
-
-          console.log('Response: ', res);
         }
       });
-
-    console.log('Kalo Ini Keliatan Arti nya Bisa');
   }
 
   return (
@@ -201,18 +185,23 @@ export default function Guru() {
           ))}
         </Select>
       </FormControl>
-      <Select
-        value={orderBy}
-        onChange={(e) => setOrderBy(e.target.value)}
-        style={{
-          padding: '10px',
-          marginBottom: 30,
-          height: 40,
-        }}
-      >
-        <option value="DESC">Filter by Descending</option>
-        <option value="ASC">Filter by Ascending</option>
-      </Select>
+      <FormControl sx={{ m: 1, minWidth: 120, bottom: 8 }} size="small">
+        <InputLabel id="demo-simple-select-label">Filter</InputLabel>
+        <Select
+          labelId="demo-simple-select-label"
+          id="demo-simple-select"
+          label="Filter"
+          value={orderBy}
+          onChange={(e) => setOrderBy(e.target.value)}
+          sx={{
+            padding: '10px',
+            height: 40,
+          }}
+        >
+          <MenuItem value="DESC">Filter by Descending</MenuItem>
+          <MenuItem value="ASC">Filter by Ascending</MenuItem>
+        </Select>
+      </FormControl>
       <Button sx={{ marginLeft: 3 }} onClick={filterData} variant="contained">
         Filter
       </Button>
@@ -221,6 +210,7 @@ export default function Guru() {
         style={{
           float: 'right',
         }}
+        variant="contained"
       >
         Tambah Guru
       </Button>
@@ -279,7 +269,7 @@ export default function Guru() {
                             )
                           }
                           style={{
-                            float: 'right',
+                            float: 'left',
                           }}
                           variant="contained"
                         >
@@ -302,62 +292,60 @@ export default function Guru() {
               >
                 Masukkan Data Guru
               </Typography>
-              <form
-                style={{
+              <FormControl
+                sx={{
                   display: 'flex',
                   justifyContent: 'center',
                 }}
               >
-                <FormControl>
-                  <TextField
-                    required
-                    id="outlined"
-                    label="Nama"
-                    type="text"
-                    onChange={(e) => setNewNama(e.target.value)}
-                    style={textFieldStyle}
-                  />
-                  <TextField
-                    required
-                    id="outlined"
-                    label="Mengajar"
-                    type="text"
-                    onChange={(e) => setNewMengajar(e.target.value)}
-                    style={textFieldStyle}
-                  />
-                  <TextField
-                    required
-                    id="outlined-number-status_aktif"
-                    label="Status Guru"
-                    type="number"
-                    onChange={(e) => setNewStatusGuru(e.target.value)}
-                    style={textFieldStyle}
-                  />
-                  <TextField
-                    required
-                    id="outlined-number-rating"
-                    label="Rating"
-                    type="number"
-                    onChange={(e) => setNewRating(e.target.value)}
-                    style={textFieldStyle}
-                  />
-                  <button
-                    onClick={(e) => checkData(e)}
-                    type="submit"
-                    style={{
-                      marginTop: 20,
-                      height: 45,
-                      backgroundColor: 'blue',
-                      color: 'white',
-                      fontWeight: 'bold',
-                      borderColor: 'transparent',
-                      borderRadius: 20,
-                    }}
-                  >
-                    Submit
-                  </button>
-                </FormControl>
-              </form>
+                <TextField
+                  required
+                  id="outlined"
+                  label="Nama"
+                  type="text"
+                  onChange={(e) => setNewNama(e.target.value)}
+                  style={textFieldStyle}
+                />
+                <TextField
+                  required
+                  id="outlined"
+                  label="Mengajar"
+                  type="text"
+                  onChange={(e) => setNewMengajar(e.target.value)}
+                  style={textFieldStyle}
+                />
+                <TextField
+                  required
+                  id="outlined-number-status_aktif"
+                  label="Status Guru"
+                  type="number"
+                  onChange={(e) => setNewStatusGuru(e.target.value)}
+                  style={textFieldStyle}
+                />
+                <TextField
+                  required
+                  id="outlined-number-rating"
+                  label="Rating"
+                  type="number"
+                  onChange={(e) => setNewRating(e.target.value)}
+                  style={textFieldStyle}
+                />
+                <Button
+                  onClick={(e) => checkData(e)}
+                  type="submit"
+                  sx={{
+                    height: 45,
+                    backgroundColor: 'blue',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    borderColor: 'transparent',
+                    borderRadius: 20,
+                    marginTop: 2,
+                  }}
+                >
+                  Submit
+                </Button>
+              </FormControl>
             </Box>
           </Modal>
           <Modal
