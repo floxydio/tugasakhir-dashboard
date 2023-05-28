@@ -13,6 +13,7 @@ import {
   Button,
   Chip,
   FormControl,
+  InputAdornment,
   InputLabel,
   MenuItem,
   Select,
@@ -22,6 +23,7 @@ import "../style/absensi.css";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
+import { AccountCircle, Search } from "@mui/icons-material";
 
 const override = (React.CSSProperties = {
   transform: "translate(-50%, -50%)",
@@ -50,6 +52,10 @@ export default function Absensi() {
   const [month, setFilterMonth] = React.useState("");
   const tableRef = React.useRef(null);
   const [loading, setLoading] = React.useState(false);
+  const [search, setSearch] = React.useState(undefined);
+  const [isThrottled, setIsThrottled] = React.useState(false);
+
+  //
   const [open, setOpen] = React.useState(false);
   const handleClose = () => setOpen(false);
   const [editId, setEditId] = React.useState("");
@@ -63,6 +69,8 @@ export default function Absensi() {
   const [editBulan, setEditBulan] = React.useState("");
   const [editTahun, setEditTahun] = React.useState("");
   const [editWaktu, setEditWaktu] = React.useState("");
+
+  //
   const [dataGuru, setDataGuru] = React.useState([]);
   const [dataPelajaran, setDataPelajaran] = React.useState([]);
   const [dataKelas, setDataKelas] = React.useState([]);
@@ -150,24 +158,58 @@ export default function Absensi() {
     await getKelas();
   }
 
-  function filterData() {
+  async function filterData() {
+    setAbsenData([]);
     let params = {};
-    if (month === "" && filterGuru === "" && orderBy !== "") {
+    if (
+      month === "" &&
+      filterGuru === "" &&
+      orderBy !== "" &&
+      search === undefined
+    ) {
       params = {
         orderby: orderBy,
       };
-    } else if (month !== "" && filterGuru === "" && orderBy !== "") {
+    } else if (
+      month !== "" &&
+      filterGuru === "" &&
+      orderBy !== "" &&
+      search === undefined
+    ) {
       params = {
         month: month,
         orderby: orderBy,
       };
-    } else if (month !== "" && filterGuru !== "" && orderBy !== "") {
+    } else if (
+      month !== "" &&
+      filterGuru !== "" &&
+      orderBy !== "" &&
+      search === undefined
+    ) {
       params = {
         gurunama: filterGuru,
         month: month,
         orderby: orderBy,
       };
+      //aa
+    } else if (
+      month === "" &&
+      filterGuru === "" &&
+      orderBy !== "" &&
+      search !== undefined
+    ) {
+      params = {
+        search: search,
+        orderby: orderBy,
+      };
+    } else if (month !== "" && filterGuru === "" && orderBy !== "") {
+      params = {
+        search: search,
+        month: month,
+        orderby: orderBy,
+      };
     }
+    console.log(params);
     async function getAbsenFilterOrderBy() {
       await axios
         .get("http://103.174.115.58:3000/v1/absen", {
@@ -175,6 +217,7 @@ export default function Absensi() {
         })
         .then((res) => {
           setAbsenData(res.data.data);
+          console.log(res.data.data);
         });
     }
     getAbsenFilterOrderBy();
@@ -223,21 +266,37 @@ export default function Absensi() {
         },
       })
       .then((res) => {
-        if(res.status === 200) {
+        if (res.status === 200) {
           handleClose();
           async function getAbsen() {
             setLoading(true);
-            await axios.get("http://103.174.115.58:3000/v1/absen").then((res) => {
-              setAbsenData(res.data.data);
-              setLoading(false);
-            });
+            await axios
+              .get("http://103.174.115.58:3000/v1/absen")
+              .then((res) => {
+                setAbsenData(res.data.data);
+                setLoading(false);
+              });
           }
           getAbsen();
         }
       });
   }
 
+  const handleChangeThrottle = async () => {
+    if (!isThrottled) {
+      // Execute the action
+      await filterData();
+
+      // Set throttling
+      setIsThrottled(true);
+      setTimeout(() => {
+        setIsThrottled(false);
+      }, 1000);
+    }
+  };
+
   React.useEffect(() => {
+    console.log("useEffect Triggered");
     async function getAbsen() {
       setLoading(true);
       await axios.get("http://103.174.115.58:3000/v1/absen").then((res) => {
@@ -251,6 +310,21 @@ export default function Absensi() {
 
   return (
     <>
+      <TextField
+        id="input-with-icon-textfield"
+        label="Search"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <Search />
+            </InputAdornment>
+          ),
+        }}
+        onChange={(e) => {
+          setSearch(e.target.value), handleChangeThrottle();
+        }}
+        variant="standard"
+      />
       <div className="filter_style">
         <Button
           className="btn_absen"
