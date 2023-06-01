@@ -21,7 +21,9 @@ import {
   Select,
   MenuItem,
   Chip,
+  InputAdornment,
 } from '@mui/material';
+import { Search } from '@mui/icons-material';
 
 const textFieldStyle = {
   marginBottom: 10,
@@ -64,6 +66,8 @@ export default function Guru() {
   const [newMengajar, setNewMengajar] = useState('');
   const [newStatusGuru, setNewStatusGuru] = useState('');
   const [newRating, setNewRating] = useState('');
+  const [search, setSearch] = useState(undefined);
+  const [isThrottled, setIsThrottled] = useState(false);
 
   const handleOpen = () => setOpenTambahGuru(true);
   const handleClose = () => setOpenTambahGuru(false);
@@ -78,18 +82,30 @@ export default function Guru() {
   }
   const handleCloseEdit = () => setOpenEditData(false);
 
-  function filterData() {
+  async function filterData() {
     let params = {};
-    if (rating === '' && orderBy !== '') {
+    if (rating === '' && orderBy !== '' && search === undefined) {
       params = {
         orderby: orderBy,
       };
-    } else if (rating !== '' && orderBy !== '') {
+      console.log('lari ke 1');
+    } else if (rating !== '' && orderBy !== '' && search !== undefined) {
+      params = {
+        rating: rating,
+        orderby: orderBy,
+        search: search,
+      };
+      console.log('lari ke 2');
+    } else if (rating !== '' && orderBy !== '' && search === undefined) {
       params = {
         rating: rating,
         orderby: orderBy,
       };
+      console.log('lari ke 3');
+    }else if (rating === '' && orderBy !== ''  && search !== undefined){
+      
     }
+    
     async function getDataGuruFilterOrderBy() {
       await axios
         .get('http://103.174.115.58:3000/v1/guru', {
@@ -131,6 +147,19 @@ export default function Guru() {
     );
   }
 
+  const handleChangeThrottle = async () => {
+    if (!isThrottled) {
+      // Execute the Action
+      await filterData();
+
+      // Set Throttling
+      setIsThrottled(true);
+      setTimeout(() => {
+        setIsThrottled(false);
+      }, {});
+    }
+  };
+
   async function handleEdit(e) {
     e.preventDefault();
     await axios
@@ -166,6 +195,21 @@ export default function Guru() {
 
   return (
     <>
+      <TextField
+        id="input-with-icon-textfield"
+        label="Search"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <Search />
+            </InputAdornment>
+          ),
+        }}
+        onChange={(e) => {
+          setSearch(e.target.value), handleChangeThrottle();
+        }}
+        variant="standard"
+      />
       <FormControl sx={{ m: 1, minWidth: 120, bottom: 8 }} size="small">
         <InputLabel id="demo-simple-select-label">Rating</InputLabel>
         <Select
