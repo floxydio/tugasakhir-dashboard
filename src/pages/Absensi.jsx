@@ -25,6 +25,8 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import { AccountCircle, Close, Search } from "@mui/icons-material";
+import axiosNew from "../components/AxiosConfig";
+import cryptoJS from "crypto-js";
 
 const override = (React.CSSProperties = {
   transform: "translate(-50%, -50%)",
@@ -98,6 +100,8 @@ export default function Absensi() {
 
   const [dataUser, setDataUser] = React.useState([]);
 
+  const token = localStorage.getItem("token");
+
   const dataKeterangan = [
     { id: 1, value: "ABSEN" },
     { id: 2, value: "IZIN" },
@@ -131,21 +135,25 @@ export default function Absensi() {
 
     async function getGuru() {
       setLoading(true);
-      await axios
-        .get("http://103.174.115.58:3000/v1/guru")
-        .then(function (res) {
-          setDataValueGuru(
-            res.data.data.find((item) => item.nama === namaGuru)
-          );
-          setNamaGuru(res.data.data.find((item) => item.nama === namaGuru));
-          setDataGuru(res.data.data);
-          setLoading(false);
-        });
+      await axiosNew.get("/guru").then(function (res) {
+        setDataValueGuru(res.data.data.find((item) => item.nama === namaGuru));
+        setNamaGuru(res.data.data.find((item) => item.nama === namaGuru));
+        setDataGuru(res.data.data);
+        setLoading(false);
+      });
     }
     async function getPelajaran() {
+      const decrypt = cryptoJS.AES.decrypt(
+        token,
+        `${import.meta.env.VITE_KEY_ENCRYPT}`
+      );
       setLoading(true);
-      await axios
-        .get("http://103.174.115.58:3000/v1/find-pelajaran")
+      await axiosNew
+        .get("/find-pelajaran", {
+          headers: {
+            "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
+          },
+        })
         .then(function (res) {
           setDataValuePelajaran(
             res.data.data.find((item) => item.nama === pelajaran)
@@ -160,18 +168,16 @@ export default function Absensi() {
     async function getKelas() {
       setLoading(true);
 
-      await axios
-        .get("http://103.174.115.58:3000/v1/kelas")
-        .then(function (res) {
-          setDataValueKelas(
-            res.data.data.find((item) => item.nomor === nomorKelas)
-          );
-          setEditNomorkelas(
-            res.data.data.find((item) => item.nomor === nomorKelas)
-          );
-          setDataKelas(res.data.data);
-          setLoading(false);
-        });
+      await axiosNew.get("/kelas").then(function (res) {
+        setDataValueKelas(
+          res.data.data.find((item) => item.nomor === nomorKelas)
+        );
+        setEditNomorkelas(
+          res.data.data.find((item) => item.nomor === nomorKelas)
+        );
+        setDataKelas(res.data.data);
+        setLoading(false);
+      });
     }
     await getGuru();
     await getPelajaran();
@@ -180,11 +186,19 @@ export default function Absensi() {
 
   async function handleOpenAbsenManual() {
     setOpenManual(true);
+    const decrypt = cryptoJS.AES.decrypt(
+      token,
+      `${import.meta.env.VITE_KEY_ENCRYPT}`
+    );
 
     async function getDataUser() {
       setLoading(true);
-      await axios
-        .get("http://103.174.115.58:3000/v1/list-users")
+      await axiosNew
+        .get("/list-users", {
+          headers: {
+            "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
+          },
+        })
         .then(function (res) {
           setDataUser(res.data.data);
           setLoading(false);
@@ -193,17 +207,19 @@ export default function Absensi() {
 
     async function getGuru() {
       setLoading(true);
-      await axios
-        .get("http://103.174.115.58:3000/v1/guru")
-        .then(function (res) {
-          setDataGuru(res.data.data);
-          setLoading(false);
-        });
+      await axiosNew.get("/guru").then(function (res) {
+        setDataGuru(res.data.data);
+        setLoading(false);
+      });
     }
     async function getPelajaran() {
       setLoading(true);
-      await axios
-        .get("http://103.174.115.58:3000/v1/find-pelajaran")
+      await axiosNew
+        .get("/find-pelajaran", {
+          headers: {
+            "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
+          },
+        })
         .then(function (res) {
           setDataPelajaran(res.data.data);
           setLoading(false);
@@ -212,12 +228,10 @@ export default function Absensi() {
     async function getKelas() {
       setLoading(true);
 
-      await axios
-        .get("http://103.174.115.58:3000/v1/kelas")
-        .then(function (res) {
-          setDataKelas(res.data.data);
-          setLoading(false);
-        });
+      await axiosNew.get("/kelas").then(function (res) {
+        setDataKelas(res.data.data);
+        setLoading(false);
+      });
     }
     await getGuru();
     await getPelajaran();
@@ -226,6 +240,10 @@ export default function Absensi() {
   }
 
   async function filterData() {
+    const decrypt = cryptoJS.AES.decrypt(
+      token,
+      `${import.meta.env.VITE_KEY_ENCRYPT}`
+    );
     setAbsenData([]);
     let params = {};
     if (
@@ -276,21 +294,26 @@ export default function Absensi() {
         orderby: orderBy,
       };
     }
-    console.log(params);
     async function getAbsenFilterOrderBy() {
-      await axios
-        .get("http://103.174.115.58:3000/v1/absen", {
+      await axiosNew
+        .get("/absen", {
           params: params,
+          headers: {
+            "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
+          },
         })
         .then((res) => {
           setAbsenData(res.data.data);
-          console.log(res.data.data);
         });
     }
     getAbsenFilterOrderBy();
   }
 
   async function submitEdit() {
+    const decrypt = cryptoJS.AES.decrypt(
+      token,
+      `${import.meta.env.VITE_KEY_ENCRYPT}`
+    );
     let formData = {};
     if (editKeterangan === "IZIN") {
       formData = {
@@ -326,10 +349,11 @@ export default function Absensi() {
       };
     }
 
-    await axios
-      .put(`http://103.174.115.58:3000/v1/edit-absen/${editId}`, formData, {
+    await axiosNew
+      .put(`/edit-absen/${editId}`, formData, {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
+          "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
         },
       })
       .then((res) => {
@@ -337,12 +361,10 @@ export default function Absensi() {
           handleClose();
           async function getAbsen() {
             setLoading(true);
-            await axios
-              .get("http://103.174.115.58:3000/v1/absen")
-              .then((res) => {
-                setAbsenData(res.data.data);
-                setLoading(false);
-              });
+            await axiosNew.get("/absen").then((res) => {
+              setAbsenData(res.data.data);
+              setLoading(false);
+            });
           }
           getAbsen();
         }
@@ -350,6 +372,10 @@ export default function Absensi() {
   }
 
   async function submitManual() {
+    const decrypt = cryptoJS.AES.decrypt(
+      token,
+      `${import.meta.env.VITE_KEY_ENCRYPT}`
+    );
     let formData = {};
     if (editKeterangan === "IZIN") {
       formData = {
@@ -380,10 +406,11 @@ export default function Absensi() {
       };
     }
 
-    await axios
-      .post(`http://103.174.115.58:3000/v1/absen`, formData, {
+    await axiosNew
+      .post(`/absen`, formData, {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
+          "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
         },
       })
       .then((res) => {
@@ -391,12 +418,10 @@ export default function Absensi() {
           handleCloseManual();
           async function getAbsen() {
             setLoading(true);
-            await axios
-              .get("http://103.174.115.58:3000/v1/absen")
-              .then((res) => {
-                setAbsenData(res.data.data);
-                setLoading(false);
-              });
+            await axiosNew.get("/absen").then((res) => {
+              setAbsenData(res.data.data);
+              setLoading(false);
+            });
           }
           getAbsen();
         }
@@ -414,13 +439,22 @@ export default function Absensi() {
   };
 
   React.useEffect(() => {
-    console.log("useEffect Triggered");
     async function getAbsen() {
       setLoading(true);
-      await axios.get("http://103.174.115.58:3000/v1/absen").then((res) => {
-        setAbsenData(res.data.data);
-        setLoading(false);
-      });
+      const decrypt = cryptoJS.AES.decrypt(
+        token,
+        `${import.meta.env.VITE_KEY_ENCRYPT}`
+      );
+      await axiosNew
+        .get("/absen", {
+          headers: {
+            "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
+          },
+        })
+        .then((res) => {
+          setAbsenData(res.data.data);
+          setLoading(false);
+        });
     }
     getAbsen();
     setGetMonth(new Date().getMonth() + 1);
@@ -892,7 +926,7 @@ export default function Absensi() {
                         size="small"
                         id="outlined"
                         label="Tanggal"
-                        type="text"
+                        type="number"
                         value={addHari}
                         onChange={(e) => setAddHari(e.target.value)}
                       />
@@ -902,7 +936,7 @@ export default function Absensi() {
                         size="small"
                         id="outlined"
                         label="Bulan"
-                        type="text"
+                        type="number"
                         value={addBulan}
                         onChange={(e) => setAddBulan(e.target.value)}
                       />
@@ -912,7 +946,7 @@ export default function Absensi() {
                         size="small"
                         id="outlined"
                         label="Tahun"
-                        type="text"
+                        type="number"
                         value={addTahun}
                         onChange={(e) => setAddTahun(e.target.value)}
                       />

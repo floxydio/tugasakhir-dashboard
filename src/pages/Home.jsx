@@ -8,23 +8,31 @@ import Typography from "@mui/material/Typography";
 import { Stack } from "@mui/material";
 import { Diversity3TwoTone, Person } from "@mui/icons-material";
 import axios from "axios";
-
+import axiosNew from "../components/AxiosConfig";
+import cryptoJS from "crypto-js";
 export default function Home() {
   const [murid, setMurid] = useState([]);
   const [guru, setGuru] = useState([]);
-
+  const token = localStorage.getItem("token");
   useEffect(() => {
     function getDataUser() {
-      axios
-        .get("http://103.174.115.58:3000/v1/list-users")
+      const decrypt = cryptoJS.AES.decrypt(
+        token,
+        `${import.meta.env.VITE_KEY_ENCRYPT}`
+      );
+      axiosNew
+        .get("/list-users", {
+          headers: {
+            "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
+          },
+        })
         .then(function (res) {
           setMurid(res.data.data);
         });
     }
     function getGuru() {
-      axios.get("http://103.174.115.58:3000/v1/guru").then(function (res) {
+      axiosNew.get("/guru").then(function (res) {
         setGuru(res.data.data);
-        setLoading(false);
       });
     }
     getDataUser();

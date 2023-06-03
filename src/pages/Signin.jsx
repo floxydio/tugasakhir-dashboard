@@ -1,25 +1,26 @@
 import { Button, Container, TextField, Typography } from "@mui/material";
-import axios from "axios";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import cryptoJS from "crypto-js";
-
+import axiosNew from "../components/AxiosConfig";
+import Avatar from "@mui/material/Avatar";
+import iconIniss from "../assets/icon.jpg";
 export default function Signin() {
   const navigate = useNavigate();
 
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
 
-  function handleKeyPress(event){
+  function handleKeyPress(event) {
     if (event.key === "Enter") {
       fetchSignInData();
     }
-  };
+  }
 
   function fetchSignInData() {
-    axios
+    axiosNew
       .post(
-        "http://103.174.115.58:3000/v1/sign-in",
+        "/sign-in",
         {
           username: username,
           password: password,
@@ -53,13 +54,17 @@ export default function Signin() {
           position: "absolute",
         }}
       >
+        <Avatar
+          src={iconIniss}
+          sx={{ width: 250, height: 250, margin: "0 auto" }}
+        />
         <Typography
           variant="h5"
           style={{
             textAlign: "center",
           }}
         >
-          Sign In Your Account
+          Login Area
         </Typography>
         <div
           onKeyDown={handleKeyPress}
@@ -75,6 +80,7 @@ export default function Signin() {
           <TextField
             id="outlined-basic"
             label="Username"
+            placeholder="Input Username anda..."
             variant="outlined"
             onChange={(e) => setUsername(e.target.value)}
           />
@@ -82,6 +88,7 @@ export default function Signin() {
             id="outlined-basic"
             label="Password"
             variant="outlined"
+            placeholder="Input Password anda..."
             type="password"
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -90,6 +97,7 @@ export default function Signin() {
             variant="contained"
             style={{
               marginTop: "40px",
+              height: 60,
             }}
           >
             Sign In

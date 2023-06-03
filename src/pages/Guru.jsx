@@ -24,6 +24,8 @@ import {
   InputAdornment,
 } from "@mui/material";
 import { Search } from "@mui/icons-material";
+import axiosNew from "../components/AxiosConfig";
+import cryptoJS from "crypto-js";
 
 const textFieldStyle = {
   marginBottom: 10,
@@ -72,6 +74,8 @@ export default function Guru() {
   const handleOpen = () => setOpenTambahGuru(true);
   const handleClose = () => setOpenTambahGuru(false);
 
+  const token = localStorage.getItem("token");
+
   function handleOpenEdit(id, namaGuru, namaMengajar, status_guru, rating) {
     setEditId(id);
     setEditNamaGuru(namaGuru);
@@ -118,11 +122,17 @@ export default function Guru() {
         search: search,
       };
     }
-    console.log(params);
     async function getDataGuruFilterOrderBy() {
-      await axios
-        .get("http://103.174.115.58:3000/v1/guru", {
+      const decrypt = cryptoJS.AES.decrypt(
+        token,
+        `${import.meta.env.VITE_KEY_ENCRYPT}`
+      );
+      await axiosNew
+        .get("/guru", {
           params: params,
+          headers: {
+            "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
+          },
         })
         .then((res) => {
           setGuru(res.data.data);
@@ -134,19 +144,32 @@ export default function Guru() {
   useEffect(() => {
     setLoading(true);
     async function findGuru() {
-      await axios.get("http://103.174.115.58:3000/v1/guru").then((result) => {
-        console.log(result.data.data);
-        setGuru(result.data.data);
-        setLoading(false);
-      });
+      const decrypt = cryptoJS.AES.decrypt(
+        token,
+        `${import.meta.env.VITE_KEY_ENCRYPT}`
+      );
+      await axiosNew
+        .get("/guru", {
+          headers: {
+            "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
+          },
+        })
+        .then((result) => {
+          setGuru(result.data.data);
+          setLoading(false);
+        });
     }
     findGuru();
   }, []);
 
   async function checkData(e) {
     e.preventDefault();
-    await axios.post(
-      "http://103.174.115.58:3000/v1/guru",
+    const decrypt = cryptoJS.AES.decrypt(
+      token,
+      `${import.meta.env.VITE_KEY_ENCRYPT}`
+    );
+    await axiosNew.post(
+      "/guru",
       {
         nama: newNama,
         mengajar: newMengajar,
@@ -156,6 +179,7 @@ export default function Guru() {
       {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
+          "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
         },
       }
     );
@@ -163,7 +187,6 @@ export default function Guru() {
 
   const handleChangeThrottle = async () => {
     if (!isThrottled) {
-      console.log("Throttle");
       await filterData();
       setIsThrottled(true);
       setTimeout(() => {
@@ -174,9 +197,13 @@ export default function Guru() {
 
   async function handleEdit(e) {
     e.preventDefault();
-    await axios
+    const decrypt = cryptoJS.AES.decrypt(
+      token,
+      `${import.meta.env.VITE_KEY_ENCRYPT}`
+    );
+    await axiosNew
       .put(
-        `http://103.174.115.58:3000/v1/edit-guru/${editId}`,
+        `/edit-guru/${editId}`,
         {
           nama: editNamaGuru,
           mengajar: editNamaMengajar,
@@ -186,6 +213,7 @@ export default function Guru() {
         {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
+            "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
           },
         }
       )
@@ -193,12 +221,10 @@ export default function Guru() {
         if (res.status === 200 || res.status === 201) {
           setOpenEditData(false);
           async function findGuru() {
-            await axios
-              .get("http://103.174.115.58:3000/v1/guru")
-              .then((result) => {
-                setGuru(result.data.data);
-                setLoading(false);
-              });
+            await axiosNew.get("/guru").then((result) => {
+              setGuru(result.data.data);
+              setLoading(false);
+            });
           }
           findGuru();
         }

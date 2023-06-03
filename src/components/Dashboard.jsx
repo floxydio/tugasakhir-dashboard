@@ -26,6 +26,7 @@ import Home from "../pages/Home";
 import cryptoJS from "crypto-js";
 import imgIcon from "../assets/icon.jpg";
 import Mapel from "../pages/Mapel";
+import axiosNew from "./AxiosConfig";
 
 function ResponsiveDrawer(props) {
   const { window } = props;
@@ -41,20 +42,29 @@ function ResponsiveDrawer(props) {
         token,
         `${import.meta.env.VITE_KEY_ENCRYPT}`
       );
-      await axios
-        .get("http://103.174.115.58:3000/v1/refresh-token", {
-          headers: {
-            "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
-          },
-        })
-        .then((res) => {
-          if (res.status === 200) {
-            setData(res.data.data);
-          } else {
-            navigate("/sign-in");
-            localStorage.removeItem("token");
-          }
-        });
+
+      if (
+        decrypt.toString(cryptoJS.enc.Utf8) === undefined ||
+        decrypt.toString(cryptoJS.enc.Utf8) === null
+      ) {
+        navigate("/sign-in");
+        localStorage.removeItem("token");
+      } else {
+        await axiosNew
+          .get("/refresh-token", {
+            headers: {
+              "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
+            },
+          })
+          .then((res) => {
+            if (res.status === 200) {
+              setData(res.data.data);
+            } else {
+              navigate("/sign-in");
+              localStorage.removeItem("token");
+            }
+          });
+      }
     }
     fetchDataRefresh();
   }, []);

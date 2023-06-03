@@ -7,13 +7,14 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import axios from "axios";
+import axiosNew from "../components/AxiosConfig";
 
 export default function Mapel() {
   const [dataPelajaran, setDataPelajaran] = React.useState([]);
 
   React.useEffect(() => {
     async function getMapel() {
-      await axios.get("http://103.174.115.58:3000/v1/pelajaran").then((res) => {
+      await axiosNew.get("/pelajaran").then((res) => {
         setDataPelajaran(res.data.data);
       });
     }
@@ -21,7 +22,6 @@ export default function Mapel() {
   }, []);
   return (
     <>
-    
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
