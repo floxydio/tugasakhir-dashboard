@@ -10,6 +10,12 @@ export default function Signin() {
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
 
+  function handleKeyPress(event){
+    if (event.key === "Enter") {
+      fetchSignInData();
+    }
+  };
+
   function fetchSignInData() {
     axios
       .post(
@@ -56,6 +62,8 @@ export default function Signin() {
           Sign In Your Account
         </Typography>
         <div
+          onKeyDown={handleKeyPress}
+          tabIndex={0}
           className="input__form"
           style={{
             marginTop: "50px",

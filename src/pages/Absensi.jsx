@@ -13,6 +13,7 @@ import {
   Button,
   Chip,
   FormControl,
+  IconButton,
   InputAdornment,
   InputLabel,
   MenuItem,
@@ -23,7 +24,7 @@ import "../style/absensi.css";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
-import { AccountCircle, Search } from "@mui/icons-material";
+import { AccountCircle, Close, Search } from "@mui/icons-material";
 
 const override = (React.CSSProperties = {
   transform: "translate(-50%, -50%)",
@@ -55,9 +56,26 @@ export default function Absensi() {
   const [search, setSearch] = React.useState(undefined);
   const [isThrottled, setIsThrottled] = React.useState(false);
 
+  // For Absen Manual
+  const [addUser, setAddUser] = React.useState("");
+  const [addNamaGuru, setAddNamaGuru] = React.useState("");
+  const [addNamaUser, setAddNamaUser] = React.useState("");
+  const [addPelajaran, setAddPelajaran] = React.useState("");
+  const [addNomorKelas, setAddNomorkelas] = React.useState("");
+  const [addKeterangan, setAddKeterangan] = React.useState("");
+  const [addAlasan, setAddAlasan] = React.useState("");
+  const [addHari, setAddHari] = React.useState("");
+  const [addBulan, setAddBulan] = React.useState("");
+  const [addTahun, setAddTahun] = React.useState("");
+  const [addWaktu, setAddWaktu] = React.useState("");
   //
+
   const [open, setOpen] = React.useState(false);
   const handleClose = () => setOpen(false);
+
+  const [openManual, setOpenManual] = React.useState(false);
+  const handleCloseManual = () => setOpenManual(false);
+
   const [editId, setEditId] = React.useState("");
   const [editNamaGuru, setNamaGuru] = React.useState("");
   const [editNamaUser, setEditNamaUser] = React.useState("");
@@ -77,6 +95,8 @@ export default function Absensi() {
   const [editValueGuru, setDataValueGuru] = React.useState("");
   const [editValueKelas, setDataValueKelas] = React.useState("");
   const [editValuePelajaran, setDataValuePelajaran] = React.useState("");
+
+  const [dataUser, setDataUser] = React.useState([]);
 
   const dataKeterangan = [
     { id: 1, value: "ABSEN" },
@@ -156,6 +176,53 @@ export default function Absensi() {
     await getGuru();
     await getPelajaran();
     await getKelas();
+  }
+
+  async function handleOpenAbsenManual() {
+    setOpenManual(true);
+
+    async function getDataUser() {
+      setLoading(true);
+      await axios
+        .get("http://103.174.115.58:3000/v1/list-users")
+        .then(function (res) {
+          setDataUser(res.data.data);
+          setLoading(false);
+        });
+    }
+
+    async function getGuru() {
+      setLoading(true);
+      await axios
+        .get("http://103.174.115.58:3000/v1/guru")
+        .then(function (res) {
+          setDataGuru(res.data.data);
+          setLoading(false);
+        });
+    }
+    async function getPelajaran() {
+      setLoading(true);
+      await axios
+        .get("http://103.174.115.58:3000/v1/find-pelajaran")
+        .then(function (res) {
+          setDataPelajaran(res.data.data);
+          setLoading(false);
+        });
+    }
+    async function getKelas() {
+      setLoading(true);
+
+      await axios
+        .get("http://103.174.115.58:3000/v1/kelas")
+        .then(function (res) {
+          setDataKelas(res.data.data);
+          setLoading(false);
+        });
+    }
+    await getGuru();
+    await getPelajaran();
+    await getKelas();
+    await getDataUser();
   }
 
   async function filterData() {
@@ -282,16 +349,67 @@ export default function Absensi() {
       });
   }
 
+  async function submitManual() {
+    let formData = {};
+    if (editKeterangan === "IZIN") {
+      formData = {
+        guru_id: addNamaGuru,
+        pelajaran_id: addPelajaran,
+        kelas_id: addNomorKelas,
+        user_id: addUser,
+        keterangan: addKeterangan,
+        reason: addAlasan,
+        day: addHari,
+        month: addBulan,
+        year: addTahun,
+        time: addWaktu,
+      };
+    } else {
+      formData = {
+        guru_id: addNamaGuru,
+        pelajaran_id: addPelajaran,
+        kelas_id: addNomorKelas,
+        keterangan: addKeterangan,
+
+        user_id: addUser,
+        reason: "-",
+        day: addHari,
+        month: addBulan,
+        year: addTahun,
+        time: addWaktu,
+      };
+    }
+
+    await axios
+      .post(`http://103.174.115.58:3000/v1/absen`, formData, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          handleCloseManual();
+          async function getAbsen() {
+            setLoading(true);
+            await axios
+              .get("http://103.174.115.58:3000/v1/absen")
+              .then((res) => {
+                setAbsenData(res.data.data);
+                setLoading(false);
+              });
+          }
+          getAbsen();
+        }
+      });
+  }
+
   const handleChangeThrottle = async () => {
     if (!isThrottled) {
-      // Execute the action
       await filterData();
-
-      // Set throttling
       setIsThrottled(true);
       setTimeout(() => {
         setIsThrottled(false);
-      }, 1000);
+      }, 500);
     }
   };
 
@@ -312,7 +430,7 @@ export default function Absensi() {
     <>
       <TextField
         id="input-with-icon-textfield"
-        label="Search"
+        label="Search Nama User"
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -331,7 +449,7 @@ export default function Absensi() {
           sx={{
             marginTop: 1,
           }}
-          onClick={handleOpen}
+          onClick={handleOpenAbsenManual}
           variant="contained"
         >
           Absen Manual
@@ -627,6 +745,193 @@ export default function Absensi() {
                         marginTop: 30,
                       }}
                       onClick={submitEdit}
+                      variant="contained"
+                    >
+                      Submit
+                    </Button>
+                  </div>
+                </Box>
+              </Modal>
+              {/* Manual Absen */}
+              <Modal
+                open={openManual}
+                onClose={handleCloseManual}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+              >
+                <Box sx={style}>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Typography variant="h5" sx={{ textAlign: "center" }}>
+                      Tambah Data Absen
+                    </Typography>
+                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                      <InputLabel id="demo-simple-select-label">
+                        Nama Guru
+                      </InputLabel>
+                      <Select
+                        sx={{
+                          height: 40,
+                        }}
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        label="Nama Guru"
+                        value={addNamaGuru}
+                        onChange={(e) => setAddNamaGuru(e.target.value)}
+                      >
+                        {dataGuru.map((e) => (
+                          <MenuItem key={e.id} value={e.id}>
+                            {e.nama}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                      <InputLabel id="demo-simple-select-label">
+                        Mata Pelajaran
+                      </InputLabel>
+
+                      <Select
+                        sx={{
+                          height: 40,
+                        }}
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        label="Mata Pelajaran"
+                        value={addPelajaran}
+                        onChange={(e) => setAddPelajaran(e.target.value)}
+                      >
+                        {dataPelajaran.map((e) => (
+                          <MenuItem key={e.id} value={e.id}>
+                            {e.nama}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                      <InputLabel id="demo-simple-select-label">
+                        Nomor Kelas
+                      </InputLabel>
+                      <Select
+                        sx={{
+                          height: 40,
+                        }}
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        label="Nomor Kelas"
+                        value={addNomorKelas}
+                        onChange={(e) => setAddNomorkelas(e.target.value)}
+                      >
+                        {dataKelas.map((e) => (
+                          <MenuItem key={e.id} value={e.nomor}>
+                            Nomor Kelas : {e.nomor}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                      <InputLabel id="demo-simple-select-label">
+                        Nama Siswa
+                      </InputLabel>
+                      <Select
+                        sx={{
+                          height: 40,
+                        }}
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        label="Nomor Kelas"
+                        value={addUser}
+                        onChange={(e) => setAddUser(e.target.value)}
+                      >
+                        {dataUser.map((e) => (
+                          <MenuItem key={e.id} value={e.id}>
+                            {e.nama}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                      <InputLabel id="demo-simple-select-label">
+                        Keterangan
+                      </InputLabel>
+                      <Select
+                        sx={{
+                          height: 40,
+                        }}
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        label="Keterangan"
+                        value={addKeterangan}
+                        onChange={(e) => setAddKeterangan(e.target.value)}
+                      >
+                        {dataKeterangan.map((e) => (
+                          <MenuItem key={e.id} value={e.value}>
+                            {e.value}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    {editKeterangan === "IZIN" ? (
+                      <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                        <TextField
+                          size="small"
+                          id="outlined"
+                          label="Alasan"
+                          type="text"
+                          value={addAlasan}
+                          onChange={(e) => setAddAlasan(e.target.value)}
+                        />
+                      </FormControl>
+                    ) : null}
+                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                      <TextField
+                        size="small"
+                        id="outlined"
+                        label="Tanggal"
+                        type="text"
+                        value={addHari}
+                        onChange={(e) => setAddHari(e.target.value)}
+                      />
+                    </FormControl>
+                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                      <TextField
+                        size="small"
+                        id="outlined"
+                        label="Bulan"
+                        type="text"
+                        value={addBulan}
+                        onChange={(e) => setAddBulan(e.target.value)}
+                      />
+                    </FormControl>
+                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                      <TextField
+                        size="small"
+                        id="outlined"
+                        label="Tahun"
+                        type="text"
+                        value={addTahun}
+                        onChange={(e) => setAddTahun(e.target.value)}
+                      />
+                    </FormControl>
+                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                      <TextField
+                        size="small"
+                        id="outlined"
+                        label="Waktu"
+                        type="text"
+                        value={addWaktu}
+                        onChange={(e) => setAddWaktu(e.target.value)}
+                      />
+                    </FormControl>
+                    <Button
+                      style={{
+                        marginTop: 30,
+                      }}
+                      onClick={submitManual}
                       variant="contained"
                     >
                       Submit
