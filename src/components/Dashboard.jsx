@@ -27,6 +27,7 @@ import cryptoJS from "crypto-js";
 import imgIcon from "../assets/icon.jpg";
 import Mapel from "../pages/Mapel";
 import axiosNew from "./AxiosConfig";
+import { Book, Event, House, PermIdentity } from "@mui/icons-material";
 
 function ResponsiveDrawer(props) {
   const { window } = props;
@@ -122,16 +123,23 @@ function ResponsiveDrawer(props) {
         {menu.map((text, index) => (
           <ListItem
             key={text.id}
+            sx={{
+              backgroundColor: changeNav - 1 === index ? "white" : null,
+              color: changeNav - 1 === index ? "black" : "white",
+            }}
             onClick={() => setChangeNav(text.id)}
             disablePadding
           >
             <ListItemButton>
               <ListItemIcon
                 sx={{
-                  color: "white",
+                  color: changeNav - 1 === index ? "black" : "white",
                 }}
               >
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                {index == 0 ? <House /> : null}
+                {index == 1 ? <PermIdentity /> : null}
+                {index == 2 ? <Event /> : null}
+                {index == 3 ? <Book /> : null}
               </ListItemIcon>
               <ListItemText primary={text.name} />
             </ListItemButton>
