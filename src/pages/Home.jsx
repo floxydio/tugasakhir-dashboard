@@ -10,6 +10,8 @@ import { Diversity3TwoTone, Person } from "@mui/icons-material";
 import axios from "axios";
 import axiosNew from "../components/AxiosConfig";
 import cryptoJS from "crypto-js";
+
+
 export default function Home() {
   const [murid, setMurid] = useState([]);
   const [guru, setGuru] = useState([]);
