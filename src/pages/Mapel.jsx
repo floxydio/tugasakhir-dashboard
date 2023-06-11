@@ -21,6 +21,8 @@ import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
+import cryptoJS from "crypto-js";
+import { JadwalModels } from "../models/Jadwal_models";
 
 const style = {
   position: "absolute",
@@ -53,6 +55,7 @@ export default function Mapel() {
   const [handleKelas,setHandlerKelas] = React.useState()
 
 
+  const [handleJadwalId,setHandlerJadwalId] = React.useState()
 
   const [handleWaktu,setHandlerWaktu] = React.useState()
 
@@ -85,6 +88,39 @@ export default function Mapel() {
     await getKelas();
 
   }
+  const token = localStorage.getItem("token");
+
+ async function submitMapel()  {
+  const decrypt = cryptoJS.AES.decrypt(
+    token,
+    `${import.meta.env.VITE_KEY_ENCRYPT}`
+  );
+  let date = new Date(2022, 3, 13); 
+let formattedDate = date.toISOString().split('T')[0];
+   await axiosNew.post("/create-pelajaran",{
+    nama: handlePelajaran,
+    guruId: handleGuru,
+    kelasId: handleKelas,
+    jadwalId: handleJadwalId,
+    jam:handleWaktu,
+    createdAt: formattedDate
+   }, {
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
+    },
+   }).then((res) => {
+    if(res.status === 200 || res.status === 201) {
+      setOpen(false)
+      async function getMapel() {
+        await axiosNew.get("/pelajaran").then((res) => {
+          setDataPelajaran(res.data.data);
+        });
+      }
+      getMapel();
+    }
+   })
+ }
 
   return (
     <>
@@ -194,11 +230,40 @@ export default function Mapel() {
                         ))}
                       </Select>
                     </FormControl>
+                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                      <InputLabel id="demo-simple-select-label">
+                       Hari Pelajaran
+                      </InputLabel>
+                      <Select
+                        sx={{
+                          height: 40,
+                        }}
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        label="Hari Pelajaran"
+                        onChange={(e) => setHandlerJadwalId(e.target.value)}
+                      >
+                        {JadwalModels.map((e) => (
+                          <MenuItem key={e.value} value={e.value}>
+                           Hari {e.status}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <FormControl sx={{ m: 1, minWidth: 120   }} size="small">
+                      <TextField
+                        size="small"
+                        id="outlined"
+                        label="Jam Pelajaran"
+                        type="text"
+                        onChange={(e) => setHandlerWaktu(e.target.value)}
+                      />
+                    </FormControl>
                     <Button
                       style={{
                         marginTop: 30,
                       }}
-                      // onClick={submitEdit}
+                      onClick={submitMapel}
                       variant="contained"
                     >
                       Submit
