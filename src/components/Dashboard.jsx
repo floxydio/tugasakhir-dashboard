@@ -27,7 +27,8 @@ import cryptoJS from "crypto-js";
 import imgIcon from "../assets/icon.jpg";
 import Mapel from "../pages/Mapel";
 import axiosNew from "./AxiosConfig";
-import { Book, Event, House, PermIdentity } from "@mui/icons-material";
+import { AccountBox, Book, Event, House, PermIdentity } from "@mui/icons-material";
+import Users from "../pages/Users";
 
 function ResponsiveDrawer(props) {
   const { window } = props;
@@ -96,6 +97,11 @@ function ResponsiveDrawer(props) {
       name: "Mapel",
       url: "/mapel",
     },
+    {
+      id: 5,
+      name: "Users",
+      url: "/users",
+    },
   ];
 
   const handleDrawerToggle = () => {
@@ -140,6 +146,7 @@ function ResponsiveDrawer(props) {
                 {index == 1 ? <PermIdentity /> : null}
                 {index == 2 ? <Event /> : null}
                 {index == 3 ? <Book /> : null}
+                {index == 4 ? <AccountBox /> : null}
               </ListItemIcon>
               <ListItemText primary={text.name} />
             </ListItemButton>
@@ -277,6 +284,8 @@ function ResponsiveDrawer(props) {
         {changeNav == 2 ? <Guru /> : null}
         {changeNav == 3 ? <Absensi /> : null}
         {changeNav == 4 ? <Mapel /> : null}
+
+        {changeNav == 5 ? <Users /> : null}
       </Box>
     </Box>
   );
