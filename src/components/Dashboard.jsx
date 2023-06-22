@@ -29,6 +29,7 @@ import Mapel from "../pages/Mapel";
 import axiosNew from "./AxiosConfig";
 import { AccountBox, Book, Event, House, PermIdentity } from "@mui/icons-material";
 import Users from "../pages/Users";
+import Nilai from "../pages/Nilai";
 
 function ResponsiveDrawer(props) {
   const { window } = props;
@@ -102,6 +103,11 @@ function ResponsiveDrawer(props) {
       name: "Users",
       url: "/users",
     },
+    {
+      id: 6,
+      name: "Nilai",
+      url:"/nilai"
+    }
   ];
 
   const handleDrawerToggle = () => {
@@ -147,6 +153,8 @@ function ResponsiveDrawer(props) {
                 {index == 2 ? <Event /> : null}
                 {index == 3 ? <Book /> : null}
                 {index == 4 ? <AccountBox /> : null}
+                {/* Icon For Nilai */}
+                {index == 5 ? <Book /> : null}
               </ListItemIcon>
               <ListItemText primary={text.name} />
             </ListItemButton>
@@ -284,8 +292,8 @@ function ResponsiveDrawer(props) {
         {changeNav == 2 ? <Guru /> : null}
         {changeNav == 3 ? <Absensi /> : null}
         {changeNav == 4 ? <Mapel /> : null}
-
         {changeNav == 5 ? <Users /> : null}
+        {changeNav == 6 ? <Nilai /> : null}
       </Box>
     </Box>
   );
