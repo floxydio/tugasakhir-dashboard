@@ -71,18 +71,18 @@ import {
     setOpenManual(true);
     await axiosNew.get("/kelas",{
       headers: {
-                 "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
+                 "x-access-token": token
                },
     }).then(function (res) {
       setDataKelas(res.data.data);
     });
     await axiosNew.get("/list-users", { headers: {
-               "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
+               "x-access-token": token
               },}).then(function (res) {
       setDataUser(res.data.data);
     });
     await axiosNew.get("/find-pelajaran", { headers: {
-               "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
+               "x-access-token": token
              },}).then(function (res) {
       setDataPelajaran(res.data.data);
     });
@@ -158,12 +158,24 @@ import {
             <TableHead>
               <TableRow>
                 <TableCell>No</TableCell>
-                <TableCell align="right">Nama Siswa/i</TableCell>
-                <TableCell align="right">Nomor Kelas</TableCell>
-                <TableCell align="right">Nilai UTS</TableCell>
-                <TableCell align="right">Nilai UAS</TableCell>
-                <TableCell align="right">Semester</TableCell>
-                <TableCell align="right">Mapel</TableCell>
+                <TableCell align="left" style={{
+                fontWeight: "bold"
+              }}>Nama Siswa/i</TableCell>
+                <TableCell align="left" style={{
+                fontWeight: "bold"
+              }}>Nomor Kelas</TableCell>
+                <TableCell align="left" style={{
+                fontWeight: "bold"
+              }}>Nilai UTS</TableCell>
+                <TableCell align="left" style={{
+                fontWeight: "bold"
+              }}>Nilai UAS</TableCell>
+                <TableCell align="left" style={{
+                fontWeight: "bold"
+              }}>Semester</TableCell>
+                <TableCell align="left" style={{
+                fontWeight: "bold"
+              }}>Mapel</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -175,12 +187,12 @@ import {
                   <TableCell component="th" scope="row">
                     {i + 1}
                   </TableCell>
-                  <TableCell align="right">{row.nama}</TableCell>
-                  <TableCell align="right">{row.nomor}</TableCell>
-                  <TableCell align="right">{row.uts}</TableCell>
-                  <TableCell align="right">{row.uas}</TableCell>
-                  <TableCell align="right">{row.semester}</TableCell>
-                  <TableCell align="right">{row.nama_pelajaran}</TableCell>
+                  <TableCell align="left">{row.nama}</TableCell>
+                  <TableCell align="left">{row.nomor}</TableCell>
+                  <TableCell align="left">{row.uts}</TableCell>
+                  <TableCell align="left">{row.uas}</TableCell>
+                  <TableCell align="left">{row.semester}</TableCell>
+                  <TableCell align="left">{row.nama_pelajaran}</TableCell>
 
                 </TableRow>
               ))}

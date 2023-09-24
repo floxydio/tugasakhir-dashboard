@@ -131,7 +131,7 @@ export default function Guru() {
         .get("/guru", {
           params: params,
           headers: {
-            "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
+            "x-access-token": token
           },
         })
         .then((res) => {
@@ -151,7 +151,7 @@ export default function Guru() {
       await axiosNew
         .get("/guru", {
           headers: {
-            "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
+            "x-access-token": token
           },
         })
         .then((result) => {
@@ -179,7 +179,7 @@ export default function Guru() {
       {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
-          "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
+          "x-access-token": token
         },
       }
     );
@@ -213,7 +213,7 @@ export default function Guru() {
         {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
-            "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
+            "x-access-token": token
           },
         }
       )
@@ -292,7 +292,7 @@ export default function Guru() {
         <Button
           onClick={handleOpen}
           style={{
-            float: "right",
+            float: "left",
           }}
           variant="contained"
         >
@@ -313,12 +313,24 @@ export default function Guru() {
               <Table sx={{ minWidth: 650 }} aria-label="simple table">
                 <TableHead>
                   <TableRow>
-                    <TableCell>No</TableCell>
-                    <TableCell>Nama</TableCell>
-                    <TableCell>Mengajar</TableCell>
-                    <TableCell>Status Guru</TableCell>
-                    <TableCell>Rating</TableCell>
-                    <TableCell>Edit</TableCell>
+                    <TableCell style={{
+                      fontWeight: "bold"
+                    }}>No</TableCell>
+                    <TableCell style={{
+                      fontWeight: "bold"
+                    }}>Nama</TableCell>
+                    <TableCell style={{
+                      fontWeight: "bold"
+                    }}>Mengajar</TableCell>
+                    <TableCell style={{
+                      fontWeight: "bold"
+                    }}>Status Guru</TableCell>
+                    <TableCell style={{
+                      fontWeight: "bold"
+                    }}>Rating</TableCell>
+                    <TableCell style={{
+                      fontWeight: "bold"
+                    }}>Edit</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>

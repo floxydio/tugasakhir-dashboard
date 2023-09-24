@@ -1,15 +1,33 @@
 import { Button, Container, TextField, Typography } from "@mui/material";
-import React from "react";
+import React,{useState,useEffect} from "react";
 import { useNavigate } from "react-router-dom";
 import cryptoJS from "crypto-js";
 import axiosNew from "../components/AxiosConfig";
 import Avatar from "@mui/material/Avatar";
 import iconIniss from "../assets/icon.jpg";
+import imgIcon from "../assets/slide1.jpg";
+import img2 from "../assets/slide2.jpg";
+import img3 from "../assets/slide3.jpg";
+
 export default function Signin() {
   const navigate = useNavigate();
 
-  const [username, setUsername] = React.useState("");
-  const [password, setPassword] = React.useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loadImage, setLoadImage] = useState(imgIcon);
+
+  function changeImageEvery3SecondsAndRepeat() {
+    const images = [img2, img3];
+    let i = 0;
+    setInterval(() => {
+      if (i === images.length) {
+        i = 0;
+      }
+      setLoadImage(images[i]);
+      i++;
+    }, 8000);
+      
+  } 
 
   function handleKeyPress(event) {
     if (event.key === "Enter") {
@@ -33,30 +51,52 @@ export default function Signin() {
       )
       .then((res) => {
         if (res.status === 200) {
-          let encrpyt = cryptoJS.AES.encrypt(
-            res.data.accessToken,
-            `${import.meta.env.VITE_KEY_ENCRYPT}`
-          );
-          localStorage.setItem("token", encrpyt);
+      
+          localStorage.setItem("token", res.data.token);
           navigate("/");
         }
       });
   }
 
+  useEffect(() => {
+    changeImageEvery3SecondsAndRepeat()
+  }, []);
+
   return (
     <>
+      <div style={{
+       
+      }}>
+      <img src={loadImage} style={{
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+        position: "absolute",
+        zIndex: -1,
+        top: 0,
+        transition: "all 0.5s ease",
+        filter: "grayscale(100%)" ,
+        left: 0
+
+      }} />
       <Container
-        maxWidth="sm"
         style={{
           transform: "translate(-50%, -50%)",
           top: "50%",
+          width: "40%",
           left: "50%",
           position: "absolute",
+          backgroundColor: "#fff",
+          padding: "2rem",
+          borderRadius: "10px",
+          opacity: 0.9,
+          boxShadow: "0 0 10px rgba(0,0,0,0.3)"
+           
         }}
       >
         <Avatar
           src={iconIniss}
-          sx={{ width: 250, height: 250, margin: "0 auto" }}
+          sx={{ width: 100, height: 100, margin: "0 auto" }}
         />
         <Typography
           variant="h5"
@@ -75,6 +115,7 @@ export default function Signin() {
             display: "flex",
             flexDirection: "column",
             gap: "1rem",
+
           }}
         >
           <TextField
@@ -82,6 +123,12 @@ export default function Signin() {
             label="Username"
             placeholder="Input Username anda..."
             variant="outlined"
+            style={{
+              marginTop: "10px",
+              width: "100%",
+              marginLeft: "auto",
+              marginRight: "auto",
+            }}
             onChange={(e) => setUsername(e.target.value)}
           />
           <TextField
@@ -90,6 +137,13 @@ export default function Signin() {
             variant="outlined"
             placeholder="Input Password anda..."
             type="password"
+            style={{
+              marginTop: "10px",
+              width: "100%",
+              marginLeft: "auto",
+              marginRight: "auto",
+
+            }}
             onChange={(e) => setPassword(e.target.value)}
           />
           <Button
@@ -97,6 +151,11 @@ export default function Signin() {
             variant="contained"
             style={{
               marginTop: "40px",
+              backgroundColor: "#274F99",
+              color: "#fff",
+              width: "100%",
+              marginLeft: "auto",
+              marginRight: "auto",
               height: 60,
             }}
           >
@@ -104,6 +163,7 @@ export default function Signin() {
           </Button>
         </div>
       </Container>
+      </div>
     </>
   );
 }

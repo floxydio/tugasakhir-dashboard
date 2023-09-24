@@ -43,7 +43,11 @@ export default function App() {
         />
       ) : (
         <Dashboard />
+        
       )}
+        <div style={{
+                marginBottom: 250
+              }}></div>
     </>
   );
 }

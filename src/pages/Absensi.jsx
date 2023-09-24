@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect,useState} from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -48,57 +48,57 @@ const style = {
 };
 
 export default function Absensi() {
-  const [getMonth, setGetMonth] = React.useState(0);
-  const [absenData, setAbsenData] = React.useState([]);
-  const [orderBy, setOrderBy] = React.useState("ASC");
-  const [filterGuru, setFilterGuru] = React.useState("");
-  const [month, setFilterMonth] = React.useState("");
-  const tableRef = React.useRef(null);
-  const [loading, setLoading] = React.useState(false);
-  const [search, setSearch] = React.useState(undefined);
-  const [isThrottled, setIsThrottled] = React.useState(false);
+  const [getMonth, setGetMonth] = useState(0);
+  const [absenData, setAbsenData] = useState([]);
+  const [orderBy, setOrderBy] = useState("ASC");
+  const [filterGuru, setFilterGuru] = useState("");
+  const [month, setFilterMonth] = useState("");
+  const tableRef = useRef(null);
+  const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState(undefined);
+  const [isThrottled, setIsThrottled] = useState(false);
 
   // For Absen Manual
-  const [addUser, setAddUser] = React.useState("");
-  const [addNamaGuru, setAddNamaGuru] = React.useState("");
-  const [addNamaUser, setAddNamaUser] = React.useState("");
-  const [addPelajaran, setAddPelajaran] = React.useState("");
-  const [addNomorKelas, setAddNomorkelas] = React.useState("");
-  const [addKeterangan, setAddKeterangan] = React.useState("");
-  const [addAlasan, setAddAlasan] = React.useState("");
-  const [addHari, setAddHari] = React.useState("");
-  const [addBulan, setAddBulan] = React.useState("");
-  const [addTahun, setAddTahun] = React.useState("");
-  const [addWaktu, setAddWaktu] = React.useState("");
+  const [addUser, setAddUser] = useState("");
+  const [addNamaGuru, setAddNamaGuru] = useState("");
+  const [addNamaUser, setAddNamaUser] = useState("");
+  const [addPelajaran, setAddPelajaran] = useState("");
+  const [addNomorKelas, setAddNomorkelas] = useState("");
+  const [addKeterangan, setAddKeterangan] = useState("");
+  const [addAlasan, setAddAlasan] = useState("");
+  const [addHari, setAddHari] = useState("");
+  const [addBulan, setAddBulan] = useState("");
+  const [addTahun, setAddTahun] = useState("");
+  const [addWaktu, setAddWaktu] = useState("");
   //
 
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const handleClose = () => setOpen(false);
 
-  const [openManual, setOpenManual] = React.useState(false);
+  const [openManual, setOpenManual] = useState(false);
   const handleCloseManual = () => setOpenManual(false);
 
-  const [editId, setEditId] = React.useState("");
-  const [editNamaGuru, setNamaGuru] = React.useState("");
-  const [editNamaUser, setEditNamaUser] = React.useState("");
-  const [editPelajaran, setEditPelajaran] = React.useState("");
-  const [editNomorKelas, setEditNomorkelas] = React.useState("");
-  const [editKeterangan, setEditKeterangan] = React.useState("");
-  const [editAlasan, setEditAlasan] = React.useState("");
-  const [editHari, setEditHari] = React.useState("");
-  const [editBulan, setEditBulan] = React.useState("");
-  const [editTahun, setEditTahun] = React.useState("");
-  const [editWaktu, setEditWaktu] = React.useState("");
+  const [editId, setEditId] = useState("");
+  const [editNamaGuru, setNamaGuru] = useState("");
+  const [editNamaUser, setEditNamaUser] = useState("");
+  const [editPelajaran, setEditPelajaran] = useState("");
+  const [editNomorKelas, setEditNomorkelas] = useState("");
+  const [editKeterangan, setEditKeterangan] = useState("");
+  const [editAlasan, setEditAlasan] = useState("");
+  const [editHari, setEditHari] = useState("");
+  const [editBulan, setEditBulan] = useState("");
+  const [editTahun, setEditTahun] = useState("");
+  const [editWaktu, setEditWaktu] = useState("");
 
   //
-  const [dataGuru, setDataGuru] = React.useState([]);
-  const [dataPelajaran, setDataPelajaran] = React.useState([]);
-  const [dataKelas, setDataKelas] = React.useState([]);
-  const [editValueGuru, setDataValueGuru] = React.useState("");
-  const [editValueKelas, setDataValueKelas] = React.useState("");
-  const [editValuePelajaran, setDataValuePelajaran] = React.useState("");
+  const [dataGuru, setDataGuru] = useState([]);
+  const [dataPelajaran, setDataPelajaran] = useState([]);
+  const [dataKelas, setDataKelas] = useState([]);
+  const [editValueGuru, setDataValueGuru] = useState("");
+  const [editValueKelas, setDataValueKelas] = useState("");
+  const [editValuePelajaran, setDataValuePelajaran] = useState("");
 
-  const [dataUser, setDataUser] = React.useState([]);
+  const [dataUser, setDataUser] = useState([]);
 
   const token = localStorage.getItem("token");
 
@@ -143,15 +143,12 @@ export default function Absensi() {
       });
     }
     async function getPelajaran() {
-      const decrypt = cryptoJS.AES.decrypt(
-        token,
-        `${import.meta.env.VITE_KEY_ENCRYPT}`
-      );
+    
       setLoading(true);
       await axiosNew
         .get("/find-pelajaran", {
           headers: {
-            "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
+            "x-access-token": token,
           },
         })
         .then(function (res) {
@@ -186,17 +183,14 @@ export default function Absensi() {
 
   async function handleOpenAbsenManual() {
     setOpenManual(true);
-    const decrypt = cryptoJS.AES.decrypt(
-      token,
-      `${import.meta.env.VITE_KEY_ENCRYPT}`
-    );
+
 
     async function getDataUser() {
       setLoading(true);
       await axiosNew
         .get("/list-users", {
           headers: {
-            "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
+            "x-access-token": token,
           },
         })
         .then(function (res) {
@@ -217,7 +211,7 @@ export default function Absensi() {
       await axiosNew
         .get("/find-pelajaran", {
           headers: {
-            "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
+            "x-access-token": token
           },
         })
         .then(function (res) {
@@ -240,10 +234,7 @@ export default function Absensi() {
   }
 
   async function filterData() {
-    const decrypt = cryptoJS.AES.decrypt(
-      token,
-      `${import.meta.env.VITE_KEY_ENCRYPT}`
-    );
+
     setAbsenData([]);
     let params = {};
     if (
@@ -299,7 +290,7 @@ export default function Absensi() {
         .get("/absen", {
           params: params,
           headers: {
-            "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
+            "x-access-token": token
           },
         })
         .then((res) => {
@@ -310,10 +301,7 @@ export default function Absensi() {
   }
 
   async function submitEdit() {
-    const decrypt = cryptoJS.AES.decrypt(
-      token,
-      `${import.meta.env.VITE_KEY_ENCRYPT}`
-    );
+
     let formData = {};
     if (editKeterangan === "IZIN") {
       formData = {
@@ -353,7 +341,7 @@ export default function Absensi() {
       .put(`/edit-absen/${editId}`, formData, {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
-          "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
+          "x-access-token": token
         },
       })
       .then((res) => {
@@ -372,10 +360,7 @@ export default function Absensi() {
   }
 
   async function submitManual() {
-    const decrypt = cryptoJS.AES.decrypt(
-      token,
-      `${import.meta.env.VITE_KEY_ENCRYPT}`
-    );
+
     let formData = {};
     if (editKeterangan === "IZIN") {
       formData = {
@@ -410,7 +395,7 @@ export default function Absensi() {
       .post(`/absen`, formData, {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
-          "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
+          "x-access-token": token
         },
       })
       .then((res) => {
@@ -438,7 +423,7 @@ export default function Absensi() {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     async function getAbsen() {
       setLoading(true);
       const decrypt = cryptoJS.AES.decrypt(
@@ -448,7 +433,7 @@ export default function Absensi() {
       await axiosNew
         .get("/absen", {
           headers: {
-            "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
+            "x-access-token": token
           },
         })
         .then((res) => {
@@ -552,17 +537,39 @@ export default function Absensi() {
             <TableHead>
               <TableRow>
                 <TableCell>No</TableCell>
-                <TableCell align="right">Nama User</TableCell>
-                <TableCell align="right">Nama Guru</TableCell>
-                <TableCell align="right">Pelajaran</TableCell>
-                <TableCell align="right">Nomor Kelas</TableCell>
-                <TableCell align="right">Keterangan</TableCell>
-                <TableCell align="right">Alasan</TableCell>
-                <TableCell align="right">Hari</TableCell>
-                <TableCell align="right">Bulan</TableCell>
-                <TableCell align="right">Tahun</TableCell>
-                <TableCell align="right">Waktu</TableCell>
-                <TableCell align="right">Action</TableCell>
+                <TableCell align="left" style={{
+                fontWeight: "bold"
+              }}>Nama User</TableCell>
+                <TableCell align="left" style={{
+                fontWeight: "bold"
+              }}>Nama Guru</TableCell>
+                <TableCell align="left"style={{
+                fontWeight: "bold"
+              }}>Pelajaran</TableCell>
+                <TableCell align="left"style={{
+                fontWeight: "bold"
+              }}>Nomor Kelas</TableCell>
+                <TableCell align="left"style={{
+                fontWeight: "bold"
+              }}>Keterangan</TableCell>
+                <TableCell align="left"style={{
+                fontWeight: "bold"
+              }}>Alasan</TableCell>
+                <TableCell align="left"style={{
+                fontWeight: "bold"
+              }}>Hari</TableCell>
+                <TableCell align="left"style={{
+                fontWeight: "bold"
+              }}>Bulan</TableCell>
+                <TableCell align="left"style={{
+                fontWeight: "bold"
+              }}>Tahun</TableCell>
+                <TableCell align="left"style={{
+                fontWeight: "bold"
+              }}>Waktu</TableCell>
+                <TableCell align="left"style={{
+                fontWeight: "bold"
+              }}>Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -574,24 +581,24 @@ export default function Absensi() {
                   <TableCell component="th" scope="row">
                     {i + 1}
                   </TableCell>
-                  <TableCell align="right">{row.nama_user}</TableCell>
-                  <TableCell align="right">{row.nama_guru}</TableCell>
-                  <TableCell align="right">{row.pelajaran_nama}</TableCell>
-                  <TableCell align="right">{row.nomor_kelas}</TableCell>
-                  <TableCell align="right">
+                  <TableCell align="left" >{row.nama_user}</TableCell>
+                  <TableCell align="left">{row.nama_guru}</TableCell>
+                  <TableCell align="left">{row.pelajaran_nama}</TableCell>
+                  <TableCell align="left">{row.nomor_kelas}</TableCell>
+                  <TableCell align="left">
                     {row.keterangan === "ABSEN" ? (
                       <Chip label={row.keterangan} color="success" />
                     ) : (
                       <Chip label={row.keterangan} color="error" />
                     )}
                   </TableCell>
-                  <TableCell align="right">{row.reason}</TableCell>
+                  <TableCell align="left">{row.reason}</TableCell>
 
-                  <TableCell align="right">{row.day}</TableCell>
-                  <TableCell align="right">{row.month}</TableCell>
-                  <TableCell align="right">{row.year}</TableCell>
-                  <TableCell align="right">{row.time}</TableCell>
-                  <TableCell align="right">
+                  <TableCell align="left">{row.day}</TableCell>
+                  <TableCell align="left">{row.month}</TableCell>
+                  <TableCell align="left">{row.year}</TableCell>
+                  <TableCell align="left">{row.time}</TableCell>
+                  <TableCell align="left">
                     <Button
                       className="btn_absen"
                       sx={{

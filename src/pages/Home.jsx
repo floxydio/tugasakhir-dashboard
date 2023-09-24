@@ -25,7 +25,7 @@ export default function Home() {
       axiosNew
         .get("/list-users", {
           headers: {
-            "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
+            "x-access-token": token
           },
         })
         .then(function (res) {

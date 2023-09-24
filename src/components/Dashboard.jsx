@@ -1,4 +1,4 @@
-import * as React from "react";
+import React,{useEffect,useState} from "react";
 import PropTypes from "prop-types";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -23,32 +23,28 @@ import { useNavigate } from "react-router-dom";
 import Absensi from "../pages/Absensi";
 import Guru from "../pages/Guru";
 import Home from "../pages/Home";
-import cryptoJS from "crypto-js";
 import imgIcon from "../assets/icon.jpg";
 import Mapel from "../pages/Mapel";
 import axiosNew from "./AxiosConfig";
 import { AccountBox, Book, Event, House, PermIdentity } from "@mui/icons-material";
 import Users from "../pages/Users";
 import Nilai from "../pages/Nilai";
+import { useLocation } from 'react-router-dom'
+import Profile from "./Profile";
 
 function ResponsiveDrawer(props) {
   const { window } = props;
-  const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [data, setData] = React.useState([]);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [data, setData] = useState([]);
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
-  const [changeNav, setChangeNav] = React.useState(1);
+  const [changeNav, setChangeNav] = useState(1);
+  const location = useLocation();
 
-  React.useEffect(() => {
+  useEffect(() => {
     async function fetchDataRefresh() {
-      const decrypt = cryptoJS.AES.decrypt(
-        token,
-        `${import.meta.env.VITE_KEY_ENCRYPT}`
-      );
-
       if (
-        decrypt.toString(cryptoJS.enc.Utf8) === undefined ||
-        decrypt.toString(cryptoJS.enc.Utf8) === null
+        token === null || token === undefined
       ) {
         navigate("/sign-in");
         localStorage.removeItem("token");
@@ -56,10 +52,11 @@ function ResponsiveDrawer(props) {
         await axiosNew
           .get("/refresh-token", {
             headers: {
-              "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
+              "x-access-token": token,
             },
           })
           .then((res) => {
+            console.log(res.data)
             if (res.status === 200) {
               setData(res.data.data);
             } else {
@@ -69,12 +66,46 @@ function ResponsiveDrawer(props) {
           });
       }
     }
+    
+    fromPath()
     fetchDataRefresh();
-  }, []);
+  }, [location]);
 
-  function logout() {
-    localStorage.removeItem("token");
-    navigate("/sign-in");
+  
+
+  function onChangeNav(id) {
+    setChangeNav(id);
+    console.log(id)
+     if(id === 2) {
+      navigate("/guru")
+     } else if(id === 1) {
+      navigate("/")
+     } else if (id === 3) {
+      navigate("/absensi")
+     } else if (id === 4) {
+      navigate("/mapel")
+     } else if (id === 5) {
+      navigate("/users")
+     } else if (id === 6) {
+      navigate("/nilai")
+     }
+  }
+
+  function fromPath() {
+    if(location.pathname === "/") {
+      setChangeNav(1)
+    } else if(location.pathname === "/guru") {
+      setChangeNav(2)
+    } else if(location.pathname === "/absensi") {
+      setChangeNav(3)
+    } else if(location.pathname === "/mapel") {
+      setChangeNav(4)
+    } else if(location.pathname === "/users") {
+      setChangeNav(5)
+    } else if(location.pathname === "/nilai") {
+      setChangeNav(6)
+    }
+
   }
 
   let menu = [
@@ -139,7 +170,7 @@ function ResponsiveDrawer(props) {
               backgroundColor: changeNav - 1 === index ? "white" : null,
               color: changeNav - 1 === index ? "black" : "white",
             }}
-            onClick={() => setChangeNav(text.id)}
+            onClick={() => onChangeNav(text.id)}
             disablePadding
           >
             <ListItemButton>
@@ -195,6 +226,7 @@ function ResponsiveDrawer(props) {
             style={{
               display: "flex",
               justifyContent: "space-between",
+              alignItems: "center",
               width: "100%",
             }}
           >
@@ -221,11 +253,7 @@ function ResponsiveDrawer(props) {
               >
                 {data.nama}
               </span>
-              <Avatar
-                onClick={() => logout()}
-                alt="Remy Sharp"
-                src="https://randomuser.me/api/portraits/men/94.jpg"
-              />
+              <Profile/>
             </div>
           </div>
         </Toolbar>
@@ -238,14 +266,13 @@ function ResponsiveDrawer(props) {
         }}
         aria-label="mailbox folders"
       >
-        {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
         <Drawer
           container={container}
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}
           ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
+            keepMounted: true, 
           }}
           sx={{
             display: { xs: "block", sm: "none" },
@@ -260,7 +287,7 @@ function ResponsiveDrawer(props) {
         <Drawer
           PaperProps={{
             sx: {
-              backgroundColor: "#000000",
+              backgroundColor: "#233044",
               color: "white",
             },
           }}
@@ -288,14 +315,16 @@ function ResponsiveDrawer(props) {
         }}
       >
         <Toolbar />
-        {changeNav == 1 ? <Home /> : null}
-        {changeNav == 2 ? <Guru /> : null}
-        {changeNav == 3 ? <Absensi /> : null}
-        {changeNav == 4 ? <Mapel /> : null}
-        {changeNav == 5 ? <Users /> : null}
-        {changeNav == 6 ? <Nilai /> : null}
+        {location.pathname === "/" ? <Home /> : null}
+        {location.pathname === "/guru" ? <Guru /> : null}
+        {location.pathname === "/absensi" ? <Absensi /> : null}
+        {location.pathname === "/mapel" ? <Mapel /> : null}
+        {location.pathname === "/users" ? <Users /> : null}
+        {location.pathname === "/nilai" ? <Nilai /> : null}
+
       </Box>
     </Box>
+    
   );
 }
 

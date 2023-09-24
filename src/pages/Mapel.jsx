@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useState,useEffect} from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -37,33 +37,35 @@ const style = {
 };
 
 export default function Mapel() {
-  const [dataPelajaran, setDataPelajaran] = React.useState([]);
-  const [open, setOpen] = React.useState(false);
+  const [dataPelajaran, setDataPelajaran] = useState([]);
+  const [open, setOpen] = useState(false);
   const handleClose = () => setOpen(false);
   const handleOpen = () => setOpen(true);
 
   //
-  const [dataGuru, setDataGuru] = React.useState([])
-  const [dataKelas,setDataKelas] = React.useState([])
+  const [dataGuru, setDataGuru] = useState([])
+  const [dataKelas,setDataKelas] = useState([])
 
   //
-  const [handlePelajaran,setHandlerPelajaran] = React.useState()
+  const [handlePelajaran,setHandlerPelajaran] = useState()
 
-  const [handleGuru,setHandlerGuru] = React.useState()
-
-
-  const [handleKelas,setHandlerKelas] = React.useState()
+  const [handleGuru,setHandlerGuru] = useState()
 
 
-  const [handleJadwalId,setHandlerJadwalId] = React.useState()
-
-  const [handleWaktu,setHandlerWaktu] = React.useState()
+  const [handleKelas,setHandlerKelas] = useState()
 
 
-  React.useEffect(() => {
+  const [handleJadwalId,setHandlerJadwalId] = useState()
+
+  const [handleWaktu,setHandlerWaktu] = useState()
+
+
+  useEffect(() => {
     async function getMapel() {
       await axiosNew.get("/pelajaran").then((res) => {
         setDataPelajaran(res.data.data);
+        console.log("Data Pelajaran" , res.data.data)
+
       });
     }
     getMapel();
@@ -107,7 +109,7 @@ let formattedDate = date.toISOString().split('T')[0];
    }, {
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
-      "x-access-token": decrypt.toString(cryptoJS.enc.Utf8),
+      "x-access-token": token,
     },
    }).then((res) => {
     if(res.status === 200 || res.status === 201) {
@@ -138,10 +140,18 @@ let formattedDate = date.toISOString().split('T')[0];
           <TableHead>
             <TableRow>
               <TableCell>No</TableCell>
-              <TableCell align="right">Nama Pelajaran</TableCell>
-              <TableCell align="right">Nama Guru</TableCell>
-              <TableCell align="right">Nomor Kelas</TableCell>
-              <TableCell align="right">Waktu</TableCell>
+              <TableCell align="left" style={{
+                fontWeight: "bold"
+              }}>Nama Pelajaran</TableCell>
+              <TableCell align="left" style={{
+                fontWeight: "bold"
+              }} >Nama Guru</TableCell>
+              <TableCell align="left" style={{
+                fontWeight: "bold"
+              }}>Nomor Kelas</TableCell>
+              <TableCell align="left" style={{
+                fontWeight: "bold"
+              }} >Waktu</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -153,10 +163,10 @@ let formattedDate = date.toISOString().split('T')[0];
                 <TableCell component="th" scope="row">
                   {i + 1}
                 </TableCell>
-                <TableCell align="right">{row.nama}</TableCell>
-                <TableCell align="right">{row.guru}</TableCell>
-                <TableCell align="right">{row.kelas_nomor}</TableCell>
-                <TableCell align="right">{row.jam}</TableCell>
+                <TableCell align="left">{row.nama}</TableCell>
+                <TableCell align="left">{row.guru}</TableCell>
+                <TableCell align="left">{row.kelas_nomor}</TableCell>
+                <TableCell align="left">{row.jam}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -271,6 +281,7 @@ let formattedDate = date.toISOString().split('T')[0];
                   </div>
                 </Box>
               </Modal>
+            
     </>
   );
 }
