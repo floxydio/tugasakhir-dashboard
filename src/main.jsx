@@ -12,39 +12,6 @@ import Nilai from "./pages/Nilai.jsx";
 import Dashboard from "./components/Dashboard.jsx";
 import Ujian from "./pages/Ujian.jsx";
 
-// const router = createBrowserRouter([
-//   {
-//     path: "/sign-in",
-//     element: <Signin />,
-//   },
-//   {
-//     path: "/",
-//     element: <App />,
-//   },
-//   {
-//     path:"/guru",
-//     element: <Guru />,
-//   },
-//   {
-//     path:"/absensi",
-//     element: <Absensi />
-//   },
-//   {
-//     path: "/mapel",
-//     element: <Mapel/>
-//   },
-//   {
-//     path: "/users",
-//     element: <Users/>
-//   },
-//   {
-//     path:"/nilai",
-//     element: <Nilai/>
-//   }
-
-// ]);
-
-// dashboard route
 const router = createBrowserRouter([
   {
     path: "/",

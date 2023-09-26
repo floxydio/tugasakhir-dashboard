@@ -40,9 +40,7 @@ export default function Signin() {
 
   return (
     <>
-      <div style={{
-       
-      }}>
+      <div>
       <img src={loadImage} style={{
         width: "100%",
         height: "100%",
