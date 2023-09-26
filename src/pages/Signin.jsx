@@ -8,10 +8,9 @@ import iconIniss from "../assets/icon.jpg";
 import imgIcon from "../assets/slide1.jpg";
 import img2 from "../assets/slide2.jpg";
 import img3 from "../assets/slide3.jpg";
-
+import { useAuth } from "../store/auth.store";
 export default function Signin() {
   const navigate = useNavigate();
-
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loadImage, setLoadImage] = useState(imgIcon);
@@ -31,31 +30,8 @@ export default function Signin() {
 
   function handleKeyPress(event) {
     if (event.key === "Enter") {
-      fetchSignInData();
+      useAuth.getState().signInFetch(username, password,navigate); 
     }
-  }
-
-  function fetchSignInData() {
-    axiosNew
-      .post(
-        "/sign-in",
-        {
-          username: username,
-          password: password,
-        },
-        {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        }
-      )
-      .then((res) => {
-        if (res.status === 200) {
-      
-          localStorage.setItem("token", res.data.token);
-          navigate("/");
-        }
-      });
   }
 
   useEffect(() => {
@@ -147,7 +123,7 @@ export default function Signin() {
             onChange={(e) => setPassword(e.target.value)}
           />
           <Button
-            onClick={() => fetchSignInData()}
+            onClick={() => useAuth.getState().signInFetchAndNavigate(username, password,navigate)}
             variant="contained"
             style={{
               marginTop: "40px",

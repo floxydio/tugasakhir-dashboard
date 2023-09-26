@@ -10,6 +10,7 @@ import Mapel from "./pages/Mapel.jsx";
 import Users from "./pages/Users.jsx";
 import Nilai from "./pages/Nilai.jsx";
 import Dashboard from "./components/Dashboard.jsx";
+import Ujian from "./pages/Ujian.jsx";
 
 // const router = createBrowserRouter([
 //   {
@@ -67,6 +68,9 @@ const router = createBrowserRouter([
       {
         path: "nilai",
         element: <Nilai />
+      }, {
+        path: "ujian",
+        element: <Ujian />
       }
     ]
   }, {

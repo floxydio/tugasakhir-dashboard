@@ -1,4 +1,4 @@
-import React, {useEffect,useState} from "react";
+import React, {useEffect,useState,useRef} from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -27,6 +27,11 @@ import Modal from "@mui/material/Modal";
 import { AccountCircle, Close, Search } from "@mui/icons-material";
 import axiosNew from "../components/AxiosConfig";
 import cryptoJS from "crypto-js";
+import { useAbsen } from "../store/absen.store";
+import { usePelajaran } from "../store/pelajaran.store";
+import { useKelas } from "../store/kelas.store";
+import { useUserList } from "../store/users_list.store";
+import { useGuru } from "../store/guru.store";
 
 const override = (React.CSSProperties = {
   transform: "translate(-50%, -50%)",
@@ -183,59 +188,9 @@ export default function Absensi() {
 
   async function handleOpenAbsenManual() {
     setOpenManual(true);
-
-
-    async function getDataUser() {
-      setLoading(true);
-      await axiosNew
-        .get("/list-users", {
-          headers: {
-            "x-access-token": token,
-          },
-        })
-        .then(function (res) {
-          setDataUser(res.data.data);
-          setLoading(false);
-        });
-    }
-
-    async function getGuru() {
-      setLoading(true);
-      await axiosNew.get("/guru").then(function (res) {
-        setDataGuru(res.data.data);
-        setLoading(false);
-      });
-    }
-    async function getPelajaran() {
-      setLoading(true);
-      await axiosNew
-        .get("/find-pelajaran", {
-          headers: {
-            "x-access-token": token
-          },
-        })
-        .then(function (res) {
-          setDataPelajaran(res.data.data);
-          setLoading(false);
-        });
-    }
-    async function getKelas() {
-      setLoading(true);
-
-      await axiosNew.get("/kelas").then(function (res) {
-        setDataKelas(res.data.data);
-        setLoading(false);
-      });
-    }
-    await getGuru();
-    await getPelajaran();
-    await getKelas();
-    await getDataUser();
   }
 
   async function filterData() {
-
-    setAbsenData([]);
     let params = {};
     if (
       month === "" &&
@@ -285,23 +240,10 @@ export default function Absensi() {
         orderby: orderBy,
       };
     }
-    async function getAbsenFilterOrderBy() {
-      await axiosNew
-        .get("/absen", {
-          params: params,
-          headers: {
-            "x-access-token": token
-          },
-        })
-        .then((res) => {
-          setAbsenData(res.data.data);
-        });
-    }
-    getAbsenFilterOrderBy();
+    useAbsen.getState().getAbsenFilterOrderBy(params);
   }
 
   async function submitEdit() {
-
     let formData = {};
     if (editKeterangan === "IZIN") {
       formData = {
@@ -336,82 +278,9 @@ export default function Absensi() {
         time: editWaktu,
       };
     }
-
-    await axiosNew
-      .put(`/edit-absen/${editId}`, formData, {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          "x-access-token": token
-        },
-      })
-      .then((res) => {
-        if (res.status === 200) {
-          handleClose();
-          async function getAbsen() {
-            setLoading(true);
-            await axiosNew.get("/absen").then((res) => {
-              setAbsenData(res.data.data);
-              setLoading(false);
-            });
-          }
-          getAbsen();
-        }
-      });
+    await useAbsen.getState().editAbsen(formData,editId)
   }
 
-  async function submitManual() {
-
-    let formData = {};
-    if (editKeterangan === "IZIN") {
-      formData = {
-        guru_id: addNamaGuru,
-        pelajaran_id: addPelajaran,
-        kelas_id: addNomorKelas,
-        user_id: addUser,
-        keterangan: addKeterangan,
-        reason: addAlasan,
-        day: addHari,
-        month: addBulan,
-        year: addTahun,
-        time: addWaktu,
-      };
-    } else {
-      formData = {
-        guru_id: addNamaGuru,
-        pelajaran_id: addPelajaran,
-        kelas_id: addNomorKelas,
-        keterangan: addKeterangan,
-
-        user_id: addUser,
-        reason: "-",
-        day: addHari,
-        month: addBulan,
-        year: addTahun,
-        time: addWaktu,
-      };
-    }
-
-    await axiosNew
-      .post(`/absen`, formData, {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          "x-access-token": token
-        },
-      })
-      .then((res) => {
-        if (res.status === 200) {
-          handleCloseManual();
-          async function getAbsen() {
-            setLoading(true);
-            await axiosNew.get("/absen").then((res) => {
-              setAbsenData(res.data.data);
-              setLoading(false);
-            });
-          }
-          getAbsen();
-        }
-      });
-  }
 
   const handleChangeThrottle = async () => {
     if (!isThrottled) {
@@ -424,26 +293,13 @@ export default function Absensi() {
   };
 
   useEffect(() => {
-    async function getAbsen() {
-      setLoading(true);
-      const decrypt = cryptoJS.AES.decrypt(
-        token,
-        `${import.meta.env.VITE_KEY_ENCRYPT}`
-      );
-      await axiosNew
-        .get("/absen", {
-          headers: {
-            "x-access-token": token
-          },
-        })
-        .then((res) => {
-          setAbsenData(res.data.data);
-          setLoading(false);
-        });
-    }
-    getAbsen();
+    useAbsen.getState().getAbsen()
+    useGuru.getState().getDataGuru()
+    usePelajaran.getState().getPelajaran()
+    useKelas.getState().getDataKelas()
+    useUserList.getState().getUsers()
     setGetMonth(new Date().getMonth() + 1);
-  }, []);
+  }, [openManual]);
 
   return (
     <>
@@ -573,7 +429,7 @@ export default function Absensi() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {absenData.map((row, i) => (
+              {useAbsen.getState().absen.map((row, i) => (
                 <TableRow
                   key={row.id}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -824,7 +680,7 @@ export default function Absensi() {
                         value={addNamaGuru}
                         onChange={(e) => setAddNamaGuru(e.target.value)}
                       >
-                        {dataGuru.map((e) => (
+                        {useGuru.getState().guru.map((e) => (
                           <MenuItem key={e.id} value={e.id}>
                             {e.nama}
                           </MenuItem>
@@ -835,7 +691,6 @@ export default function Absensi() {
                       <InputLabel id="demo-simple-select-label">
                         Mata Pelajaran
                       </InputLabel>
-
                       <Select
                         sx={{
                           height: 40,
@@ -846,7 +701,7 @@ export default function Absensi() {
                         value={addPelajaran}
                         onChange={(e) => setAddPelajaran(e.target.value)}
                       >
-                        {dataPelajaran.map((e) => (
+                        {usePelajaran.getState().pelajaran.map((e) => (
                           <MenuItem key={e.id} value={e.id}>
                             {e.nama}
                           </MenuItem>
@@ -867,7 +722,7 @@ export default function Absensi() {
                         value={addNomorKelas}
                         onChange={(e) => setAddNomorkelas(e.target.value)}
                       >
-                        {dataKelas.map((e) => (
+                        {useKelas.getState().kelas.map((e) => (
                           <MenuItem key={e.id} value={e.nomor}>
                             Nomor Kelas : {e.nomor}
                           </MenuItem>
@@ -888,7 +743,7 @@ export default function Absensi() {
                         value={addUser}
                         onChange={(e) => setAddUser(e.target.value)}
                       >
-                        {dataUser.map((e) => (
+                        {useUserList.getState().users.map((e) => (
                           <MenuItem key={e.id} value={e.id}>
                             {e.nama}
                           </MenuItem>
@@ -972,7 +827,7 @@ export default function Absensi() {
                       style={{
                         marginTop: 30,
                       }}
-                      onClick={submitManual}
+                      onClick={() => useAbsen.getState().createAbsen(addNamaGuru,addPelajaran,addNomorKelas,addUser,addKeterangan,addAlasan,addHari,addBulan,addTahun,addWaktu,editKeterangan)}
                       variant="contained"
                     >
                       Submit

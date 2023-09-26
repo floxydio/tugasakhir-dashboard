@@ -31,6 +31,7 @@ import Users from "../pages/Users";
 import Nilai from "../pages/Nilai";
 import { useLocation } from 'react-router-dom'
 import Profile from "./Profile";
+import Ujian from "../pages/Ujian";
 
 function ResponsiveDrawer(props) {
   const { window } = props;
@@ -88,6 +89,8 @@ function ResponsiveDrawer(props) {
       navigate("/users")
      } else if (id === 6) {
       navigate("/nilai")
+     } else if (id === 7) {
+      navigate("/ujian")
      }
   }
 
@@ -104,6 +107,8 @@ function ResponsiveDrawer(props) {
       setChangeNav(5)
     } else if(location.pathname === "/nilai") {
       setChangeNav(6)
+    } else if(location.pathname === "/ujian") {
+      setChangeNav(7)
     }
 
   }
@@ -138,6 +143,11 @@ function ResponsiveDrawer(props) {
       id: 6,
       name: "Nilai",
       url:"/nilai"
+    },
+    {
+      id: 7,
+      name: "Ujian",
+      url:"/ujian"
     }
   ];
 
@@ -186,6 +196,7 @@ function ResponsiveDrawer(props) {
                 {index == 4 ? <AccountBox /> : null}
                 {/* Icon For Nilai */}
                 {index == 5 ? <Book /> : null}
+                {index == 6 ? <Book /> : null}
               </ListItemIcon>
               <ListItemText primary={text.name} />
             </ListItemButton>
@@ -321,6 +332,7 @@ function ResponsiveDrawer(props) {
         {location.pathname === "/mapel" ? <Mapel /> : null}
         {location.pathname === "/users" ? <Users /> : null}
         {location.pathname === "/nilai" ? <Nilai /> : null}
+        {location.pathname === "/ujian" ? <Ujian/> : null}
 
       </Box>
     </Box>
