@@ -32,6 +32,15 @@ import Nilai from "../pages/Nilai";
 import { useLocation } from 'react-router-dom'
 import Profile from "./Profile";
 import Ujian from "../pages/Ujian";
+import AbsenIcon from "../assets/absen_ico.png"
+import HomeIcon from "../assets/home_ico.png"
+import MapelIcon from "../assets/mapel_ico.png"
+import GuruIcon from "../assets/teacher_ico.png"
+import UserIcon from "../assets/user_ico.png"
+import NilaiIcon from "../assets/nilai_ico.png"
+import UjianIcon from "../assets/ujian_ico.png"
+
+
 
 function ResponsiveDrawer(props) {
   const { window } = props;

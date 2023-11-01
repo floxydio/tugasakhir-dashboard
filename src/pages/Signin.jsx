@@ -9,6 +9,10 @@ import imgIcon from "../assets/slide1.jpg";
 import img2 from "../assets/slide2.jpg";
 import img3 from "../assets/slide3.jpg";
 import { useAuth } from "../store/auth.store";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+
 export default function Signin() {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
@@ -41,6 +45,7 @@ export default function Signin() {
   return (
     <>
       <div>
+      <ToastContainer />
       <img src={loadImage} style={{
         width: "100%",
         height: "100%",
