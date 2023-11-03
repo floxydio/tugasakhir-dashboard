@@ -1,9 +1,10 @@
 import axios from "axios";
 
 const axiosNew = axios.create({
-  baseURL: "http://192.168.47.110:4200/v2",
+  baseURL: `${import.meta.env.VITE_BASEURL_INISS + import.meta.env.VITE_BASEURL_VERSION}`,
   timeoutErrorMessage:"Timeout",
-  
+  timeout: 10000,
+
 });
 
 export default axiosNew;

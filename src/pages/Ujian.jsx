@@ -1,9 +1,19 @@
 import { Box, Button, Fade, FormControl, FormControlLabel, Input, InputLabel, MenuItem, Modal, Select, Switch, TextField, Typography } from '@mui/material'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import TimePicker from 'react-time-picker';
 import 'react-time-picker/dist/TimePicker.css';
 import 'react-clock/dist/Clock.css';
 import { ToastContainer, toast } from 'react-toastify';
+import axiosNew from "../components/AxiosConfig"
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import { useUjian } from '../store/ujian.store';
+
 
 
 export default function Ujian() {
@@ -17,9 +27,10 @@ export default function Ujian() {
   const [jawaban, setJawaban] = useState('');
   const [addEssay, setAddEssay] = useState(false)
   const [essay, setEssay] = useState([])
+  const tableRef = useRef(null);
+
 
   const onHideModal = () => {
-
     setShowModal(false)
 
   }
@@ -35,8 +46,11 @@ export default function Ujian() {
       setEssay(JSON.parse(savedEssay));
     }
     if(savedQuestions || savedEssay) {
-      toast.info("Data Ujian belum disubmit, silahkan submit!")
+      if(import.meta.env.VITE_SERVER_TYPE !== "dev") {
+        toast.info("Data Ujian belum disubmit, silahkan submit!")
+      }
     }
+    useUjian.getState().getUjian()
   }, []);
 
   
@@ -45,6 +59,24 @@ export default function Ujian() {
     localStorage.setItem('essay', JSON.stringify(essay));
   }, [questions, essay]);
 
+  async function createUjian() {
+    await axiosNew.post("/create-ujian", {
+      nama_ujian: "Ujian Tengah Semester",
+      durasi: 60,
+      total_soal: questions.length + essay.length,
+      soal: questions,
+      essay: essay,
+    },{
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      }
+    }).then((res) => {
+      toast.success("Berhasil Membuat Ujian")
+      onHideModal()
+    }).catch((err) => {
+     toast.error("Gagal Membuat Ujian")
+    })
+  }
 
 
   return (
@@ -216,15 +248,23 @@ export default function Ujian() {
                 style={{ marginTop: "20px" }}
                 variant='contained'
                 onClick={() => {
-                  setQuestions([...questions, {
-                    id_soal: questions.length + 1,
-                    soal: '',
-                    pilihan: Array(5).fill({}).map((_, i) => ({
-                      ['jenis_pilihan[' + i + ']']: String.fromCharCode(65 + i),
-                      ['isi_plihan[' + i + ']']: ''
-                    })),
-                    jawaban: ''
-                  }]);
+                  if(questions[questions.length - 1].soal === '') {
+                    toast.error("Soal tidak boleh kosong!")
+                    return
+                  } else if(questions[questions.length - 1].jawaban === '') {
+                    toast.error("Jawaban tidak boleh kosong!")
+                    return
+                  } else {
+                    setQuestions([...questions, {
+                      id_soal: questions.length + 1,
+                      soal: '',
+                      pilihan: Array(5).fill({}).map((_, i) => ({
+                        ['jenis_pilihan[' + i + ']']: String.fromCharCode(65 + i),
+                        ['isi_plihan[' + i + ']']: ''
+                      })),
+                      jawaban: ''
+                    }]);
+                  }
                 }}
               >
                 Tambah Soal Pilihan Ganda
@@ -315,12 +355,79 @@ export default function Ujian() {
                 <Button variant="contained" onClick={() => {
                     console.log(JSON.stringify(questions, null, 2));
                     console.log(JSON.stringify(essay, null, 2));
+                    // createUjian()
 
                 }}>Submit Data</Button>
               </div>
             </div>
           </Box>
       </Modal>
+
+      <TableContainer sx={{marginTop: 10}} component={Paper} ref={tableRef}>
+          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>No</TableCell>
+                <TableCell align="left" style={{
+                fontWeight: "bold"
+              }}>Kelas ID</TableCell>
+                <TableCell align="left" style={{
+                fontWeight: "bold"
+              }}>Type Ujian</TableCell>
+                <TableCell align="left"style={{
+                fontWeight: "bold"
+              }}>Tanggal</TableCell>
+                <TableCell align="left"style={{
+                fontWeight: "bold"
+              }}>Nama Pelajaran</TableCell>
+                <TableCell align="left"style={{
+                fontWeight: "bold"
+              }}>Jam Mulai</TableCell>
+                <TableCell align="left"style={{
+                fontWeight: "bold"
+              }}>Total Soal</TableCell>
+                <TableCell align="left"style={{
+                fontWeight: "bold"
+              }}>Dibuat Pada</TableCell>
+                <TableCell align="left"style={{
+                fontWeight: "bold"
+              }}>Action</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {useUjian.getState().ujian.map((row, i) => (
+                <TableRow
+                  key={i}
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <TableCell component="th" scope="row">
+                    {i + 1}
+                  </TableCell>
+                  <TableCell align="left" >{row.kelas_id}</TableCell>
+                  <TableCell align="left">{row.nama_ujian}</TableCell>
+                  <TableCell align="left">{row.tanggal}</TableCell>
+                  <TableCell align="left">{row.nama ?? "Kosong"}</TableCell>
+                  <TableCell align="left">{row.jam_mulai}</TableCell>
+                  <TableCell align="left">{row.total_soal}</TableCell>
+                  <TableCell align="left">{row.createdAt}</TableCell>
+                  <TableCell align="left">
+                    <Button
+                      className="btn_absen"
+                      sx={{
+                        marginTop: 1,
+                      }}
+                   
+                      variant="contained"
+                    >
+                      Edit
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+          
+            </TableBody>
+          </Table>
+        </TableContainer>
 
     </>
   )
