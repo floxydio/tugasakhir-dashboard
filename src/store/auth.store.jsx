@@ -5,8 +5,7 @@ import { toast } from 'react-toastify';
 export const useAuth = create((set) => ({
     user: {},
     signInFetchAndNavigate: async (username, password, navigate) => {
-        console.log(username)
-        console.log(password)
+      
         await axiosNew.post("/sign-in", {
             username: username,
             password: password

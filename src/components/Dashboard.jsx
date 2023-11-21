@@ -3,10 +3,8 @@ import PropTypes from "prop-types";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
-import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -26,19 +24,12 @@ import Home from "../pages/Home";
 import imgIcon from "../assets/icon.jpg";
 import Mapel from "../pages/Mapel";
 import axiosNew from "./AxiosConfig";
-import { AccountBox, Book, Event, House, PermIdentity } from "@mui/icons-material";
+import { AccountBox, Book, Event, House, PermIdentity, School, Star } from "@mui/icons-material";
 import Users from "../pages/Users";
 import Nilai from "../pages/Nilai";
 import { useLocation } from 'react-router-dom'
 import Profile from "./Profile";
 import Ujian from "../pages/Ujian";
-import AbsenIcon from "../assets/absen_ico.png"
-import HomeIcon from "../assets/home_ico.png"
-import MapelIcon from "../assets/mapel_ico.png"
-import GuruIcon from "../assets/teacher_ico.png"
-import UserIcon from "../assets/user_ico.png"
-import NilaiIcon from "../assets/nilai_ico.png"
-import UjianIcon from "../assets/ujian_ico.png"
 
 
 
@@ -69,10 +60,12 @@ function ResponsiveDrawer(props) {
             console.log(res.data)
             if (res.status === 200) {
               setData(res.data.data);
-            } else {
-              navigate("/sign-in");
-              localStorage.removeItem("token");
             }
+          }).catch((err) => {
+              if(err.response.status === 400) {
+                navigate("/sign-in");
+                localStorage.removeItem("token");
+              }
           });
       }
     }
@@ -166,50 +159,33 @@ function ResponsiveDrawer(props) {
 
   const drawer = (
     <div>
-      {/* <img
-        src={imgIcon}
-        width={80}
-        style={{
-          display: "block",
-          marginLeft: "auto",
-          marginRight: "auto",
-        }}
-      /> */}
-      <p style={{ textAlign: "center" }}>INISS</p>
-
+      <p style={{ textAlign: "center", color: "white",
+      marginTop: 40,fontSize: 42
+    }}>INISS</p>
       <List
         sx={{
           marginTop: 10,
         }}
       >
         {menu.map((text, index) => (
-          <ListItem
-            key={text.id}
-            sx={{
-              backgroundColor: changeNav - 1 === index ? "white" : null,
-              color: changeNav - 1 === index ? "black" : "white",
-            }}
-            onClick={() => onChangeNav(text.id)}
-            disablePadding
-          >
-            <ListItemButton>
-              <ListItemIcon
-                sx={{
-                  color: changeNav - 1 === index ? "black" : "white",
-                }}
-              >
-                {index == 0 ? <House /> : null}
-                {index == 1 ? <PermIdentity /> : null}
-                {index == 2 ? <Event /> : null}
-                {index == 3 ? <Book /> : null}
-                {index == 4 ? <AccountBox /> : null}
-                {/* Icon For Nilai */}
-                {index == 5 ? <Book /> : null}
-                {index == 6 ? <Book /> : null}
-              </ListItemIcon>
-              <ListItemText primary={text.name} />
-            </ListItemButton>
-          </ListItem>
+          <div key={text.id} className="last:mb-0 mb-2">
+            <div
+              className={`flex items-center p-2 cursor-pointer ${changeNav - 1 === index ? 'bg-white text-black' : 'text-white'}`}
+              onClick={() => onChangeNav(text.id)}
+            >
+              <div className={`flex-shrink-0 ${changeNav - 1 === index ? 'text-black' : 'text-white'}`}>
+                {index === 0 && <House className="h-5 w-5" />}
+                {index === 1 && <PermIdentity className="h-5 w-5" />}
+                {index === 2 && <Event className="h-5 w-5" />}
+                {index === 3 && <Book className="h-5 w-5" />}
+                {index === 4 && <AccountBox className="h-5 w-5" />}
+                {index === 5 && <Star className="h-5 w-5" />}
+                {index === 6 && <School className="h-5 w-5" />}
+              </div>
+              <span className="ml-3">{text.name}</span>
+            </div>
+            {index < menu.length - 1 && <hr className="border-t border-gray-200" />}
+          </div>
         ))}
       </List>
     </div>
@@ -258,7 +234,7 @@ function ResponsiveDrawer(props) {
                 fontSize: 20,
               }}
             >
-              Dashboard - Intelligentsia Nurul Ilmi Secondary School
+              Dashboard
             </Typography>
             <div
               style={{
@@ -299,6 +275,8 @@ function ResponsiveDrawer(props) {
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: drawerWidth,
+              
+          backgroundColor: "#233044"
             },
           }}
         >
