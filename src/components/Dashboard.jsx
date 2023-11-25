@@ -1,4 +1,4 @@
-import React,{useEffect,useState} from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -24,7 +24,7 @@ import Home from "../pages/Home";
 import imgIcon from "../assets/icon.jpg";
 import Mapel from "../pages/Mapel";
 import axiosNew from "./AxiosConfig";
-import { AccountBox, Book, Event, House, PermIdentity, School, Star } from "@mui/icons-material";
+import { AccountBox, Book, Event, House, Logout, PermIdentity, School, Star } from "@mui/icons-material";
 import Users from "../pages/Users";
 import Nilai from "../pages/Nilai";
 import { useLocation } from 'react-router-dom'
@@ -62,54 +62,57 @@ function ResponsiveDrawer(props) {
               setData(res.data.data);
             }
           }).catch((err) => {
-              if(err.response.status === 400) {
-                navigate("/sign-in");
-                localStorage.removeItem("token");
-              }
+            if (err.response.status === 400) {
+              navigate("/sign-in");
+              localStorage.removeItem("token");
+            }
           });
       }
     }
-    
+
     fromPath()
     fetchDataRefresh();
   }, [location]);
 
-  
+
 
   function onChangeNav(id) {
     setChangeNav(id);
     console.log(id)
-     if(id === 2) {
+    if (id === 2) {
       navigate("/guru")
-     } else if(id === 1) {
+    } else if (id === 1) {
       navigate("/")
-     } else if (id === 3) {
+    } else if (id === 3) {
       navigate("/absensi")
-     } else if (id === 4) {
+    } else if (id === 4) {
       navigate("/mapel")
-     } else if (id === 5) {
+    } else if (id === 5) {
       navigate("/users")
-     } else if (id === 6) {
+    } else if (id === 6) {
       navigate("/nilai")
-     } else if (id === 7) {
+    } else if (id === 7) {
       navigate("/ujian")
-     }
+    } else if (id === 8) {
+      navigate('/sign-in', { replace: true })
+      localStorage.removeItem("token");
+    }
   }
 
   function fromPath() {
-    if(location.pathname === "/") {
+    if (location.pathname === "/") {
       setChangeNav(1)
-    } else if(location.pathname === "/guru") {
+    } else if (location.pathname === "/guru") {
       setChangeNav(2)
-    } else if(location.pathname === "/absensi") {
+    } else if (location.pathname === "/absensi") {
       setChangeNav(3)
-    } else if(location.pathname === "/mapel") {
+    } else if (location.pathname === "/mapel") {
       setChangeNav(4)
-    } else if(location.pathname === "/users") {
+    } else if (location.pathname === "/users") {
       setChangeNav(5)
-    } else if(location.pathname === "/nilai") {
+    } else if (location.pathname === "/nilai") {
       setChangeNav(6)
-    } else if(location.pathname === "/ujian") {
+    } else if (location.pathname === "/ujian") {
       setChangeNav(7)
     }
 
@@ -144,12 +147,17 @@ function ResponsiveDrawer(props) {
     {
       id: 6,
       name: "Nilai",
-      url:"/nilai"
+      url: "/nilai"
     },
     {
       id: 7,
       name: "Ujian",
-      url:"/ujian"
+      url: "/ujian"
+    },
+    {
+      id: 8,
+      name: "Logout",
+      url: "/sign-in",
     }
   ];
 
@@ -159,9 +167,10 @@ function ResponsiveDrawer(props) {
 
   const drawer = (
     <div>
-      <p style={{ textAlign: "center", color: "white",
-      marginTop: 40,fontSize: 42
-    }}>INISS</p>
+      <p style={{
+        textAlign: "center", color: "white",
+        marginTop: 40, fontSize: 42
+      }}>INISS</p>
       <List
         sx={{
           marginTop: 10,
@@ -181,6 +190,11 @@ function ResponsiveDrawer(props) {
                 {index === 4 && <AccountBox className="h-5 w-5" />}
                 {index === 5 && <Star className="h-5 w-5" />}
                 {index === 6 && <School className="h-5 w-5" />}
+                {index === 7 && <Logout onClick={() => {
+                  localStorage.removeItem("token");
+                  navigate("/sign-in");
+                }} className="h-5 w-5" />}
+
               </div>
               <span className="ml-3">{text.name}</span>
             </div>
@@ -249,7 +263,7 @@ function ResponsiveDrawer(props) {
               >
                 {data.nama}
               </span>
-              <Profile/>
+              <Profile />
             </div>
           </div>
         </Toolbar>
@@ -268,15 +282,15 @@ function ResponsiveDrawer(props) {
           open={mobileOpen}
           onClose={handleDrawerToggle}
           ModalProps={{
-            keepMounted: true, 
+            keepMounted: true,
           }}
           sx={{
             display: { xs: "block", sm: "none" },
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: drawerWidth,
-              
-          backgroundColor: "#233044"
+
+              backgroundColor: "#233044"
             },
           }}
         >
@@ -319,11 +333,12 @@ function ResponsiveDrawer(props) {
         {location.pathname === "/mapel" ? <Mapel /> : null}
         {location.pathname === "/users" ? <Users /> : null}
         {location.pathname === "/nilai" ? <Nilai /> : null}
-        {location.pathname === "/ujian" ? <Ujian/> : null}
+        {location.pathname === "/ujian" ? <Ujian /> : null}
+
 
       </Box>
     </Box>
-    
+
   );
 }
 

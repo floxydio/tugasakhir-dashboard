@@ -8,6 +8,7 @@ import Nilai from "../pages/Nilai.jsx";
 import Ujian from "../pages/Ujian.jsx";
 import SignUp from "../pages/SignUp.jsx";
 import Signin from "../pages/Signin.jsx";
+import ErrorNotFound from "../pages/ErrorNotFound.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -43,5 +44,8 @@ export const router = createBrowserRouter([
   }, {
     path: "/sign-up",
     element: <SignUp />
+  }, {
+    path: "*",
+    element: <ErrorNotFound />
   }
 ])
