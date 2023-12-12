@@ -9,6 +9,9 @@ import Ujian from "../pages/Ujian.jsx";
 import SignUp from "../pages/SignUp.jsx";
 import Signin from "../pages/Signin.jsx";
 import ErrorNotFound from "../pages/ErrorNotFound.jsx";
+import axiosNew from "../components/AxiosConfig.jsx";
+
+
 
 export const router = createBrowserRouter([
   {

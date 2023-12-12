@@ -43,6 +43,8 @@ export default function Ujian() {
   const [selectedPelajaran, setSelectedPelajaran] = useState()
   const tableRef = useRef(null);
 
+  const [hideModalTrigger, setHideModalTrigger] = useState(false)
+
   // For Edit
   const [showModalEdit, setShowModalEdit] = useState(false)
   const [editTypeUjian, setEditTypeUjian] = useState()
@@ -55,6 +57,7 @@ export default function Ujian() {
   const [editTanggal, setEditTanggal] = useState()
   const [editSelectedPelajaran, setEditSelectedPelajaran] = useState()
   const [isEdit, setIsEdit] = useState(false)
+  const [editId, setEditId] = useState()
 
   async function getEditUjian(id) {
     console.time("Fetch Get Edit Ujian")
@@ -87,6 +90,7 @@ export default function Ujian() {
     await axiosNew.get("/all-ujian", {
     }).then((res) => {
       setDataUjian(res.data.data)
+      setHideModalTrigger(false)
       console.timeEnd("fetched Data Ujian")
       console.log("Response Ujian -> ", res.data.data)
     }).catch((err) => {
@@ -121,7 +125,8 @@ export default function Ujian() {
     console.log(`Reader Result -> ${reader.result}`)
     reader.onloadend = () => {
       const updatedQuestions = [...editQuestions];
-      updatedQuestions[qIndex].pilihan[cIndex]['isi_plihan[' + cIndex + ']'] = reader.result;
+
+      updatedQuestions[qIndex].pilihan[cIndex][1] = reader.result;
       setQuestions(updatedQuestions);
     };
   };
@@ -130,6 +135,8 @@ export default function Ujian() {
     setDataUjian([])
     await axiosNew.get("/all-exam", {}).then((res) => {
       setAnswerUser(res.data.data)
+      setHideModalTrigger(true)
+      console.log("Data Jawaban Siswa ->", res.data.data)
     })
   }
 
@@ -194,9 +201,11 @@ export default function Ujian() {
         "Content-Type": "application/x-www-form-urlencoded",
       }
     }).then((res) => {
+      console.log("Sukses Edit Ujian")
       toast.success("Berhasil Edit Ujian")
 
     }).catch((err) => {
+      console.error("Gagal Edit Ujian")
       toast.error("Gagal Edit Ujian")
     })
   }
@@ -399,7 +408,7 @@ export default function Ujian() {
                     sx={{
                       width: "100%"
                     }}
-                    value={question.soal || ''}
+                    defaultValue={question.soal || ''}
                     label={`Soal No-${qIndex + 1}`}
                     variant="outlined"
                     onChange={(e) => {
@@ -452,6 +461,7 @@ export default function Ujian() {
                             sx={{
                               width: "100%"
                             }}
+                            defaultValue={question.pilihan[cIndex]['isi_plihan[' + cIndex + ']'] || ''}
                             label={`Pilihan ${choiceLabel}`}
                             variant="outlined"
                             onChange={(e) => {
@@ -473,7 +483,7 @@ export default function Ujian() {
                       marginTop: "20px",
                       marginBottom: "20px",
                     }}
-                    value={question.jawaban || ''}
+                    defaultValue={question.jawaban || ''}
                     label={`Jawaban No-${qIndex + 1}`}
                     variant="outlined"
                     onChange={(e) => {
@@ -532,7 +542,7 @@ export default function Ujian() {
                     <p>Soal Essay ke {eIndex + 1}</p>
                     <FormControl fullWidth>
                       <TextField
-                        value={essay[eIndex].soal || ''}
+                        defaultValue={essay[eIndex].soal || ''}
                         label="Soal Essay"
                         variant="outlined"
                         sx={{ marginTop: "15px" }}
@@ -543,7 +553,7 @@ export default function Ujian() {
                         }}
                       />
                       <TextField
-                        value={essay[eIndex].jawaban || ''}
+                        defaultValue={essay[eIndex].jawaban || ''}
                         label="Jawaban Essay" onChange={e => {
                           const updatedEssay = [...essay];
                           updatedEssay[eIndex].jawaban = e.target.value;
@@ -780,6 +790,8 @@ export default function Ujian() {
                     }}
                   />
                 </FormControl>
+
+
                 {['A', 'B', 'C', 'D', 'E'].map((choiceLabel, cIndex) => {
                   const inputTypeKey = `${qIndex}-${cIndex}`;
                   const isImageInput = choiceInputType[inputTypeKey] === 'image';
@@ -793,6 +805,7 @@ export default function Ujian() {
                         marginLeft: "auto",
                       }} variant='contained' onClick={() => {
                         toggleChoiceInputType(qIndex, cIndex)
+
                       }}>
                         {isImageInput ? <PhotoCamera sx={{
                           marginTop: "10px"
@@ -800,7 +813,9 @@ export default function Ujian() {
                       </Button>
                       {isImageInput ? (
                         <>
-                          <img src={question.pilihan[cIndex]['isi_plihan[' + cIndex + ']']} alt="" height={100} className='img_soal' style={{
+                          {/* console.log(editQuestions[qIndex].pilihan[1][1]) */}
+
+                          <img src={question.pilihan[cIndex][1]} alt="" height={100} className='img_soal' style={{
                             marginTop: "20px",
                             marginBottom: "20px",
                           }} />
@@ -809,7 +824,6 @@ export default function Ujian() {
                           }</InputLabel>
                           <TextField
                             type="file"
-
                             variant="outlined"
                             sx={{
                               width: "100%"
@@ -826,15 +840,16 @@ export default function Ujian() {
                             sx={{
                               width: "100%"
                             }}
-                            value={
-                              question.pilihan[cIndex]['isi_plihan[' + cIndex + ']'].toString().includes("data:image") ? "" : question.pilihan[cIndex]['isi_plihan[' + cIndex + ']']
-                            }
                             label={`Pilihan ${choiceLabel}`}
                             variant="outlined"
+                            defaultValue={
+                              question.pilihan[cIndex][1].toString().includes("data:image") ? "" : question.pilihan[cIndex][1].toString() ?? ''
+                            }
                             onChange={(e) => {
-                              const updatedQuestions = [...editQuestions];
-                              updatedQuestions[qIndex].pilihan[cIndex]['isi_plihan[' + cIndex + ']'] = e.target.value;
-                              setQuestions(updatedQuestions);
+                              // const updatedQuestions = [...editQuestions];
+                              // updatedQuestions[qIndex].pilihan[cIndex]['isi_plihan[' + cIndex + ']'] = e.target.value;
+                              // setQuestions(updatedQuestions);
+                              question.pilihan[cIndex][1] = e.target.value
                             }}
                           />
                         </>
@@ -902,6 +917,7 @@ export default function Ujian() {
               Hapus 1 Soal Pilihan Ganda
             </Button>}
 
+
             <FormControlLabel sx={{ marginTop: "40px", marginBottom: "40px" }} control={<Switch checked={editAddEssay} onChange={() => {
               setEditAddEssay(!editAddEssay)
             }} />} label="Tambahkan Essay" />
@@ -934,6 +950,7 @@ export default function Ujian() {
                   </div>
                 </>
               ))}
+
               <Button
                 style={{ marginTop: "20px" }}
                 variant='contained'
@@ -972,11 +989,9 @@ export default function Ujian() {
 
               }}>Close Modal</Button> */}
 
-              <Button variant="contained" onClick={() => {
-                // console.log(JSON.stringify(questions, null, 2));
-                console.log(JSON.stringify(editEssay, null, 2));
-                // createUjian()
-                console.log(editQuestions)
+              <Button variant="contained" onClick={async () => {
+                // console.log(JSON.stringify(editQuestions, null, 2));
+                await editUjian(editId)
 
               }}>Submit Edit Data</Button>
             </div>
@@ -984,7 +999,7 @@ export default function Ujian() {
         </Box>
       </Modal>
 
-      {answerUser.length === 0 && <TableContainer sx={{ marginTop: 10 }} component={Paper} ref={tableRef}>
+      <TableContainer sx={{ marginTop: 10, display: hideModalTrigger ? 'none' : 'block' }} component={Paper} ref={tableRef}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
@@ -1040,7 +1055,6 @@ export default function Ujian() {
                     variant="contained"
                     onClick={async () => {
                       await getPelajaran()
-                      console.log(`Row ID -> ${row.id}`)
                       getEditUjian(row.id)
                       setEditTypeUjian(row.nama_ujian)
                       setEditDurasi(row.durasi)
@@ -1048,6 +1062,7 @@ export default function Ujian() {
                       setEditTanggal(formatDate(new Date(row.tanggal)))
                       setEditSelectedPelajaran(row.pelajaran_id)
                       setShowModalEdit(true)
+                      setEditId(row.id)
                       setIsEdit(true)
                     }}
                   >
@@ -1060,9 +1075,8 @@ export default function Ujian() {
           </TableBody>
         </Table>
       </TableContainer>
-      }
 
-      {dataUjian.length === 0 && <TableContainer sx={{ marginTop: 10 }} component={Paper} ref={tableRef}>
+      {dataUjian.length === 0 && <TableContainer sx={{ marginTop: 10, display: hideModalTrigger ? 'block' : 'none' }} component={Paper} ref={tableRef}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>

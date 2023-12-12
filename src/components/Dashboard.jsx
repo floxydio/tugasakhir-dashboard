@@ -39,8 +39,20 @@ function ResponsiveDrawer(props) {
   const [data, setData] = useState([]);
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
-  const [changeNav, setChangeNav] = useState(1);
+  const [changeNav, setChangeNav] = useState(0);
+  const [changeMenuName, setChangeMenuName] = useState('');
   const location = useLocation();
+  const [roleId, setRoleId] = useState()
+  const [menu, setMenu] = useState([])
+
+
+  const fetchRole = async (id) => {
+    await axiosNew.get(`/role/${id}`).then((data) => {
+      console.log(data.data.data)
+      setMenu(data.data.data)
+
+    })
+  }
 
   useEffect(() => {
     async function fetchDataRefresh() {
@@ -57,9 +69,10 @@ function ResponsiveDrawer(props) {
             },
           })
           .then((res) => {
-            console.log(res.data)
+            console.log(res.data.data.role)
             if (res.status === 200) {
               setData(res.data.data);
+              fetchRole(res.data.data.role)
             }
           }).catch((err) => {
             if (err.response.status === 400) {
@@ -69,97 +82,57 @@ function ResponsiveDrawer(props) {
           });
       }
     }
-
-    fromPath()
+    // fromPath()
     fetchDataRefresh();
   }, [location]);
 
 
 
-  function onChangeNav(id) {
+  function onChangeNav(id, route) {
     setChangeNav(id);
-    console.log(id)
-    if (id === 2) {
-      navigate("/guru")
-    } else if (id === 1) {
-      navigate("/")
-    } else if (id === 3) {
-      navigate("/absensi")
-    } else if (id === 4) {
-      navigate("/mapel")
-    } else if (id === 5) {
-      navigate("/users")
-    } else if (id === 6) {
-      navigate("/nilai")
-    } else if (id === 7) {
-      navigate("/ujian")
-    } else if (id === 8) {
-      navigate('/sign-in', { replace: true })
-      localStorage.removeItem("token");
+    setChangeMenuName(route)
+    navigate(route)
+    // if (id === 2) {
+    //   navigate("/guru")
+    // } else if (id === 1) {
+    //   navigate("/")
+    // } else if (id === 3) {
+    //   navigate("/absensi")
+    // } else if (id === 4) {
+    //   navigate("/mapel")
+    // } else if (id === 5) {
+    //   navigate("/users")
+    // } else if (id === 6) {
+    //   navigate("/nilai")
+    // } else if (id === 7) {
+    //   navigate("/ujian")
+    // } else if (id === 8) {
+    //   navigate('/sign-in', { replace: true })
+    //   localStorage.removeItem("token");
+    // }
+  }
+
+  function fromPath(route, id) {
+    if (location.pathname === route) {
+      setChangeNav(id)
     }
   }
 
-  function fromPath() {
-    if (location.pathname === "/") {
-      setChangeNav(1)
-    } else if (location.pathname === "/guru") {
-      setChangeNav(2)
-    } else if (location.pathname === "/absensi") {
-      setChangeNav(3)
-    } else if (location.pathname === "/mapel") {
-      setChangeNav(4)
-    } else if (location.pathname === "/users") {
-      setChangeNav(5)
-    } else if (location.pathname === "/nilai") {
-      setChangeNav(6)
-    } else if (location.pathname === "/ujian") {
-      setChangeNav(7)
+  function iconByName(name) {
+    if (name === "Guru") {
+      return <AccountBox className="h-5 w-5" />
+    } else if (name === "Absensi") {
+      return <Book className="h-5 w-5" />
+    } else if (name === "Ujian") {
+      return <School className="h-5 w-5" />
+    } else if (name === "Nilai") {
+      return <School className="h-5 w-5" />
+    } else if (name === "Users") {
+      return <Star className="h-5 w-5" />
+    } else if (name === "Mapel") {
+      return <AccountBox className="h-5 w-5" />
     }
-
   }
-
-  let menu = [
-    {
-      id: 1,
-      name: "Home",
-      url: "/",
-    },
-    {
-      id: 2,
-      name: "Guru",
-      url: "/guru",
-    },
-    {
-      id: 3,
-      name: "Absensi",
-      url: "/absensi",
-    },
-    {
-      id: 4,
-      name: "Mapel",
-      url: "/mapel",
-    },
-    {
-      id: 5,
-      name: "Users",
-      url: "/users",
-    },
-    {
-      id: 6,
-      name: "Nilai",
-      url: "/nilai"
-    },
-    {
-      id: 7,
-      name: "Ujian",
-      url: "/ujian"
-    },
-    {
-      id: 8,
-      name: "Logout",
-      url: "/sign-in",
-    }
-  ];
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -180,23 +153,13 @@ function ResponsiveDrawer(props) {
           <div key={text.id} className="last:mb-0 mb-2">
             <div
               className={`flex items-center p-2 cursor-pointer ${changeNav - 1 === index ? 'bg-white text-black' : 'text-white'}`}
-              onClick={() => onChangeNav(text.id)}
+              onClick={() => onChangeNav(text.id, text.url_path)}
             >
               <div className={`flex-shrink-0 ${changeNav - 1 === index ? 'text-black' : 'text-white'}`}>
-                {index === 0 && <House className="h-5 w-5" />}
-                {index === 1 && <PermIdentity className="h-5 w-5" />}
-                {index === 2 && <Event className="h-5 w-5" />}
-                {index === 3 && <Book className="h-5 w-5" />}
-                {index === 4 && <AccountBox className="h-5 w-5" />}
-                {index === 5 && <Star className="h-5 w-5" />}
-                {index === 6 && <School className="h-5 w-5" />}
-                {index === 7 && <Logout onClick={() => {
-                  localStorage.removeItem("token");
-                  navigate("/sign-in");
-                }} className="h-5 w-5" />}
+                {iconByName(text.menu_name)}
 
               </div>
-              <span className="ml-3">{text.name}</span>
+              <span className="ml-3">{text.menu_name}</span>
             </div>
             {index < menu.length - 1 && <hr className="border-t border-gray-200" />}
           </div>
