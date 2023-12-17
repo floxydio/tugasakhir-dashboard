@@ -18,10 +18,6 @@ import { useMediaQuery } from 'react-responsive'
 import { formatDate } from '../helper/DateConverter';
 
 
-
-
-
-
 export default function Ujian() {
 
   const isDesktopOrLaptop = useMediaQuery({
@@ -37,6 +33,7 @@ export default function Ujian() {
   const [questions, setQuestions] = useState([]);
   const [addEssay, setAddEssay] = useState(false)
   const [essay, setEssay] = useState([])
+  const [tanggal, setTanggal] = useState('')
   const [dataUjian, setDataUjian] = useState([])
   const [answerUser, setAnswerUser] = useState([])
   const [dataPelajaran, setDataPelajaran] = useState([])
@@ -85,14 +82,11 @@ export default function Ujian() {
   }
 
   async function getUjian() {
-    console.time("fetched Data Ujian")
     setAnswerUser([])
     await axiosNew.get("/all-ujian", {
     }).then((res) => {
       setDataUjian(res.data.data)
       setHideModalTrigger(false)
-      console.timeEnd("fetched Data Ujian")
-      console.log("Response Ujian -> ", res.data.data)
     }).catch((err) => {
       console.log(`Err when load ujian: ${err} `)
     })
@@ -169,9 +163,10 @@ export default function Ujian() {
   async function createUjian() {
     await axiosNew.post("/create-ujian", {
       nama_ujian: typeUjian,
-      mapel: selectedPelajaran,
+      mapel: selectedPelajaran ?? dataPelajaran[0]?.pelajaran_id,
       jam: jamMulai,
       durasi: durasi,
+      tanggal: new Date(tanggal).toISOString(),
       total_soal: questions.length + essay.length,
       soal: questions,
       essay: essay,
@@ -180,9 +175,15 @@ export default function Ujian() {
         "Content-Type": "application/x-www-form-urlencoded",
       }
     }).then((res) => {
-      toast.success("Berhasil Membuat Ujian")
-      localStorage.removeItem('questions');
-      localStorage.removeItem('essay'); f
+      if (res.status === 200 || res.status === 201) {
+        toast.success("Berhasil Membuat Ujian")
+        localStorage.removeItem('questions');
+        localStorage.removeItem('essay');
+        getUjian()
+        setShowModal(false)
+
+      }
+    }).catch((err) => {
       toast.error("Gagal Membuat Ujian")
     })
   }
@@ -372,7 +373,7 @@ export default function Ujian() {
               marginTop: "20px"
             }}
             >
-              <TextField id="outlined" variant='outlined' type='date' />
+              <TextField id="outlined" variant='outlined' type='date' onChange={(e) => setTanggal(e.target.value)} />
             </FormControl>
 
             <div style={{
@@ -463,6 +464,7 @@ export default function Ujian() {
                             }}
                             defaultValue={question.pilihan[cIndex]['isi_plihan[' + cIndex + ']'] || ''}
                             label={`Pilihan ${choiceLabel}`}
+
                             variant="outlined"
                             onChange={(e) => {
                               // Handle text change
@@ -604,7 +606,7 @@ export default function Ujian() {
               <Button variant="contained" onClick={() => {
                 console.log(JSON.stringify(questions, null, 2));
                 // console.log(JSON.stringify(essay, null, 2));
-                // createUjian()
+                createUjian()
 
               }}>Submit Data</Button>
             </div>
@@ -1047,6 +1049,27 @@ export default function Ujian() {
                 <TableCell align="left">{row.total_soal}</TableCell>
                 <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
                 <TableCell align="left">
+                  <Button
+                    className="btn_absen"
+                    sx={{
+                      marginTop: 1,
+                    }}
+                    variant="contained"
+                    onClick={async () => {
+                      await getPelajaran()
+                      getEditUjian(row.id)
+                      setEditTypeUjian(row.nama_ujian)
+                      setEditDurasi(row.durasi)
+                      setEditJamMulai(row.jam_mulai.split("")[0] + row.jam_mulai.split("")[1])
+                      setEditTanggal(formatDate(new Date(row.tanggal)))
+                      setEditSelectedPelajaran(row.pelajaran_id)
+                      setShowModalEdit(true)
+                      setEditId(row.id)
+                      setIsEdit(true)
+                    }}
+                  >
+                    Buat Ulang
+                  </Button>
                   <Button
                     className="btn_absen"
                     sx={{

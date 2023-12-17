@@ -144,6 +144,12 @@ function ResponsiveDrawer(props) {
         textAlign: "center", color: "white",
         marginTop: 40, fontSize: 42
       }}>INISS</p>
+      <p style={{
+        textAlign: "center", color: "white",
+        fontSize: 8
+      }}>
+        (Intelligentsia Nurul Ilmi Secondary School)
+      </p>
       <List
         sx={{
           marginTop: 10,
