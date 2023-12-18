@@ -41,6 +41,7 @@ export default function Ujian() {
   const tableRef = useRef(null);
 
   const [hideModalTrigger, setHideModalTrigger] = useState(false)
+  const [modalRecreate, setModalRecreate] = useState(false)
 
   // For Edit
   const [showModalEdit, setShowModalEdit] = useState(false)
@@ -203,11 +204,36 @@ export default function Ujian() {
       }
     }).then((res) => {
       console.log("Sukses Edit Ujian")
+      getUjian()
       toast.success("Berhasil Edit Ujian")
 
     }).catch((err) => {
       console.error("Gagal Edit Ujian")
       toast.error("Gagal Edit Ujian")
+    })
+  }
+
+  async function recreateEditUjian() {
+    await axiosNew.post(`/create-ujian`, {
+      nama_ujian: editTypeUjian,
+      mapel: editSelectedPelajaran,
+      jam: editJamMulai,
+      durasi: editDurasi,
+      total_soal: editQuestions.length + editEssay.length,
+      soal: editQuestions,
+      tanggal: new Date(editTanggal).toISOString(),
+      essay: editEssay,
+    }, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      }
+    }).then((res) => {
+      getUjian()
+      toast.success("Berhasil Buat Ulang Ujian")
+
+    }).catch((err) => {
+      console.error("Gagal Edit Ujian")
+      toast.error("Gagal Buat Ulang Ujian")
     })
   }
 
@@ -616,6 +642,378 @@ export default function Ujian() {
 
       {/* End */}
 
+      {/* Modal untuk buat ulang */}
+      <Modal
+        disablePortal
+        open={modalRecreate}
+        onClose={() => setModalRecreate(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '60%',
+          height: '90vh',
+          bgcolor: 'white',
+          border: '2px solid #000',
+          boxShadow: 24,
+          p: 4,
+          overflowY: 'auto',
+        }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+
+            <Typography variant="h5" sx={{ textAlign: "center" }}>
+              Buat Ulang Ujian
+            </Typography>
+            <FormControl fullWidth style={{
+              marginTop: "50px"
+            }}>
+              <InputLabel id="demo-simple-select-label">Jenis Ujian</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={editTypeUjian}
+                defaultValue={editTypeUjian}
+                label="Jenis Ujian"
+                onChange={(e) => setEditTypeUjian(e.target.value)}
+              >
+                <MenuItem value={"Ujian Tengah Semester"}>Ujian Tengah Semester</MenuItem>
+                <MenuItem value={"Ujian Akhir Semester"}>Ujian Akhir Semester</MenuItem>
+                <MenuItem value={"Ulangan Harian"}>Ulangan Harian</MenuItem>
+              </Select>
+            </FormControl>
+
+            <FormControl fullWidth style={{
+              marginTop: "20px"
+            }}>
+              <InputLabel id="demo-simple-select-label">Durasi Ujian</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={editDurasi}
+                label="Durasi Ujian"
+                defaultValue={editDurasi}
+                onChange={(e) => setEditDurasi(e.target.value)}
+              >
+                <MenuItem value={15}>15 Menit</MenuItem>
+                <MenuItem value={30}>30 Menit</MenuItem>
+                <MenuItem value={45}>45 Menit</MenuItem>
+                <MenuItem value={60}>60 Menit</MenuItem>
+                <MenuItem value={90}>90 Menit</MenuItem>
+                <MenuItem value={120}>120 Menit</MenuItem>
+              </Select>
+            </FormControl>
+
+            <FormControl fullWidth style={{
+              marginTop: "20px"
+            }}
+            >
+              <InputLabel id="demo-simple-select-label">Jam Mulai</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={editJamMulai}
+                label="Durasi Ujian"
+                onChange={(e) => setEditJamMulai(e.target.value)}
+              >
+                <MenuItem value={"07"}>07.00</MenuItem>
+                <MenuItem value={"08"}>08.00</MenuItem>
+                <MenuItem value={"09"}>09.00</MenuItem>
+                <MenuItem value={"10"}>10.00</MenuItem>
+                <MenuItem value={"11"}>11.00</MenuItem>
+                <MenuItem value={"11"}>12.00</MenuItem>
+                <MenuItem value={"13"}>13.00</MenuItem>
+                <MenuItem value={"14"}>14.00</MenuItem>
+                <MenuItem value={"15"}>15.00</MenuItem>
+                <MenuItem value={"16"}>16.00</MenuItem>
+                <MenuItem value={"17"}>17.00</MenuItem>
+              </Select>
+            </FormControl>
+
+            <FormControl fullWidth style={{
+              marginTop: "20px"
+            }}
+            >
+              <InputLabel id="demo-simple-select-label">Mata Pelajaran</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={editSelectedPelajaran}
+                label="Mata Pelajaran"
+                onChange={(e) => {
+                  setEditSelectedPelajaran(e.target.value)
+                }}
+              >
+                {dataPelajaran.map((pelajaran, i) => (
+                  <MenuItem key={i} value={pelajaran.pelajaran_id}>{pelajaran.nama}</MenuItem>
+                ))}
+
+              </Select>
+            </FormControl>
+
+            <FormControl fullWidth style={{
+              marginTop: "20px"
+            }}
+            >
+              <TextField id="outlined-basic" label="Keterangan" variant="outlined" />
+            </FormControl>
+
+            <FormControl fullWidth style={{
+              marginTop: "20px"
+            }}
+            >
+              <TextField id="outlined" value={editTanggal} variant='outlined' type='date' onChange={(e) => setEditTanggal(e.target.value)} />
+            </FormControl>
+
+            <div style={{
+              marginTop: "40px",
+              marginBottom: "40px",
+              width: "100%",
+              height: "1px",
+              backgroundColor: "black",
+            }}></div>
+
+            <p style={{
+
+              marginBottom: 30
+            }}>Soal Ujian Input</p>
+            {editQuestions.length === 0 && <Button
+              onClick={() => {
+                setEditQuestions([...editQuestions, {
+                  id_soal: 1,
+                  soal: '',
+                  pilihan: Array(5).fill({}).map((_, i) => ({
+                    ['jenis_pilihan[' + i + ']']: String.fromCharCode(65 + i),
+                    ['isi_plihan[' + i + ']']: ''
+                  })),
+                  jawaban: ''
+                }]);
+              }}
+            >
+              Tambah Soal Pilihan Ganda
+            </Button>}
+            {editQuestions.map((question, qIndex) => (
+              <div key={qIndex}>
+                <FormControl fullWidth style={{}}>
+                  <TextField
+                    sx={{
+                      width: "100%"
+                    }}
+                    defaultValue={question.soal}
+                    label={`Soal No-${qIndex + 1}`}
+                    variant="outlined"
+                    onChange={(e) => {
+                      editQuestions[qIndex].soal = e.target.value;
+                      // Handle text change
+                    }}
+                  />
+                </FormControl>
+
+
+                {['A', 'B', 'C', 'D', 'E'].map((choiceLabel, cIndex) => {
+                  const inputTypeKey = `${qIndex}-${cIndex}`;
+                  const isImageInput = choiceInputType[inputTypeKey] === 'image';
+                  return (
+                    <div key={cIndex}>
+
+                      <Button sx={{
+                        display: "block",
+                        marginBottom: "10px",
+                        marginTop: "10px",
+                        marginLeft: "auto",
+                      }} variant='contained' onClick={() => {
+                        toggleChoiceInputType(qIndex, cIndex)
+
+                      }}>
+                        {isImageInput ? <PhotoCamera sx={{
+                          marginTop: "10px"
+                        }} /> : <span>Switch</span>}
+                      </Button>
+                      {isImageInput ? (
+                        <>
+                          {/* console.log(editQuestions[qIndex].pilihan[1][1]) */}
+
+                          <img src={question.pilihan[cIndex][1]} alt="" height={100} className='img_soal' style={{
+                            marginTop: "20px",
+                            marginBottom: "20px",
+                          }} />
+                          <InputLabel id="demo-simple-select-label">{
+                            `Pilihan ${choiceLabel}`
+                          }</InputLabel>
+                          <TextField
+                            type="file"
+                            variant="outlined"
+                            sx={{
+                              width: "100%"
+                            }}
+                            accept="image/*"
+                            onChange={(e) => handleFileChangeEdit(e.target.files[0], qIndex, cIndex)}
+
+                          />
+                        </>
+                      ) : (
+                        <>
+
+                          <TextField
+                            sx={{
+                              width: "100%"
+                            }}
+                            label={`Pilihan ${choiceLabel}`}
+                            variant="outlined"
+                            defaultValue={
+                              question.pilihan[cIndex][1].toString().includes("data:image") ? "" : question.pilihan[cIndex][1].toString() ?? ''
+                            }
+                            onChange={(e) => {
+                              // const updatedQuestions = [...editQuestions];
+                              // updatedQuestions[qIndex].pilihan[cIndex]['isi_plihan[' + cIndex + ']'] = e.target.value;
+                              // setQuestions(updatedQuestions);
+                              question.pilihan[cIndex][1] = e.target.value
+                            }}
+                          />
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
+                <FormControl fullWidth style={{}}>
+                  <TextField
+                    sx={{
+                      width: "100%",
+                      marginTop: "20px",
+                      marginBottom: "20px",
+                    }}
+                    value={
+                      question.jawaban ?? ''
+                    }
+                    label={`Jawaban No-${qIndex + 1}`}
+                    variant="outlined"
+                    onChange={(e) => {
+                      const updatedQuestions = [...editQuestions];
+                      updatedQuestions[qIndex].jawaban = e.target.value;
+                      setQuestions(updatedQuestions);
+                      // Handle text change
+                    }}
+                  />
+                </FormControl>
+              </div>
+            ))}
+
+            <Button
+              style={{ marginTop: "20px" }}
+              variant='contained'
+              onClick={() => {
+                if (editQuestions[editQuestions.length - 1].soal === '') {
+                  toast.error("Soal tidak boleh kosong!")
+                  return
+                } else if (editQuestions[editQuestions.length - 1].jawaban === '') {
+                  toast.error("Jawaban tidak boleh kosong!")
+                  return
+                } else {
+                  console.log(editQuestions)
+                  setEditQuestions([...editQuestions, {
+                    id_soal: editQuestions.length + 1 ?? 1,
+                    soal: '',
+                    pilihan: Array(5).fill({}).map((_, i) => ({
+                      ['jenis_pilihan[' + i + ']']: String.fromCharCode(65 + i),
+                      ['isi_plihan[' + i + ']']: ''
+                    })),
+                    jawaban: ''
+                  }]);
+                }
+              }}
+            >
+              Tambah Soal Pilihan Ganda
+            </Button>
+            {editQuestions.length > 1 && <Button
+              style={{ marginTop: "20px" }}
+              variant="contained"
+              color='error'
+              onClick={() => {
+                setEditQuestions([...editQuestions].slice(0, editQuestions.length - 1));
+              }}
+            >
+              Hapus 1 Soal Pilihan Ganda
+            </Button>}
+
+
+            <FormControlLabel sx={{ marginTop: "40px", marginBottom: "40px" }} control={<Switch checked={editAddEssay} onChange={() => {
+              setEditAddEssay(!editAddEssay)
+            }} />} label="Tambahkan Essay" />
+
+            {editAddEssay && <>
+              {editEssay.map((s, eIndex) => (
+                <>
+                  <div style={{}} key={eIndex}>
+                    <p>Soal Essay ke {eIndex + 1}</p>
+                    <FormControl fullWidth>
+                      <TextField
+                        value={editEssay[eIndex].soal || ''}
+                        label="Soal Essay"
+                        variant="outlined"
+                        sx={{ marginTop: "15px" }}
+                        onChange={e => {
+                          const updatedEssay = [...editEssay];
+                          updatedEssay[eIndex].soal = e.target.value;
+                          setEssay(updatedEssay);
+                        }}
+                      />
+                      <TextField
+                        value={editEssay[eIndex].jawaban || ''}
+                        label="Jawaban Essay" onChange={e => {
+                          const updatedEssay = [...editEssay];
+                          updatedEssay[eIndex].jawaban = e.target.value;
+                          setEssay(updatedEssay);
+                        }} variant='outlined' sx={{ marginTop: "15px" }} />
+                    </FormControl>
+                  </div>
+                </>
+              ))}
+
+              <Button
+                style={{ marginTop: "20px" }}
+                variant='contained'
+                onClick={() => {
+                  setEditEssay([...editEssay, {
+                    id_soal: editEssay.length + 1,
+                    soal: '',
+                    jawaban: ''
+                  }]);
+                }}
+              >
+                Tambah Soal Essay
+              </Button>
+            </>}
+
+            {editEssay.length > 1 && <Button
+              style={{ marginTop: "20px" }}
+              variant='contained'
+              color='error'
+              onClick={() => {
+                setEditEssay([...editEssay].slice(0, essay.length - 1));
+              }}
+            >
+              Hapus 1 Soal Essay
+            </Button>}
+            <Button variant="contained" onClick={async () => {
+              // console.log(JSON.stringify(editQuestions, null, 2));
+              await recreateEditUjian()
+
+            }}>Submit Edit Data</Button>
+          </div>
+        </Box>
+        </Modal>
+
+
+      {/* End */}
+
 
       {/* Modal untuk Edit Ujian - Modal Edit */}
 
@@ -979,24 +1377,11 @@ export default function Ujian() {
               Hapus 1 Soal Essay
             </Button>}
 
-            <div style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginTop: "100px"
-            }}>
-              {/* <Button variant="contained" color='error' onClick={() => {
-                onHideModal()
+            <Button variant="contained" onClick={async () => {
+              // console.log(JSON.stringify(editQuestions, null, 2));
+              await editUjian(editId)
 
-              }}>Close Modal</Button> */}
-
-              <Button variant="contained" onClick={async () => {
-                // console.log(JSON.stringify(editQuestions, null, 2));
-                await editUjian(editId)
-
-              }}>Submit Edit Data</Button>
-            </div>
+            }}>Submit Edit Data</Button>
           </div>
         </Box>
       </Modal>
@@ -1063,9 +1448,9 @@ export default function Ujian() {
                       setEditJamMulai(row.jam_mulai.split("")[0] + row.jam_mulai.split("")[1])
                       setEditTanggal(formatDate(new Date(row.tanggal)))
                       setEditSelectedPelajaran(row.pelajaran_id)
-                      setShowModalEdit(true)
+
                       setEditId(row.id)
-                      setIsEdit(true)
+                      setModalRecreate(true)
                     }}
                   >
                     Buat Ulang
