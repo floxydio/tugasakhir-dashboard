@@ -32,7 +32,8 @@ export default function SignIn() {
     }
     await axiosNew.post("/sign-in", {
       username: username,
-      password: password
+      password: password,
+      role: 1
     }, {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"

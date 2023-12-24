@@ -158,10 +158,10 @@ function ResponsiveDrawer(props) {
         {menu.map((text, index) => (
           <div key={text.id} className="last:mb-0 mb-2">
             <div
-              className={`flex items-center p-2 cursor-pointer ${changeNav - 1 === index ? 'bg-white text-black' : 'text-white'}`}
-              onClick={() => onChangeNav(text.id, text.url_path)}
+              className={`flex items-center p-2 cursor-pointer ${changeNav === index ? 'bg-white text-black' : 'text-white'}`}
+              onClick={() => onChangeNav(index, text.url_path)}
             >
-              <div className={`flex-shrink-0 ${changeNav - 1 === index ? 'text-black' : 'text-white'}`}>
+              <div className={`flex-shrink-0 ${changeNav === index ? 'text-black' : 'text-white'}`}>
                 {iconByName(text.menu_name)}
 
               </div>

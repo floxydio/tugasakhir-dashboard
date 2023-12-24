@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -8,7 +8,8 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import axios from "axios";
 import axiosNew from "../components/AxiosConfig";
-import {   Button,
+import {
+  Button,
   Chip,
   FormControl,
   IconButton,
@@ -16,11 +17,12 @@ import {   Button,
   InputLabel,
   MenuItem,
   Select,
-  TextField, } from "@mui/material";
+  TextField,
+} from "@mui/material";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-
+import { ToastContainer, toast } from 'react-toastify';
 import cryptoJS from "crypto-js";
 import { JadwalModels } from "../models/Jadwal_models";
 
@@ -44,38 +46,37 @@ export default function Mapel() {
 
   //
   const [dataGuru, setDataGuru] = useState([])
-  const [dataKelas,setDataKelas] = useState([])
+  const [dataKelas, setDataKelas] = useState([])
 
   //
-  const [handlePelajaran,setHandlerPelajaran] = useState()
+  const [handlePelajaran, setHandlerPelajaran] = useState()
 
-  const [handleGuru,setHandlerGuru] = useState()
-
-
-  const [handleKelas,setHandlerKelas] = useState()
+  const [handleGuru, setHandlerGuru] = useState()
 
 
-  const [handleJadwalId,setHandlerJadwalId] = useState()
+  const [handleKelas, setHandlerKelas] = useState()
 
-  const [handleWaktu,setHandlerWaktu] = useState()
 
+  const [handleJadwalId, setHandlerJadwalId] = useState()
+
+  const [handleWaktu, setHandlerWaktu] = useState()
+  async function getMapel() {
+    setDataPelajaran([])
+    await axiosNew.get("/pelajaran").then((res) => {
+      setDataPelajaran(res.data.data);
+
+    });
+  }
 
   useEffect(() => {
-    async function getMapel() {
-      await axiosNew.get("/pelajaran").then((res) => {
-        setDataPelajaran(res.data.data);
-        console.log("Data Pelajaran" , res.data.data)
-
-      });
-    }
-    getMapel();
+    getMapel()
   }, []);
 
 
   async function openModalApi() {
     setOpen(true)
-    async function getGuru() {
-      await axiosNew.get("/guru").then(function (res) {
+    async function getGuruByRole() {
+      await axiosNew.get("/list-user-guru").then(function (res) {
         setDataGuru(res.data.data);
       });
     }
@@ -86,55 +87,51 @@ export default function Mapel() {
       });
     }
 
-    await getGuru();
+    await getGuruByRole();
     await getKelas();
 
   }
   const token = localStorage.getItem("token");
 
- async function submitMapel()  {
-  const decrypt = cryptoJS.AES.decrypt(
-    token,
-    `${import.meta.env.VITE_KEY_ENCRYPT}`
-  );
-  let date = new Date(2022, 3, 13); 
-let formattedDate = date.toISOString().split('T')[0];
-   await axiosNew.post("/create-pelajaran",{
-    nama: handlePelajaran,
-    guruId: handleGuru,
-    kelasId: handleKelas,
-    jadwalId: handleJadwalId,
-    jam:handleWaktu,
-    createdAt: formattedDate
-   }, {
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      "x-access-token": token,
-    },
-   }).then((res) => {
-    if(res.status === 200 || res.status === 201) {
-      setOpen(false)
-      async function getMapel() {
-        await axiosNew.get("/pelajaran").then((res) => {
-          setDataPelajaran(res.data.data);
-        });
+  async function submitMapel() {
+    const decrypt = cryptoJS.AES.decrypt(
+      token,
+      `${import.meta.env.VITE_KEY_ENCRYPT}`
+    );
+    let date = new Date(2022, 3, 13);
+    await axiosNew.post("/create-pelajaran", {
+      nama: handlePelajaran,
+      guruId: handleGuru,
+      kelasId: handleKelas,
+      jadwalId: handleJadwalId,
+      jam: handleWaktu,
+      createdAt: new Date().toISOString()
+    }, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "x-access-token": token,
+      },
+    }).then((res) => {
+      if (res.status === 200 || res.status === 201) {
+        setOpen(false)
+        getMapel()
       }
-      getMapel();
-    }
-   })
- }
+    }).catch((err) => toast.error(err.response.data.message ?? "Something went wrong"))
+  }
 
   return (
     <>
-     <Button
-          onClick={openModalApi}
-          style={{
-            marginBottom: "40px"
-          }}
-          variant="contained"
-        >
-          Tambah Mata Pelajaran
-        </Button>
+      <ToastContainer />
+
+      <Button
+        onClick={openModalApi}
+        style={{
+          marginBottom: "40px"
+        }}
+        variant="contained"
+      >
+        Tambah Mata Pelajaran
+      </Button>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
@@ -164,8 +161,8 @@ let formattedDate = date.toISOString().split('T')[0];
                   {i + 1}
                 </TableCell>
                 <TableCell align="left">{row.nama}</TableCell>
-                <TableCell align="left">{row.guru}</TableCell>
-                <TableCell align="left">{row.kelas_nomor}</TableCell>
+                <TableCell align="left">{row.users.nama}</TableCell>
+                <TableCell align="left">{row.kelas.nomor}</TableCell>
                 <TableCell align="left">{row.jam}</TableCell>
               </TableRow>
             ))}
@@ -174,114 +171,115 @@ let formattedDate = date.toISOString().split('T')[0];
       </TableContainer>
 
       <Modal
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <Typography variant="h5" sx={{ textAlign: "center" }}>
+              Tambah Pelajaran
+            </Typography>
+            <FormControl sx={{ m: 1, minWidth: 120, marginTop: 5 }} size="small">
+              <TextField
+                size="small"
+                id="outlined"
+                label="Nama Pelajaran"
+                type="text"
+                onChange={(e) => setHandlerPelajaran(e.target.value)}
+              />
+            </FormControl>
+            <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+
+              <Select
+                sx={{
+                  height: 40,
+                }}
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                defaultValue={999}
+                onChange={(e) => setHandlerGuru(e.target.value)}
               >
-                <Box sx={style}>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                    }}
-                  >
-                    <Typography variant="h5" sx={{ textAlign: "center" }}>
-                     Tambah Pelajaran
-                    </Typography>
-                    <FormControl sx={{ m: 1, minWidth: 120, marginTop: 5 }} size="small">
-                      <TextField
-                        size="small"
-                        id="outlined"
-                        label="Nama Pelajaran"
-                        type="text"
-                        onChange={(e) => setHandlerPelajaran(e.target.value)}
-                      />
-                    </FormControl>
-                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-                      <InputLabel id="demo-simple-select-label">
-                        Nama Guru
-                      </InputLabel>
-                      <Select
-                        sx={{
-                          height: 40,
-                        }}
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        label="Nama Guru"
+                <MenuItem value={999} disabled>
+                  Pilih Guru
+                </MenuItem>
+                {dataGuru.map((e) => (
+                  <MenuItem key={e.user_id} value={e.user_id}>
+                    {e.nama}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
 
-                        onChange={(e) => setHandlerGuru(e.target.value)}
-                      >
-                        {dataGuru.map((e) => (
-                          <MenuItem key={e.id} value={e.id}>
-                            {e.nama}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-                      <InputLabel id="demo-simple-select-label">
-                        Nama Kelas
-                      </InputLabel>
-                      <Select
-                        sx={{
-                          height: 40,
-                        }}
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        label="Nama Kelas"
+              <Select
+                sx={{
+                  height: 40,
+                }}
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                defaultValue={999}
+                onChange={(e) => setHandlerKelas(e.target.value)}
+              >
+                <MenuItem value={999} disabled>
+                  Pilih Kelas
+                </MenuItem>
+                {dataKelas.map((e) => (
+                  <MenuItem key={e.id} value={e.id}>
+                    Kelas {e.nomor}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
 
-                        onChange={(e) => setHandlerKelas(e.target.value)}
-                      >
-                        {dataKelas.map((e) => (
-                          <MenuItem key={e.id} value={e.id}>
-                           Kelas {e.nomor}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-                      <InputLabel id="demo-simple-select-label">
-                       Hari Pelajaran
-                      </InputLabel>
-                      <Select
-                        sx={{
-                          height: 40,
-                        }}
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        label="Hari Pelajaran"
-                        onChange={(e) => setHandlerJadwalId(e.target.value)}
-                      >
-                        {JadwalModels.map((e) => (
-                          <MenuItem key={e.value} value={e.value}>
-                           Hari {e.status}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                    <FormControl sx={{ m: 1, minWidth: 120   }} size="small">
-                      <TextField
-                        size="small"
-                        id="outlined"
-                        label="Jam Pelajaran"
-                        type="text"
-                        onChange={(e) => setHandlerWaktu(e.target.value)}
-                      />
-                    </FormControl>
-                    <Button
-                      style={{
-                        marginTop: 30,
-                      }}
-                      onClick={submitMapel}
-                      variant="contained"
-                    >
-                      Submit
-                    </Button>
-                  </div>
-                </Box>
-              </Modal>
-            
+              <Select
+                sx={{
+                  height: 40,
+                }}
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                defaultValue={999}
+                onChange={(e) => setHandlerJadwalId(e.target.value)}
+              >
+                <MenuItem value={999} disabled>
+                  Pilih Hari
+                </MenuItem>
+                {JadwalModels.map((e) => (
+                  <MenuItem key={e.value} value={e.value}>
+                    Hari {e.status}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+              <TextField
+                size="small"
+                id="outlined"
+                label="Jam Pelajaran"
+                type="text"
+                onChange={(e) => setHandlerWaktu(e.target.value)}
+              />
+            </FormControl>
+            <Button
+              style={{
+                marginTop: 30,
+              }}
+              onClick={submitMapel}
+              variant="contained"
+            >
+              Submit
+            </Button>
+          </div>
+        </Box>
+      </Modal>
+
     </>
   );
 }

@@ -93,7 +93,7 @@ export default function SignUp() {
                          block w-full rounded-md focus:ring-indigo-500"
             />
           </div>
-          <label htmlFor="password" className="block text-sm text-gray-700">Pilih Login</label>
+          <label htmlFor="password" className="block text-sm text-gray-700">Daftar sebagai</label>
 
           <select className='mt-1 px-3 py-2 bg-white border shadow-sm border-gray-300 
                          placeholder-gray-400 focus:outline-none focus:border-indigo-500 

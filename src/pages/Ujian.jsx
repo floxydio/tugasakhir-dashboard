@@ -194,7 +194,7 @@ export default function Ujian() {
       }
     }).catch((err) => {
       console.log(err)
-      // toast.error(err.response.data.message)
+      toast.error(err.response.data.message)
     })
   }
 
@@ -310,15 +310,14 @@ export default function Ujian() {
             <FormControl fullWidth style={{
               marginTop: "50px"
             }}>
-              <InputLabel id="demo-simple-select-label">Jenis Ujian</InputLabel>
               <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                value={typeUjian ?? "Ujian Tengah Semester"}
-                defaultValue={"Ujian Tengah Semester"}
-                label="Jenis Ujian"
+                value={typeUjian ?? "nonvalue"}
+                defaultValue={"nonvalue"}
                 onChange={(e) => setTypeUjian(e.target.value)}
               >
+                <MenuItem value={"nonvalue"} disabled>Pilih Tipe Ujian</MenuItem>
                 <MenuItem value={"Ujian Tengah Semester"}>Ujian Tengah Semester</MenuItem>
                 <MenuItem value={"Ujian Akhir Semester"}>Ujian Akhir Semester</MenuItem>
                 <MenuItem value={"Ulangan Harian"}>Ulangan Harian</MenuItem>
@@ -328,15 +327,14 @@ export default function Ujian() {
             <FormControl fullWidth style={{
               marginTop: "20px"
             }}>
-              <InputLabel id="demo-simple-select-label">Durasi Ujian</InputLabel>
               <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                value={durasi ?? 15}
-                label="Durasi Ujian"
-                defaultValue={15}
+                value={durasi ?? 999}
+                defaultValue={999}
                 onChange={(e) => setDurasi(e.target.value)}
               >
+                <MenuItem value={999} disabled>Pilih Durasi Ujian / Ulangan</MenuItem>
                 <MenuItem value={15}>15 Menit</MenuItem>
                 <MenuItem value={30}>30 Menit</MenuItem>
                 <MenuItem value={45}>45 Menit</MenuItem>
@@ -350,15 +348,14 @@ export default function Ujian() {
               marginTop: "20px"
             }}
             >
-              <InputLabel id="demo-simple-select-label">Jam Mulai</InputLabel>
               <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                value={jamMulai ?? 7}
-                label="Durasi Ujian"
-                defaultValue={7}
+                value={jamMulai ?? 999}
+                defaultValue={999}
                 onChange={(e) => setJamMulai(e.target.value)}
               >
+                <MenuItem value={999} disabled>Pilih Durasi Ujian / Ulangan</MenuItem>
                 <MenuItem value={7}>07.00</MenuItem>
                 <MenuItem value={8}>08.00</MenuItem>
                 <MenuItem value={9}>09.00</MenuItem>
@@ -377,17 +374,17 @@ export default function Ujian() {
               marginTop: "20px"
             }}
             >
-              <InputLabel id="demo-simple-select-label">Mata Pelajaran</InputLabel>
               <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                value={selectedPelajaran ?? dataPelajaran[0]?.pelajaran_id}
-                label="Mata Pelajaran"
-                defaultValue={dataPelajaran[0]?.pelajaran_id}
+                value={selectedPelajaran ?? 999}
+                defaultValue={999}
                 onChange={(e) => {
                   setSelectedPelajaran(e.target.value)
                 }}
-              >f
+              >
+                <MenuItem value={999} disabled>Pilih Mata Pelajaran</MenuItem>
+
                 {dataPelajaran.map((pelajaran, i) => (
                   <MenuItem key={i} value={pelajaran.pelajaran_id}>{pelajaran.nama}</MenuItem>
                 ))}
@@ -399,14 +396,16 @@ export default function Ujian() {
               marginTop: "20px"
             }}
             >
-
               <TextField id="outlined-basic" label="Keterangan" variant="outlined" onChange={(e) => setKeterangan(e.target.value)} />
             </FormControl>
-
+            <InputLabel id="demo-simple-select-label" style={{ marginTop: "20px", marginBottom: "10px" }}>{
+              `Tanggal Mulai`
+            }</InputLabel>
             <FormControl fullWidth style={{
-              marginTop: "20px"
+
             }}
             >
+
               <TextField id="outlined" variant='outlined' type='date' onChange={(e) => setTanggal(e.target.value)} />
             </FormControl>
 
@@ -421,21 +420,7 @@ export default function Ujian() {
             <p style={{
               marginBottom: 30
             }}>Soal Ujian Input</p>
-            {questions.length === 0 && <Button
-              onClick={() => {
-                setQuestions([...questions, {
-                  id_soal: 1,
-                  soal: '',
-                  pilihan: Array(5).fill({}).map((_, i) => ({
-                    ['jenis_pilihan[' + i + ']']: String.fromCharCode(65 + i),
-                    ['isi_plihan[' + i + ']']: ''
-                  })),
-                  jawaban: ''
-                }]);
-              }}
-            >
-              Tambah Soal Pilihan Ganda
-            </Button>}
+
             {questions.map((question, qIndex) => (
               <div key={qIndex}>
                 <FormControl fullWidth style={{}}>
@@ -457,7 +442,6 @@ export default function Ujian() {
                   const isImageInput = choiceInputType[inputTypeKey] === 'image';
                   return (
                     <div key={cIndex}>
-
                       <Button sx={{
                         display: "block",
                         marginBottom: "10px",
@@ -534,16 +518,9 @@ export default function Ujian() {
               style={{ marginTop: "20px" }}
               variant='contained'
               onClick={() => {
-                if (questions[questions.length - 1].soal === '') {
-                  toast.error("Soal tidak boleh kosong!")
-                  return
-                } else if (questions[questions.length - 1].jawaban === '') {
-                  toast.error("Jawaban tidak boleh kosong!")
-                  return
-                } else {
-                  console.log(questions)
+                if (questions.length === 0) {
                   setQuestions([...questions, {
-                    id_soal: questions.length + 1 ?? 1,
+                    id_soal: 1,
                     soal: '',
                     pilihan: Array(5).fill({}).map((_, i) => ({
                       ['jenis_pilihan[' + i + ']']: String.fromCharCode(65 + i),
@@ -551,6 +528,25 @@ export default function Ujian() {
                     })),
                     jawaban: ''
                   }]);
+                } else {
+                  if (questions[questions.length - 1].soal === '') {
+                    toast.error("Soal tidak boleh kosong!")
+                    return
+                  } else if (questions[questions.length - 1].jawaban === '') {
+                    toast.error("Jawaban tidak boleh kosong!")
+                    return
+                  } else {
+                    console.log(questions)
+                    setQuestions([...questions, {
+                      id_soal: questions.length === 0 ? questions.length + 1 : 1,
+                      soal: '',
+                      pilihan: Array(5).fill({}).map((_, i) => ({
+                        ['jenis_pilihan[' + i + ']']: String.fromCharCode(65 + i),
+                        ['isi_plihan[' + i + ']']: ''
+                      })),
+                      jawaban: ''
+                    }]);
+                  }
                 }
               }}
             >
@@ -614,16 +610,21 @@ export default function Ujian() {
               </Button>
             </>}
 
-            {essay.length > 1 && <Button
+            {essay.length > 0 ? <Button
               style={{ marginTop: "20px" }}
               variant='contained'
               color='error'
               onClick={() => {
-                setEssay([...essay].slice(0, essay.length - 1));
+                if (essay.length === 1) {
+                  setAddEssay(false)
+                  setEssay([...essay].slice(0, essay.length - 1));
+                } else {
+                  setEssay([...essay].slice(0, essay.length - 1));
+                }
               }}
             >
               Hapus 1 Soal Essay
-            </Button>}
+            </Button> : <div></div>}
 
             <div style={{
               display: "flex",
@@ -633,17 +634,18 @@ export default function Ujian() {
               marginTop: "100px"
             }}>
               <Button variant="contained" color='error' onClick={() => {
+                if (essay.length === 0) {
+                  setAddEssay(false)
+                }
                 onHideModal()
 
               }}>Close Modal</Button>
 
               <Button variant="contained" onClick={() => {
-                // console.log(JSON.stringify(essay, null, 2));
                 if (tanggal === undefined || tanggal === null) {
                   toast.error('Pilih tanggal ujian terlebih dahulu')
                 } else {
                   createUjian()
-
                 }
 
               }}>Submit Data</Button>
@@ -1441,7 +1443,7 @@ export default function Ujian() {
                 <TableCell align="left" >{row.kelas_id}</TableCell>
                 <TableCell align="left">{row.nama_ujian}</TableCell>
                 <TableCell align="left">{new Date(row.tanggal).toLocaleDateString()}</TableCell>
-                <TableCell align="left">{row.nama ?? "Kosong"}</TableCell>
+                <TableCell align="left">{row.pelajaran.nama}</TableCell>
                 <TableCell align="left">{row.jam_mulai}</TableCell>
                 <TableCell align="left">{row.total_soal}</TableCell>
                 <TableCell align="left">{new Date(row.createdAt).toLocaleDateString()}</TableCell>
@@ -1450,6 +1452,7 @@ export default function Ujian() {
                     className="btn_absen"
                     sx={{
                       marginTop: 1,
+                      marginRight: 1
                     }}
                     variant="contained"
                     onClick={async () => {
