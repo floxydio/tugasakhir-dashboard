@@ -25,6 +25,10 @@ export default function Ujian() {
   })
   const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
 
+  const [keterangan, setKeterangan] = useState('')
+  const [editKeterangan, setEditKeterangan] = useState('')
+
+
   // For Create
   const [showModal, setShowModal] = useState(false)
   const [typeUjian, setTypeUjian] = useState()
@@ -33,7 +37,7 @@ export default function Ujian() {
   const [questions, setQuestions] = useState([]);
   const [addEssay, setAddEssay] = useState(false)
   const [essay, setEssay] = useState([])
-  const [tanggal, setTanggal] = useState('')
+  const [tanggal, setTanggal] = useState(new Date().toISOString())
   const [dataUjian, setDataUjian] = useState([])
   const [answerUser, setAnswerUser] = useState([])
   const [dataPelajaran, setDataPelajaran] = useState([])
@@ -162,13 +166,16 @@ export default function Ujian() {
   }, [questions, essay]);
 
   async function createUjian() {
+    console.log(questions)
     await axiosNew.post("/create-ujian", {
       nama_ujian: typeUjian,
       mapel: selectedPelajaran ?? dataPelajaran[0]?.pelajaran_id,
       jam: jamMulai,
       durasi: durasi,
+      kelas_id: 1,
       tanggal: new Date(tanggal).toISOString(),
       total_soal: questions.length + essay.length,
+      keterangan: keterangan,
       soal: questions,
       essay: essay,
     }, {
@@ -182,10 +189,12 @@ export default function Ujian() {
         localStorage.removeItem('essay');
         getUjian()
         setShowModal(false)
-
+      } else {
+        console.log(res)
       }
     }).catch((err) => {
-      toast.error("Gagal Membuat Ujian")
+      console.log(err)
+      // toast.error(err.response.data.message)
     })
   }
 
@@ -251,20 +260,19 @@ export default function Ujian() {
   return (
     <>
       <ToastContainer />
-      <div className='flex flex-col lg:flex-row justify-between' style={{
+      <div className='flex flex-col lg:flex-row' style={{
       }}>
         <Button variant='contained' onClick={async () => {
           await getPelajaran()
           setShowModal(true)
         }}>Buat Ujian</Button>
-        <div className='flex flex-col lg:flex-row mt-5'>
-          <Button style={{
-            marginRight: isDesktopOrLaptop ? 10 : 0,
-            marginBottom: isDesktopOrLaptop ? 0 : 20,
-          }} variant='contained' onClick={() => getUjian()}>Cek Soal</Button>
-          <Button className='lg:ml-2' variant='contained' onClick={() => onClickJawabanSiswa()}>Cek Jawaban Siswa</Button>
-        </div>
-
+        <Button style={{
+          marginRight: isDesktopOrLaptop ? 10 : 0,
+          marginBottom: isDesktopOrLaptop ? 0 : 20,
+          marginTop: isDesktopOrLaptop ? 0 : 20,
+          marginLeft: isDesktopOrLaptop ? 10 : 0,
+        }} variant='contained' onClick={() => getUjian()}>Cek Soal</Button>
+        <Button className='lg:ml-2' variant='contained' onClick={() => onClickJawabanSiswa()}>Cek Jawaban Siswa</Button>
       </div>
 
       {/* Modal untuk buat ujian */}
@@ -392,7 +400,7 @@ export default function Ujian() {
             }}
             >
 
-              <TextField id="outlined-basic" label="Keterangan" variant="outlined" />
+              <TextField id="outlined-basic" label="Keterangan" variant="outlined" onChange={(e) => setKeterangan(e.target.value)} />
             </FormControl>
 
             <FormControl fullWidth style={{
@@ -630,9 +638,13 @@ export default function Ujian() {
               }}>Close Modal</Button>
 
               <Button variant="contained" onClick={() => {
-                console.log(JSON.stringify(questions, null, 2));
                 // console.log(JSON.stringify(essay, null, 2));
-                createUjian()
+                if (tanggal === undefined || tanggal === null) {
+                  toast.error('Pilih tanggal ujian terlebih dahulu')
+                } else {
+                  createUjian()
+
+                }
 
               }}>Submit Data</Button>
             </div>
@@ -763,7 +775,7 @@ export default function Ujian() {
               marginTop: "20px"
             }}
             >
-              <TextField id="outlined-basic" label="Keterangan" variant="outlined" />
+              <TextField id="outlined-basic" label="Keterangan" variant="outlined" onChange={(e) => setEditKeterangan(e.target.value)} />
             </FormControl>
 
             <FormControl fullWidth style={{
@@ -841,7 +853,7 @@ export default function Ujian() {
                         <>
                           {/* console.log(editQuestions[qIndex].pilihan[1][1]) */}
 
-                          <img src={question.pilihan[cIndex][1]} alt="" height={100} className='img_soal' style={{
+                          <img src={editQuestions.pilihan[cIndex][1]} alt="" height={100} className='img_soal' style={{
                             marginTop: "20px",
                             marginBottom: "20px",
                           }} />
@@ -868,14 +880,14 @@ export default function Ujian() {
                             }}
                             label={`Pilihan ${choiceLabel}`}
                             variant="outlined"
-                            defaultValue={
-                              question.pilihan[cIndex][1].toString().includes("data:image") ? "" : question.pilihan[cIndex][1].toString() ?? ''
-                            }
+                            // defaultValue={
+                            //   editQuestions.pilihan[cIndex][1].toString().includes("data:image") ? "" : editQuestions.pilihan[cIndex][1].toString() ?? ''
+                            // }
                             onChange={(e) => {
                               // const updatedQuestions = [...editQuestions];
                               // updatedQuestions[qIndex].pilihan[cIndex]['isi_plihan[' + cIndex + ']'] = e.target.value;
                               // setQuestions(updatedQuestions);
-                              question.pilihan[cIndex][1] = e.target.value
+                              editQuestions.pilihan[cIndex][1] = e.target.value
                             }}
                           />
                         </>
@@ -891,7 +903,7 @@ export default function Ujian() {
                       marginBottom: "20px",
                     }}
                     value={
-                      question.jawaban ?? ''
+                      editQuestions?.jawaban ?? ''
                     }
                     label={`Jawaban No-${qIndex + 1}`}
                     variant="outlined"
@@ -1009,7 +1021,7 @@ export default function Ujian() {
             }}>Submit Edit Data</Button>
           </div>
         </Box>
-        </Modal>
+      </Modal>
 
 
       {/* End */}
@@ -1137,7 +1149,7 @@ export default function Ujian() {
               marginTop: "20px"
             }}
             >
-              <TextField id="outlined-basic" label="Keterangan" variant="outlined" />
+              <TextField id="outlined-basic" label="Keterangan" variant="outlined" onChange={(e) => setEditKeterangan(e.target.value)} />
             </FormControl>
 
             <FormControl fullWidth style={{
@@ -1242,9 +1254,9 @@ export default function Ujian() {
                             }}
                             label={`Pilihan ${choiceLabel}`}
                             variant="outlined"
-                            defaultValue={
-                              question.pilihan[cIndex][1].toString().includes("data:image") ? "" : question.pilihan[cIndex][1].toString() ?? ''
-                            }
+                            // defaultValue={
+                            //   question.pilihan[cIndex][1].toString().includes("data:image") ? "" : question.pilihan[cIndex][1].toString() ?? ''
+                            // }
                             onChange={(e) => {
                               // const updatedQuestions = [...editQuestions];
                               // updatedQuestions[qIndex].pilihan[cIndex]['isi_plihan[' + cIndex + ']'] = e.target.value;
