@@ -62,8 +62,10 @@ export default function Mapel() {
   const [handleWaktu, setHandlerWaktu] = useState()
   async function getMapel() {
     setDataPelajaran([])
-    await axiosNew.get("/pelajaran").then((res) => {
+    await axiosNew.get("/find-pelajaran").then((res) => {
+      console.log(res.data.data)
       setDataPelajaran(res.data.data);
+      console.log(dataPelajaran[0].nama)
 
     });
   }
@@ -162,7 +164,7 @@ export default function Mapel() {
                 </TableCell>
                 <TableCell align="left">{row.nama}</TableCell>
                 <TableCell align="left">{row.users.nama}</TableCell>
-                <TableCell align="left">{row.kelas.nomor}</TableCell>
+                <TableCell align="left">{row.kelas.nomor_kelas}</TableCell>
                 <TableCell align="left">{row.jam}</TableCell>
               </TableRow>
             ))}
@@ -203,14 +205,14 @@ export default function Mapel() {
                 }}
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                defaultValue={999}
+                defaultValue={handleGuru ?? 999}
                 onChange={(e) => setHandlerGuru(e.target.value)}
               >
                 <MenuItem value={999} disabled>
                   Pilih Guru
                 </MenuItem>
                 {dataGuru.map((e) => (
-                  <MenuItem key={e.user_id} value={e.user_id}>
+                  <MenuItem key={e.guru_id} value={e.guru_id}>
                     {e.nama}
                   </MenuItem>
                 ))}
@@ -224,15 +226,15 @@ export default function Mapel() {
                 }}
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                defaultValue={999}
+                defaultValue={handleKelas ?? 999}
                 onChange={(e) => setHandlerKelas(e.target.value)}
               >
                 <MenuItem value={999} disabled>
                   Pilih Kelas
                 </MenuItem>
                 {dataKelas.map((e) => (
-                  <MenuItem key={e.id} value={e.id}>
-                    Kelas {e.nomor}
+                  <MenuItem key={e.kelas_id} value={e.kelas_id}>
+                    Kelas {e.nomor_kelas}
                   </MenuItem>
                 ))}
               </Select>

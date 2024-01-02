@@ -43,16 +43,46 @@ function ResponsiveDrawer(props) {
   const [changeMenuName, setChangeMenuName] = useState('');
   const location = useLocation();
   const [roleId, setRoleId] = useState()
-  const [menu, setMenu] = useState([])
+  const [menu, setMenu] = useState([
+    {
+      id: 1,
+      name: "Home",
+      url: "/",
+    },
+    {
+      id: 2,
+      name: "Guru",
+      url: "/guru",
+    },
+    // {
+    //   id: 3,
+    //   name: "Absensi",
+    //   url: "/absensi",
+    // },
+    {
+      id: 4,
+      name: "Mata Pelajaran",
+      url: "/mapel",
+    },
+    // {
+    //   id: 5,
+    //   name: "Users",
+    //   url: "/users",
+    // },
+    // {
+    //   id: 6,
+    //   name: "Nilai",
+    //   url: "/nilai"
+    // },
+    {
+      id: 7,
+      name: "Ujian",
+      url: "/ujian"
+    }
+  ])
 
 
-  const fetchRole = async (id) => {
-    await axiosNew.get(`/role/${id}`).then((data) => {
-      console.log(data.data.data)
-      setMenu(data.data.data)
 
-    })
-  }
 
   useEffect(() => {
     async function fetchDataRefresh() {
@@ -69,10 +99,9 @@ function ResponsiveDrawer(props) {
             },
           })
           .then((res) => {
-            console.log(res.data.data.role)
             if (res.status === 200) {
               setData(res.data.data);
-              fetchRole(res.data.data.role)
+              // fetchRole(res.data.data.role)
             }
           }).catch((err) => {
             if (err.response.status === 400) {
@@ -82,39 +111,70 @@ function ResponsiveDrawer(props) {
           });
       }
     }
-    // fromPath()
+    fromPathSpesific()
     fetchDataRefresh();
   }, [location]);
 
 
-
-  function onChangeNav(id, route) {
+  function onChangeNav(id) {
     setChangeNav(id);
-    setChangeMenuName(route)
-    navigate(route)
-    // if (id === 2) {
-    //   navigate("/guru")
-    // } else if (id === 1) {
-    //   navigate("/")
-    // } else if (id === 3) {
-    //   navigate("/absensi")
-    // } else if (id === 4) {
-    //   navigate("/mapel")
-    // } else if (id === 5) {
-    //   navigate("/users")
-    // } else if (id === 6) {
-    //   navigate("/nilai")
-    // } else if (id === 7) {
-    //   navigate("/ujian")
-    // } else if (id === 8) {
-    //   navigate('/sign-in', { replace: true })
-    //   localStorage.removeItem("token");
-    // }
+    if (id === 2) {
+      navigate("/guru")
+    } else if (id === 1) {
+      navigate("/")
+    } else if (id === 3) {
+      navigate("/absensi")
+    } else if (id === 4) {
+      navigate("/mapel")
+    } else if (id === 5) {
+      navigate("/users")
+    } else if (id === 6) {
+      navigate("/nilai")
+    } else if (id === 7) {
+      navigate("/ujian")
+    }
   }
 
-  function fromPath(route, id) {
-    if (location.pathname === route) {
-      setChangeNav(id)
+  function onChangeNavSpesific(id) {
+    setChangeNav(id);
+    if (id === 1) {
+      navigate("/guru")
+    } else if (id === 0) {
+      navigate("/")
+    } else if (id === 2) {
+      navigate("/mapel")
+    } else if (id === 3) {
+      navigate("/ujian")
+    }
+  }
+
+  function fromPath() {
+    if (location.pathname === "/") {
+      setChangeNav(1)
+    } else if (location.pathname === "/guru") {
+      setChangeNav(2)
+    } else if (location.pathname === "/absensi") {
+      setChangeNav(3)
+    } else if (location.pathname === "/mapel") {
+      setChangeNav(4)
+    } else if (location.pathname === "/users") {
+      setChangeNav(5)
+    } else if (location.pathname === "/nilai") {
+      setChangeNav(6)
+    } else if (location.pathname === "/ujian") {
+      setChangeNav(7)
+    }
+  }
+
+  function fromPathSpesific() {
+    if (location.pathname === "/") {
+      setChangeNav(0)
+    } else if (location.pathname === "/guru") {
+      setChangeNav(1)
+    } else if (location.pathname === "/mapel") {
+      setChangeNav(2)
+    } else if (location.pathname === "/ujian") {
+      setChangeNav(3)
     }
   }
 
@@ -133,6 +193,7 @@ function ResponsiveDrawer(props) {
       return <AccountBox className="h-5 w-5" />
     }
   }
+
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -159,15 +220,22 @@ function ResponsiveDrawer(props) {
           <div key={text.id} className="last:mb-0 mb-2">
             <div
               className={`flex items-center p-2 cursor-pointer ${changeNav === index ? 'bg-white text-black' : 'text-white'}`}
-              onClick={() => onChangeNav(index, text.url_path)}
+              onClick={() => onChangeNavSpesific(index)}
             >
               <div className={`flex-shrink-0 ${changeNav === index ? 'text-black' : 'text-white'}`}>
-                {iconByName(text.menu_name)}
 
+                {index == 0 ? <House /> : null}
+                {index == 1 ? <PermIdentity /> : null}
+                {index == 2 ? <Event /> : null}
+                {index == 3 ? <Book /> : null}
+                {index == 4 ? <AccountBox /> : null}
+                {/* Icon For Nilai */}
+                {index == 5 ? <Book /> : null}
+                {index == 6 ? <Book /> : null}
               </div>
-              <span className="ml-3">{text.menu_name}</span>
+              <span className="ml-3">{text.name}</span>
             </div>
-            {index < menu.length - 1 && <hr className="border-t border-gray-200" />}
+            {index < menu.length && <hr className="border-t border-gray-200" />}
           </div>
         ))}
       </List>

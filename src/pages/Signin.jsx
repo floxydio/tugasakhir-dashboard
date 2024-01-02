@@ -30,10 +30,9 @@ export default function SignIn() {
     } else {
       localStorage.removeItem('rememberedUsername');
     }
-    await axiosNew.post("/sign-in", {
+    await axiosNew.post("/guru/sign-in", {
       username: username,
       password: password,
-      role: 1
     }, {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"

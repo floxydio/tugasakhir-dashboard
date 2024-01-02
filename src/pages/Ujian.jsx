@@ -28,6 +28,14 @@ export default function Ujian() {
   const [keterangan, setKeterangan] = useState('')
   const [editKeterangan, setEditKeterangan] = useState('')
 
+  const [semester, setSemester] = useState(0)
+  const [editSemester, setEditSemester] = useState(0)
+
+  const [dataKelas, setDataKelas] = useState([])
+  const [handleKelas, setHandlerKelas] = useState()
+
+  const [editDataKelas, setEditDataKelas] = useState([])
+  const [editHandleKelas, setEditHandlerKelas] = useState()
 
   // For Create
   const [showModal, setShowModal] = useState(false)
@@ -37,6 +45,7 @@ export default function Ujian() {
   const [questions, setQuestions] = useState([]);
   const [addEssay, setAddEssay] = useState(false)
   const [essay, setEssay] = useState([])
+  const [showEssayRecreate, setShowEssayRecreate] = useState(false)
   const [tanggal, setTanggal] = useState(new Date().toISOString())
   const [dataUjian, setDataUjian] = useState([])
   const [answerUser, setAnswerUser] = useState([])
@@ -65,14 +74,15 @@ export default function Ujian() {
     console.time("Fetch Get Edit Ujian")
     await axiosNew.get(`/ujian-detail/${id}`).then((res) => {
       setEditDataUjian(res.data)
-      setEditQuestions(res.data.soal)
-      setEditEssay(res.data.essay)
-
-      console.log(`Data Soal -> ${JSON.parse(res.data.soal)}`)
-      console.log(`Data Essay -> ${JSON.parse(res.data.essay)}`)
+      setEditQuestions(res.data.soal) ?? []
+      setEditEssay(res.data.essay) ?? []
       console.timeEnd("Fetch Get Edit Ujian")
-    }).catch((err) => {
-      console.log(`Err when load ujian edit ${JSON.stringify(err)} `)
+    })
+  }
+
+  async function fetchKelas() {
+    await axiosNew.get("/kelas").then((res) => {
+      setDataKelas(res.data.data)
     })
   }
 
@@ -83,7 +93,11 @@ export default function Ujian() {
 
   const onHideModalEdit = () => {
     setShowModalEdit(false)
-    setIsEdit(false)
+
+  }
+
+  const onHideModalRecreate = () => {
+    setModalRecreate(false)
   }
 
   async function getUjian() {
@@ -166,13 +180,13 @@ export default function Ujian() {
   }, [questions, essay]);
 
   async function createUjian() {
-    console.log(questions)
     await axiosNew.post("/create-ujian", {
       nama_ujian: typeUjian,
       mapel: selectedPelajaran ?? dataPelajaran[0]?.pelajaran_id,
-      jam: jamMulai,
+      jam: jamMulai + ".00",
       durasi: durasi,
-      kelas_id: 1,
+      kelas_id: handleKelas,
+      semester: semester,
       tanggal: new Date(tanggal).toISOString(),
       total_soal: questions.length + essay.length,
       keterangan: keterangan,
@@ -194,6 +208,36 @@ export default function Ujian() {
       }
     }).catch((err) => {
       console.log(err)
+      toast.error(err.response.data.message)
+    })
+  }
+
+  async function createUjianFromRecreate() {
+    await axiosNew.post("/create-ujian", {
+      nama_ujian: editTypeUjian,
+      mapel: editSelectedPelajaran,
+      jam: editJamMulai + ".00",
+      durasi: editDurasi,
+      kelas_id: 5,
+      semester: editSemester,
+      tanggal: new Date(editTanggal).toISOString(),
+      total_soal: editQuestions.length + editEssay.length,
+      keterangan: editKeterangan,
+      soal: editQuestions,
+      essay: editEssay,
+    }, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      }
+    }).then((res) => {
+      if (res.status === 200 || res.status === 201) {
+        toast.success("Berhasil Membuat Ulang Ujian")
+        localStorage.removeItem('questions');
+        localStorage.removeItem('essay');
+        getUjian()
+        setModalRecreate(false)
+      }
+    }).catch((err) => {
       toast.error(err.response.data.message)
     })
   }
@@ -264,6 +308,7 @@ export default function Ujian() {
       }}>
         <Button variant='contained' onClick={async () => {
           await getPelajaran()
+          await fetchKelas()
           setShowModal(true)
         }}>Buat Ujian</Button>
         <Button style={{
@@ -304,8 +349,8 @@ export default function Ujian() {
             }}
           >
 
-            <Typography variant="h5" sx={{ textAlign: "center" }}>
-              Input Ujian
+            <Typography variant="h5" sx={{ textAlign: "center", fontWeight: 'bold' }}>
+              Buat soal ujian / ulangan
             </Typography>
             <FormControl fullWidth style={{
               marginTop: "50px"
@@ -341,6 +386,26 @@ export default function Ujian() {
                 <MenuItem value={60}>60 Menit</MenuItem>
                 <MenuItem value={90}>90 Menit</MenuItem>
                 <MenuItem value={120}>120 Menit</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl fullWidth style={{
+              marginTop: "20px"
+            }}>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={semester ?? 0}
+                defaultValue={0}
+                onChange={(e) => setSemester(e.target.value)}
+              >
+                <MenuItem value={0} disabled>Pilih Semester</MenuItem>
+                <MenuItem value={1}>1</MenuItem>
+                <MenuItem value={2}>2</MenuItem>
+                <MenuItem value={3}>3</MenuItem>
+                <MenuItem value={4}>4</MenuItem>
+                <MenuItem value={5}>5</MenuItem>
+                <MenuItem value={7}>7</MenuItem>
+                <MenuItem value={8}>8</MenuItem>
               </Select>
             </FormControl>
 
@@ -387,6 +452,28 @@ export default function Ujian() {
 
                 {dataPelajaran.map((pelajaran, i) => (
                   <MenuItem key={i} value={pelajaran.pelajaran_id}>{pelajaran.nama}</MenuItem>
+                ))}
+
+              </Select>
+            </FormControl>
+
+            <FormControl fullWidth style={{
+              marginTop: "20px"
+            }}
+            >
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={handleKelas ?? 999}
+                defaultValue={999}
+                onChange={(e) => {
+                  setHandlerKelas(e.target.value)
+                }}
+              >
+                <MenuItem value={999} disabled>Pilih Kelas</MenuItem>
+
+                {dataKelas.map((kelas, i) => (
+                  <MenuItem key={i} value={kelas.kelas_id}>{kelas.nomor_kelas}</MenuItem>
                 ))}
 
               </Select>
@@ -660,7 +747,7 @@ export default function Ujian() {
       <Modal
         disablePortal
         open={modalRecreate}
-        onClose={() => setModalRecreate(false)}
+        onClose={onHideModalRecreate}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
@@ -684,21 +771,20 @@ export default function Ujian() {
             }}
           >
 
-            <Typography variant="h5" sx={{ textAlign: "center" }}>
-              Buat Ulang Ujian
+            <Typography variant="h5" sx={{ textAlign: "center", fontWeight: 'bold' }}>
+              Input Ulang Soal
             </Typography>
             <FormControl fullWidth style={{
               marginTop: "50px"
             }}>
-              <InputLabel id="demo-simple-select-label">Jenis Ujian</InputLabel>
               <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                value={editTypeUjian}
+                value={editTypeUjian ?? "nonvalue"}
                 defaultValue={editTypeUjian}
-                label="Jenis Ujian"
                 onChange={(e) => setEditTypeUjian(e.target.value)}
               >
+                <MenuItem value={"nonvalue"} disabled>Pilih Tipe Ujian</MenuItem>
                 <MenuItem value={"Ujian Tengah Semester"}>Ujian Tengah Semester</MenuItem>
                 <MenuItem value={"Ujian Akhir Semester"}>Ujian Akhir Semester</MenuItem>
                 <MenuItem value={"Ulangan Harian"}>Ulangan Harian</MenuItem>
@@ -708,15 +794,14 @@ export default function Ujian() {
             <FormControl fullWidth style={{
               marginTop: "20px"
             }}>
-              <InputLabel id="demo-simple-select-label">Durasi Ujian</InputLabel>
               <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                value={editDurasi}
-                label="Durasi Ujian"
-                defaultValue={editDurasi}
+                value={editDurasi ?? 999}
+                defaultValue={999}
                 onChange={(e) => setEditDurasi(e.target.value)}
               >
+                <MenuItem value={999} disabled>Pilih Durasi Ujian / Ulangan</MenuItem>
                 <MenuItem value={15}>15 Menit</MenuItem>
                 <MenuItem value={30}>30 Menit</MenuItem>
                 <MenuItem value={45}>45 Menit</MenuItem>
@@ -725,30 +810,24 @@ export default function Ujian() {
                 <MenuItem value={120}>120 Menit</MenuItem>
               </Select>
             </FormControl>
-
             <FormControl fullWidth style={{
               marginTop: "20px"
-            }}
-            >
-              <InputLabel id="demo-simple-select-label">Jam Mulai</InputLabel>
+            }}>
               <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                value={editJamMulai}
-                label="Durasi Ujian"
-                onChange={(e) => setEditJamMulai(e.target.value)}
+                value={editSemester ?? 0}
+                defaultValue={editSemester}
+                onChange={(e) => setEditSemester(e.target.value)}
               >
-                <MenuItem value={"07"}>07.00</MenuItem>
-                <MenuItem value={"08"}>08.00</MenuItem>
-                <MenuItem value={"09"}>09.00</MenuItem>
-                <MenuItem value={"10"}>10.00</MenuItem>
-                <MenuItem value={"11"}>11.00</MenuItem>
-                <MenuItem value={"11"}>12.00</MenuItem>
-                <MenuItem value={"13"}>13.00</MenuItem>
-                <MenuItem value={"14"}>14.00</MenuItem>
-                <MenuItem value={"15"}>15.00</MenuItem>
-                <MenuItem value={"16"}>16.00</MenuItem>
-                <MenuItem value={"17"}>17.00</MenuItem>
+                <MenuItem value={0} disabled>Pilih Semester</MenuItem>
+                <MenuItem value={1}>1</MenuItem>
+                <MenuItem value={2}>2</MenuItem>
+                <MenuItem value={3}>3</MenuItem>
+                <MenuItem value={4}>4</MenuItem>
+                <MenuItem value={5}>5</MenuItem>
+                <MenuItem value={7}>7</MenuItem>
+                <MenuItem value={8}>8</MenuItem>
               </Select>
             </FormControl>
 
@@ -756,16 +835,43 @@ export default function Ujian() {
               marginTop: "20px"
             }}
             >
-              <InputLabel id="demo-simple-select-label">Mata Pelajaran</InputLabel>
               <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                value={editSelectedPelajaran}
-                label="Mata Pelajaran"
+                value={editJamMulai ?? 999}
+                defaultValue={editJamMulai}
+                onChange={(e) => setEditJamMulai(e.target.value)}
+              >
+                <MenuItem value={999} disabled>Pilih Jam Mulai Ujian / Ulangan</MenuItem>
+                <MenuItem value={7}>07.00</MenuItem>
+                <MenuItem value={8}>08.00</MenuItem>
+                <MenuItem value={9}>09.00</MenuItem>
+                <MenuItem value={10}>10.00</MenuItem>
+                <MenuItem value={11}>11.00</MenuItem>
+                <MenuItem value={12}>12.00</MenuItem>
+                <MenuItem value={13}>13.00</MenuItem>
+                <MenuItem value={14}>14.00</MenuItem>
+                <MenuItem value={15}>15.00</MenuItem>
+                <MenuItem value={16}>16.00</MenuItem>
+                <MenuItem value={17}>17.00</MenuItem>
+              </Select>
+            </FormControl>
+
+            <FormControl fullWidth style={{
+              marginTop: "20px"
+            }}
+            >
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={editSelectedPelajaran ?? 999}
+                defaultValue={editSelectedPelajaran}
                 onChange={(e) => {
                   setEditSelectedPelajaran(e.target.value)
                 }}
               >
+                <MenuItem value={999} disabled>Pilih Mata Pelajaran</MenuItem>
+
                 {dataPelajaran.map((pelajaran, i) => (
                   <MenuItem key={i} value={pelajaran.pelajaran_id}>{pelajaran.nama}</MenuItem>
                 ))}
@@ -777,14 +883,39 @@ export default function Ujian() {
               marginTop: "20px"
             }}
             >
-              <TextField id="outlined-basic" label="Keterangan" variant="outlined" onChange={(e) => setEditKeterangan(e.target.value)} />
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={editHandleKelas ?? 999}
+                defaultValue={editHandleKelas ?? 999}
+                onChange={(e) => {
+                  setEditHandlerKelas(e.target.value)
+                }}
+              >
+                <MenuItem value={999} disabled>Pilih Kelas</MenuItem>
+
+                {dataKelas.map((kelas, i) => (
+                  <MenuItem key={i} value={kelas.kelas_id}>{kelas.nomor_kelas}</MenuItem>
+                ))}
+
+              </Select>
             </FormControl>
 
             <FormControl fullWidth style={{
               marginTop: "20px"
             }}
             >
-              <TextField id="outlined" value={editTanggal} variant='outlined' type='date' onChange={(e) => setEditTanggal(e.target.value)} />
+              <TextField id="outlined-basic" label="Keterangan" defaultValue={editKeterangan ?? ""} variant="outlined" onChange={(e) => setEditKeterangan(e.target.value)} />
+            </FormControl>
+            <InputLabel id="demo-simple-select-label" style={{ marginTop: "20px", marginBottom: "10px" }}>{
+              `Tanggal Mulai`
+            }</InputLabel>
+            <FormControl fullWidth style={{
+
+            }}
+            >
+
+              <TextField id="outlined" variant='outlined' type='date' value={editTanggal} onChange={(e) => setEditTanggal(e.target.value)} />
             </FormControl>
 
             <div style={{
@@ -796,32 +927,22 @@ export default function Ujian() {
             }}></div>
 
             <p style={{
+              marginBottom: 30,
+              textAlign: "center",
+              fontWeight: "bold",
+              fontSize: 22,
+            }}>Input Pilihan Ganda</p>
 
-              marginBottom: 30
-            }}>Soal Ujian Input</p>
-            {editQuestions.length === 0 && <Button
-              onClick={() => {
-                setEditQuestions([...editQuestions, {
-                  id_soal: 1,
-                  soal: '',
-                  pilihan: Array(5).fill({}).map((_, i) => ({
-                    ['jenis_pilihan[' + i + ']']: String.fromCharCode(65 + i),
-                    ['isi_plihan[' + i + ']']: ''
-                  })),
-                  jawaban: ''
-                }]);
-              }}
-            >
-              Tambah Soal Pilihan Ganda
-            </Button>}
             {editQuestions.map((question, qIndex) => (
               <div key={qIndex}>
+                <p style={{ marginBottom: 20 }}>Soal nomor-{qIndex + 1}</p>
+
                 <FormControl fullWidth style={{}}>
                   <TextField
                     sx={{
                       width: "100%"
                     }}
-                    defaultValue={question.soal}
+                    defaultValue={question.soal || ''}
                     label={`Soal No-${qIndex + 1}`}
                     variant="outlined"
                     onChange={(e) => {
@@ -830,70 +951,30 @@ export default function Ujian() {
                     }}
                   />
                 </FormControl>
-
-
                 {['A', 'B', 'C', 'D', 'E'].map((choiceLabel, cIndex) => {
                   const inputTypeKey = `${qIndex}-${cIndex}`;
                   const isImageInput = choiceInputType[inputTypeKey] === 'image';
                   return (
                     <div key={cIndex}>
+                      <TextField
+                        sx={{
+                          width: "100%",
+                          marginTop: "20px",
+                          marginBottom: "20px",
+                        }}
+                        defaultValue={
+                          editQuestions[qIndex].pilihan[cIndex][1] ?? ''
+                        }
+                        label={`Pilihan ${choiceLabel}`}
 
-                      <Button sx={{
-                        display: "block",
-                        marginBottom: "10px",
-                        marginTop: "10px",
-                        marginLeft: "auto",
-                      }} variant='contained' onClick={() => {
-                        toggleChoiceInputType(qIndex, cIndex)
-
-                      }}>
-                        {isImageInput ? <PhotoCamera sx={{
-                          marginTop: "10px"
-                        }} /> : <span>Switch</span>}
-                      </Button>
-                      {isImageInput ? (
-                        <>
-                          {/* console.log(editQuestions[qIndex].pilihan[1][1]) */}
-
-                          <img src={editQuestions.pilihan[cIndex][1]} alt="" height={100} className='img_soal' style={{
-                            marginTop: "20px",
-                            marginBottom: "20px",
-                          }} />
-                          <InputLabel id="demo-simple-select-label">{
-                            `Pilihan ${choiceLabel}`
-                          }</InputLabel>
-                          <TextField
-                            type="file"
-                            variant="outlined"
-                            sx={{
-                              width: "100%"
-                            }}
-                            accept="image/*"
-                            onChange={(e) => handleFileChangeEdit(e.target.files[0], qIndex, cIndex)}
-
-                          />
-                        </>
-                      ) : (
-                        <>
-
-                          <TextField
-                            sx={{
-                              width: "100%"
-                            }}
-                            label={`Pilihan ${choiceLabel}`}
-                            variant="outlined"
-                            // defaultValue={
-                            //   editQuestions.pilihan[cIndex][1].toString().includes("data:image") ? "" : editQuestions.pilihan[cIndex][1].toString() ?? ''
-                            // }
-                            onChange={(e) => {
-                              // const updatedQuestions = [...editQuestions];
-                              // updatedQuestions[qIndex].pilihan[cIndex]['isi_plihan[' + cIndex + ']'] = e.target.value;
-                              // setQuestions(updatedQuestions);
-                              editQuestions.pilihan[cIndex][1] = e.target.value
-                            }}
-                          />
-                        </>
-                      )}
+                        variant="outlined"
+                        onChange={(e) => {
+                          // Handle text change
+                          const updatedQuestions = [...editQuestions];
+                          updatedQuestions[qIndex].pilihan[cIndex][1] = e.target.value;
+                          setEditQuestions(updatedQuestions);
+                        }}
+                      />
                     </div>
                   );
                 })}
@@ -904,36 +985,24 @@ export default function Ujian() {
                       marginTop: "20px",
                       marginBottom: "20px",
                     }}
-                    value={
-                      editQuestions?.jawaban ?? ''
-                    }
+                    defaultValue={question.jawaban || ''}
                     label={`Jawaban No-${qIndex + 1}`}
                     variant="outlined"
                     onChange={(e) => {
-                      const updatedQuestions = [...editQuestions];
-                      updatedQuestions[qIndex].jawaban = e.target.value;
-                      setQuestions(updatedQuestions);
+                      questions[qIndex].jawaban = e.target.value;
                       // Handle text change
                     }}
                   />
                 </FormControl>
               </div>
             ))}
-
             <Button
               style={{ marginTop: "20px" }}
               variant='contained'
               onClick={() => {
-                if (editQuestions[editQuestions.length - 1].soal === '') {
-                  toast.error("Soal tidak boleh kosong!")
-                  return
-                } else if (editQuestions[editQuestions.length - 1].jawaban === '') {
-                  toast.error("Jawaban tidak boleh kosong!")
-                  return
-                } else {
-                  console.log(editQuestions)
-                  setEditQuestions([...editQuestions, {
-                    id_soal: editQuestions.length + 1 ?? 1,
+                if (questions.length === 0) {
+                  setEditQuestions([...questions, {
+                    id_soal: 1,
                     soal: '',
                     pilihan: Array(5).fill({}).map((_, i) => ({
                       ['jenis_pilihan[' + i + ']']: String.fromCharCode(65 + i),
@@ -941,90 +1010,146 @@ export default function Ujian() {
                     })),
                     jawaban: ''
                   }]);
+                } else {
+                  if (questions[questions.length - 1].soal === '') {
+                    toast.error("Soal tidak boleh kosong!")
+                    return
+                  } else if (questions[questions.length - 1].jawaban === '') {
+                    toast.error("Jawaban tidak boleh kosong!")
+                    return
+                  } else {
+                    console.log(questions)
+                    setEditQuestions([...questions, {
+                      id_soal: editQuestions.length === 0 ? editQuestions.length + 1 : 1,
+                      soal: '',
+                      pilihan: Array(5).fill({}).map((_, i) => ({
+                        ['jenis_pilihan[' + i + ']']: String.fromCharCode(65 + i),
+                        ['isi_plihan[' + i + ']']: ''
+                      })),
+                      jawaban: ''
+                    }]);
+                  }
                 }
               }}
             >
               Tambah Soal Pilihan Ganda
             </Button>
-            {editQuestions.length > 1 && <Button
+
+            <div style={{
+              marginTop: "40px",
+              marginBottom: "20px",
+              width: "100%",
+              height: "1px",
+              backgroundColor: "black",
+            }}></div>
+
+            {questions.length > 1 && <Button
               style={{ marginTop: "20px" }}
               variant="contained"
               color='error'
               onClick={() => {
-                setEditQuestions([...editQuestions].slice(0, editQuestions.length - 1));
+                setEditQuestions([...questions].slice(0, questions.length - 1));
               }}
             >
               Hapus 1 Soal Pilihan Ganda
             </Button>}
-
-
-            <FormControlLabel sx={{ marginTop: "40px", marginBottom: "40px" }} control={<Switch checked={editAddEssay} onChange={() => {
-              setEditAddEssay(!editAddEssay)
-            }} />} label="Tambahkan Essay" />
-
-            {editAddEssay && <>
+            <FormControlLabel sx={{ marginTop: "40px", marginBottom: "40px" }} control={<Switch checked={showEssayRecreate} onChange={() => {
+              setShowEssayRecreate(!showEssayRecreate)
+            }} />} label="Tampilkan Input Essay" />
+            <p style={{
+              marginBottom: 30,
+              textAlign: "center",
+              fontWeight: "bold",
+              fontSize: 22,
+            }}>Input Essay</p>
+            {showEssayRecreate && <>
               {editEssay.map((s, eIndex) => (
                 <>
                   <div style={{}} key={eIndex}>
-                    <p>Soal Essay ke {eIndex + 1}</p>
+                    <p style={{ marginBottom: "20px", marginTop: "20px" }}>Soal Essay nomor-{eIndex + 1}</p>
                     <FormControl fullWidth>
                       <TextField
-                        value={editEssay[eIndex].soal || ''}
+                        defaultValue={editEssay[eIndex].soal || ''}
                         label="Soal Essay"
                         variant="outlined"
                         sx={{ marginTop: "15px" }}
                         onChange={e => {
                           const updatedEssay = [...editEssay];
                           updatedEssay[eIndex].soal = e.target.value;
-                          setEssay(updatedEssay);
+                          setEditEssay(updatedEssay);
                         }}
                       />
                       <TextField
-                        value={editEssay[eIndex].jawaban || ''}
+                        defaultValue={editEssay[eIndex].jawaban || ''}
                         label="Jawaban Essay" onChange={e => {
                           const updatedEssay = [...editEssay];
                           updatedEssay[eIndex].jawaban = e.target.value;
-                          setEssay(updatedEssay);
+                          setEditEssay(updatedEssay);
                         }} variant='outlined' sx={{ marginTop: "15px" }} />
                     </FormControl>
                   </div>
                 </>
               ))}
-
-              <Button
+              <>
+                <Button
+                  style={{ marginTop: "20px" }}
+                  variant='contained'
+                  onClick={() => {
+                    setEditEssay([...editEssay, {
+                      id_soal: editEssay.length + 1,
+                      soal: '',
+                      jawaban: ''
+                    }]);
+                  }}
+                >
+                  Tambah Soal Essay
+                </Button>
+              </>
+              {editEssay.length > 1 ? <Button
                 style={{ marginTop: "20px" }}
                 variant='contained'
+                color='error'
                 onClick={() => {
-                  setEditEssay([...editEssay, {
-                    id_soal: editEssay.length + 1,
-                    soal: '',
-                    jawaban: ''
-                  }]);
+                  if (essay.length === 1) {
+                    // setShowEssayRecreate(false)
+                    setEditEssay([...editEssay].slice(0, editEssay.length - 1));
+                  } else {
+                    setEditEssay([...editEssay].slice(0, editEssay.length - 1));
+                  }
                 }}
               >
-                Tambah Soal Essay
-              </Button>
+                Hapus 1 Soal Essay
+              </Button> : <div></div>}
             </>}
 
-            {editEssay.length > 1 && <Button
-              style={{ marginTop: "20px" }}
-              variant='contained'
-              color='error'
-              onClick={() => {
-                setEditEssay([...editEssay].slice(0, essay.length - 1));
-              }}
-            >
-              Hapus 1 Soal Essay
-            </Button>}
-            <Button variant="contained" onClick={async () => {
-              // console.log(JSON.stringify(editQuestions, null, 2));
-              await recreateEditUjian()
 
-            }}>Submit Edit Data</Button>
+            <div style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginTop: "100px"
+            }}>
+              <Button variant="contained" color='error' onClick={() => {
+                if (editEssay.length === 0) {
+                  setShowEssayRecreate(false)
+                }
+                onHideModalRecreate()
+
+              }}>Close Modal</Button>
+
+              <Button variant="contained" onClick={() => {
+                if (tanggal === undefined || tanggal === null) {
+                  toast.error('Pilih tanggal ujian terlebih dahulu')
+                } else {
+                  createUjianFromRecreate()
+                }
+
+              }}>Submit Data</Button>
+            </div>
           </div>
         </Box>
       </Modal>
-
 
       {/* End */}
 
@@ -1058,21 +1183,20 @@ export default function Ujian() {
             }}
           >
 
-            <Typography variant="h5" sx={{ textAlign: "center" }}>
-              Input Ujian
+            <Typography variant="h5" sx={{ textAlign: "center", fontWeight: 'bold' }}>
+              Input Ubah Data
             </Typography>
             <FormControl fullWidth style={{
               marginTop: "50px"
             }}>
-              <InputLabel id="demo-simple-select-label">Jenis Ujian</InputLabel>
               <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                value={editTypeUjian}
+                value={editTypeUjian ?? "nonvalue"}
                 defaultValue={editTypeUjian}
-                label="Jenis Ujian"
                 onChange={(e) => setEditTypeUjian(e.target.value)}
               >
+                <MenuItem value={"nonvalue"} disabled>Pilih Tipe Ujian</MenuItem>
                 <MenuItem value={"Ujian Tengah Semester"}>Ujian Tengah Semester</MenuItem>
                 <MenuItem value={"Ujian Akhir Semester"}>Ujian Akhir Semester</MenuItem>
                 <MenuItem value={"Ulangan Harian"}>Ulangan Harian</MenuItem>
@@ -1082,15 +1206,14 @@ export default function Ujian() {
             <FormControl fullWidth style={{
               marginTop: "20px"
             }}>
-              <InputLabel id="demo-simple-select-label">Durasi Ujian</InputLabel>
               <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                value={editDurasi}
-                label="Durasi Ujian"
-                defaultValue={editDurasi}
+                value={editDurasi ?? 999}
+                defaultValue={999}
                 onChange={(e) => setEditDurasi(e.target.value)}
               >
+                <MenuItem value={999} disabled>Pilih Durasi Ujian / Ulangan</MenuItem>
                 <MenuItem value={15}>15 Menit</MenuItem>
                 <MenuItem value={30}>30 Menit</MenuItem>
                 <MenuItem value={45}>45 Menit</MenuItem>
@@ -1099,30 +1222,24 @@ export default function Ujian() {
                 <MenuItem value={120}>120 Menit</MenuItem>
               </Select>
             </FormControl>
-
             <FormControl fullWidth style={{
               marginTop: "20px"
-            }}
-            >
-              <InputLabel id="demo-simple-select-label">Jam Mulai</InputLabel>
+            }}>
               <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                value={editJamMulai}
-                label="Durasi Ujian"
-                onChange={(e) => setEditJamMulai(e.target.value)}
+                value={editSemester ?? 0}
+                defaultValue={editSemester}
+                onChange={(e) => setEditSemester(e.target.value)}
               >
-                <MenuItem value={"07"}>07.00</MenuItem>
-                <MenuItem value={"08"}>08.00</MenuItem>
-                <MenuItem value={"09"}>09.00</MenuItem>
-                <MenuItem value={"10"}>10.00</MenuItem>
-                <MenuItem value={"11"}>11.00</MenuItem>
-                <MenuItem value={"11"}>12.00</MenuItem>
-                <MenuItem value={"13"}>13.00</MenuItem>
-                <MenuItem value={"14"}>14.00</MenuItem>
-                <MenuItem value={"15"}>15.00</MenuItem>
-                <MenuItem value={"16"}>16.00</MenuItem>
-                <MenuItem value={"17"}>17.00</MenuItem>
+                <MenuItem value={0} disabled>Pilih Semester</MenuItem>
+                <MenuItem value={1}>1</MenuItem>
+                <MenuItem value={2}>2</MenuItem>
+                <MenuItem value={3}>3</MenuItem>
+                <MenuItem value={4}>4</MenuItem>
+                <MenuItem value={5}>5</MenuItem>
+                <MenuItem value={7}>7</MenuItem>
+                <MenuItem value={8}>8</MenuItem>
               </Select>
             </FormControl>
 
@@ -1130,16 +1247,43 @@ export default function Ujian() {
               marginTop: "20px"
             }}
             >
-              <InputLabel id="demo-simple-select-label">Mata Pelajaran</InputLabel>
               <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                value={editSelectedPelajaran}
-                label="Mata Pelajaran"
+                value={editJamMulai ?? 999}
+                defaultValue={editJamMulai}
+                onChange={(e) => setEditJamMulai(e.target.value)}
+              >
+                <MenuItem value={999} disabled>Pilih Jam Mulai Ujian / Ulangan</MenuItem>
+                <MenuItem value={7}>07.00</MenuItem>
+                <MenuItem value={8}>08.00</MenuItem>
+                <MenuItem value={9}>09.00</MenuItem>
+                <MenuItem value={10}>10.00</MenuItem>
+                <MenuItem value={11}>11.00</MenuItem>
+                <MenuItem value={12}>12.00</MenuItem>
+                <MenuItem value={13}>13.00</MenuItem>
+                <MenuItem value={14}>14.00</MenuItem>
+                <MenuItem value={15}>15.00</MenuItem>
+                <MenuItem value={16}>16.00</MenuItem>
+                <MenuItem value={17}>17.00</MenuItem>
+              </Select>
+            </FormControl>
+
+            <FormControl fullWidth style={{
+              marginTop: "20px"
+            }}
+            >
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={editSelectedPelajaran ?? 999}
+                defaultValue={editSelectedPelajaran}
                 onChange={(e) => {
                   setEditSelectedPelajaran(e.target.value)
                 }}
               >
+                <MenuItem value={999} disabled>Pilih Mata Pelajaran</MenuItem>
+
                 {dataPelajaran.map((pelajaran, i) => (
                   <MenuItem key={i} value={pelajaran.pelajaran_id}>{pelajaran.nama}</MenuItem>
                 ))}
@@ -1151,14 +1295,39 @@ export default function Ujian() {
               marginTop: "20px"
             }}
             >
-              <TextField id="outlined-basic" label="Keterangan" variant="outlined" onChange={(e) => setEditKeterangan(e.target.value)} />
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={editHandleKelas ?? 999}
+                defaultValue={editHandleKelas ?? 999}
+                onChange={(e) => {
+                  setEditHandlerKelas(e.target.value)
+                }}
+              >
+                <MenuItem value={999} disabled>Pilih Kelas</MenuItem>
+
+                {dataKelas.map((kelas, i) => (
+                  <MenuItem key={i} value={kelas.kelas_id}>{kelas.nomor_kelas}</MenuItem>
+                ))}
+
+              </Select>
             </FormControl>
 
             <FormControl fullWidth style={{
               marginTop: "20px"
             }}
             >
-              <TextField id="outlined" value={editTanggal} variant='outlined' type='date' />
+              <TextField id="outlined-basic" label="Keterangan" defaultValue={editKeterangan ?? ""} variant="outlined" onChange={(e) => setEditKeterangan(e.target.value)} />
+            </FormControl>
+            <InputLabel id="demo-simple-select-label" style={{ marginTop: "20px", marginBottom: "10px" }}>{
+              `Tanggal Mulai`
+            }</InputLabel>
+            <FormControl fullWidth style={{
+
+            }}
+            >
+
+              <TextField id="outlined" variant='outlined' type='date' value={editTanggal} onChange={(e) => setEditTanggal(e.target.value)} />
             </FormControl>
 
             <div style={{
@@ -1170,32 +1339,22 @@ export default function Ujian() {
             }}></div>
 
             <p style={{
+              marginBottom: 30,
+              textAlign: "center",
+              fontWeight: "bold",
+              fontSize: 22,
+            }}>Input Pilihan Ganda</p>
 
-              marginBottom: 30
-            }}>Soal Ujian Input</p>
-            {editQuestions.length === 0 && <Button
-              onClick={() => {
-                setEditQuestions([...editQuestions, {
-                  id_soal: 1,
-                  soal: '',
-                  pilihan: Array(5).fill({}).map((_, i) => ({
-                    ['jenis_pilihan[' + i + ']']: String.fromCharCode(65 + i),
-                    ['isi_plihan[' + i + ']']: ''
-                  })),
-                  jawaban: ''
-                }]);
-              }}
-            >
-              Tambah Soal Pilihan Ganda
-            </Button>}
             {editQuestions.map((question, qIndex) => (
               <div key={qIndex}>
+                <p style={{ marginBottom: 20 }}>Soal nomor-{qIndex + 1}</p>
+
                 <FormControl fullWidth style={{}}>
                   <TextField
                     sx={{
                       width: "100%"
                     }}
-                    defaultValue={question.soal}
+                    defaultValue={question.soal || ''}
                     label={`Soal No-${qIndex + 1}`}
                     variant="outlined"
                     onChange={(e) => {
@@ -1204,70 +1363,30 @@ export default function Ujian() {
                     }}
                   />
                 </FormControl>
-
-
                 {['A', 'B', 'C', 'D', 'E'].map((choiceLabel, cIndex) => {
                   const inputTypeKey = `${qIndex}-${cIndex}`;
                   const isImageInput = choiceInputType[inputTypeKey] === 'image';
                   return (
                     <div key={cIndex}>
+                      <TextField
+                        sx={{
+                          width: "100%",
+                          marginTop: "20px",
+                          marginBottom: "20px",
+                        }}
+                        defaultValue={
+                          editQuestions[qIndex].pilihan[cIndex][1] ?? ''
+                        }
+                        label={`Pilihan ${choiceLabel}`}
 
-                      <Button sx={{
-                        display: "block",
-                        marginBottom: "10px",
-                        marginTop: "10px",
-                        marginLeft: "auto",
-                      }} variant='contained' onClick={() => {
-                        toggleChoiceInputType(qIndex, cIndex)
-
-                      }}>
-                        {isImageInput ? <PhotoCamera sx={{
-                          marginTop: "10px"
-                        }} /> : <span>Switch</span>}
-                      </Button>
-                      {isImageInput ? (
-                        <>
-                          {/* console.log(editQuestions[qIndex].pilihan[1][1]) */}
-
-                          <img src={question.pilihan[cIndex][1]} alt="" height={100} className='img_soal' style={{
-                            marginTop: "20px",
-                            marginBottom: "20px",
-                          }} />
-                          <InputLabel id="demo-simple-select-label">{
-                            `Pilihan ${choiceLabel}`
-                          }</InputLabel>
-                          <TextField
-                            type="file"
-                            variant="outlined"
-                            sx={{
-                              width: "100%"
-                            }}
-                            accept="image/*"
-                            onChange={(e) => handleFileChangeEdit(e.target.files[0], qIndex, cIndex)}
-
-                          />
-                        </>
-                      ) : (
-                        <>
-
-                          <TextField
-                            sx={{
-                              width: "100%"
-                            }}
-                            label={`Pilihan ${choiceLabel}`}
-                            variant="outlined"
-                            // defaultValue={
-                            //   question.pilihan[cIndex][1].toString().includes("data:image") ? "" : question.pilihan[cIndex][1].toString() ?? ''
-                            // }
-                            onChange={(e) => {
-                              // const updatedQuestions = [...editQuestions];
-                              // updatedQuestions[qIndex].pilihan[cIndex]['isi_plihan[' + cIndex + ']'] = e.target.value;
-                              // setQuestions(updatedQuestions);
-                              question.pilihan[cIndex][1] = e.target.value
-                            }}
-                          />
-                        </>
-                      )}
+                        variant="outlined"
+                        onChange={(e) => {
+                          // Handle text change
+                          const updatedQuestions = [...editQuestions];
+                          updatedQuestions[qIndex].pilihan[cIndex][1] = e.target.value;
+                          setEditQuestions(updatedQuestions);
+                        }}
+                      />
                     </div>
                   );
                 })}
@@ -1278,36 +1397,24 @@ export default function Ujian() {
                       marginTop: "20px",
                       marginBottom: "20px",
                     }}
-                    value={
-                      question.jawaban ?? ''
-                    }
+                    defaultValue={question.jawaban || ''}
                     label={`Jawaban No-${qIndex + 1}`}
                     variant="outlined"
                     onChange={(e) => {
-                      const updatedQuestions = [...editQuestions];
-                      updatedQuestions[qIndex].jawaban = e.target.value;
-                      setQuestions(updatedQuestions);
+                      questions[qIndex].jawaban = e.target.value;
                       // Handle text change
                     }}
                   />
                 </FormControl>
               </div>
             ))}
-
             <Button
               style={{ marginTop: "20px" }}
               variant='contained'
               onClick={() => {
-                if (editQuestions[editQuestions.length - 1].soal === '') {
-                  toast.error("Soal tidak boleh kosong!")
-                  return
-                } else if (editQuestions[editQuestions.length - 1].jawaban === '') {
-                  toast.error("Jawaban tidak boleh kosong!")
-                  return
-                } else {
-                  console.log(editQuestions)
-                  setEditQuestions([...editQuestions, {
-                    id_soal: editQuestions.length + 1 ?? 1,
+                if (questions.length === 0) {
+                  setEditQuestions([...questions, {
+                    id_soal: 1,
                     soal: '',
                     pilihan: Array(5).fill({}).map((_, i) => ({
                       ['jenis_pilihan[' + i + ']']: String.fromCharCode(65 + i),
@@ -1315,87 +1422,143 @@ export default function Ujian() {
                     })),
                     jawaban: ''
                   }]);
+                } else {
+                  if (questions[questions.length - 1].soal === '') {
+                    toast.error("Soal tidak boleh kosong!")
+                    return
+                  } else if (questions[questions.length - 1].jawaban === '') {
+                    toast.error("Jawaban tidak boleh kosong!")
+                    return
+                  } else {
+                    console.log(questions)
+                    setEditQuestions([...questions, {
+                      id_soal: editQuestions.length === 0 ? editQuestions.length + 1 : 1,
+                      soal: '',
+                      pilihan: Array(5).fill({}).map((_, i) => ({
+                        ['jenis_pilihan[' + i + ']']: String.fromCharCode(65 + i),
+                        ['isi_plihan[' + i + ']']: ''
+                      })),
+                      jawaban: ''
+                    }]);
+                  }
                 }
               }}
             >
               Tambah Soal Pilihan Ganda
             </Button>
-            {editQuestions.length > 1 && <Button
+
+            <div style={{
+              marginTop: "40px",
+              marginBottom: "20px",
+              width: "100%",
+              height: "1px",
+              backgroundColor: "black",
+            }}></div>
+
+            {questions.length > 1 && <Button
               style={{ marginTop: "20px" }}
               variant="contained"
               color='error'
               onClick={() => {
-                setEditQuestions([...editQuestions].slice(0, editQuestions.length - 1));
+                setEditQuestions([...questions].slice(0, questions.length - 1));
               }}
             >
               Hapus 1 Soal Pilihan Ganda
             </Button>}
-
-
-            <FormControlLabel sx={{ marginTop: "40px", marginBottom: "40px" }} control={<Switch checked={editAddEssay} onChange={() => {
-              setEditAddEssay(!editAddEssay)
-            }} />} label="Tambahkan Essay" />
-
-            {editAddEssay && <>
+            <FormControlLabel sx={{ marginTop: "40px", marginBottom: "40px" }} control={<Switch checked={showEssayRecreate} onChange={() => {
+              setShowEssayRecreate(!showEssayRecreate)
+            }} />} label="Tampilkan Input Essay" />
+            <p style={{
+              marginBottom: 30,
+              textAlign: "center",
+              fontWeight: "bold",
+              fontSize: 22,
+            }}>Input Essay</p>
+            {showEssayRecreate && <>
               {editEssay.map((s, eIndex) => (
                 <>
                   <div style={{}} key={eIndex}>
-                    <p>Soal Essay ke {eIndex + 1}</p>
+                    <p style={{ marginBottom: "20px", marginTop: "20px" }}>Soal Essay nomor-{eIndex + 1}</p>
                     <FormControl fullWidth>
                       <TextField
-                        value={editEssay[eIndex].soal || ''}
+                        defaultValue={editEssay[eIndex].soal || ''}
                         label="Soal Essay"
                         variant="outlined"
                         sx={{ marginTop: "15px" }}
                         onChange={e => {
                           const updatedEssay = [...editEssay];
                           updatedEssay[eIndex].soal = e.target.value;
-                          setEssay(updatedEssay);
+                          setEditEssay(updatedEssay);
                         }}
                       />
                       <TextField
-                        value={editEssay[eIndex].jawaban || ''}
+                        defaultValue={editEssay[eIndex].jawaban || ''}
                         label="Jawaban Essay" onChange={e => {
                           const updatedEssay = [...editEssay];
                           updatedEssay[eIndex].jawaban = e.target.value;
-                          setEssay(updatedEssay);
+                          setEditEssay(updatedEssay);
                         }} variant='outlined' sx={{ marginTop: "15px" }} />
                     </FormControl>
                   </div>
                 </>
               ))}
-
-              <Button
+              <>
+                <Button
+                  style={{ marginTop: "20px" }}
+                  variant='contained'
+                  onClick={() => {
+                    setEditEssay([...editEssay, {
+                      id_soal: editEssay.length + 1,
+                      soal: '',
+                      jawaban: ''
+                    }]);
+                  }}
+                >
+                  Tambah Soal Essay
+                </Button>
+              </>
+              {editEssay.length > 1 ? <Button
                 style={{ marginTop: "20px" }}
                 variant='contained'
+                color='error'
                 onClick={() => {
-                  setEditEssay([...editEssay, {
-                    id_soal: editEssay.length + 1,
-                    soal: '',
-                    jawaban: ''
-                  }]);
+                  if (essay.length === 1) {
+                    // setShowEssayRecreate(false)
+                    setEditEssay([...editEssay].slice(0, editEssay.length - 1));
+                  } else {
+                    setEditEssay([...editEssay].slice(0, editEssay.length - 1));
+                  }
                 }}
               >
-                Tambah Soal Essay
-              </Button>
+                Hapus 1 Soal Essay
+              </Button> : <div></div>}
             </>}
 
-            {editEssay.length > 1 && <Button
-              style={{ marginTop: "20px" }}
-              variant='contained'
-              color='error'
-              onClick={() => {
-                setEditEssay([...editEssay].slice(0, essay.length - 1));
-              }}
-            >
-              Hapus 1 Soal Essay
-            </Button>}
 
-            <Button variant="contained" onClick={async () => {
-              // console.log(JSON.stringify(editQuestions, null, 2));
-              await editUjian(editId)
+            <div style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginTop: "100px"
+            }}>
+              <Button variant="contained" color='error' onClick={() => {
+                if (editEssay.length === 0) {
+                  setShowModalEdit(false)
+                }
+                onHideModalEdit()
 
-            }}>Submit Edit Data</Button>
+              }}>Close Modal</Button>
+
+              <Button variant="contained" onClick={() => {
+                if (editId === undefined || editId === null) {
+                  toast.error("Id Tidak ditemukan")
+                } else {
+                  editUjian(editId)
+                }
+
+              }}>Submit Data</Button>
+            </div>
           </div>
         </Box>
       </Modal>
@@ -1404,19 +1567,21 @@ export default function Ujian() {
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell>No</TableCell>
               <TableCell align="left" style={{
                 fontWeight: "bold"
-              }}>Kelas ID</TableCell>
+              }}>No</TableCell>
               <TableCell align="left" style={{
                 fontWeight: "bold"
-              }}>Type Ujian</TableCell>
+              }}>No Kelas</TableCell>
+              <TableCell align="left" style={{
+                fontWeight: "bold"
+              }}>Jenis Ujian</TableCell>
               <TableCell align="left" style={{
                 fontWeight: "bold"
               }}>Tanggal</TableCell>
               <TableCell align="left" style={{
                 fontWeight: "bold"
-              }}>Nama Pelajaran</TableCell>
+              }}>Pelajaran</TableCell>
               <TableCell align="left" style={{
                 fontWeight: "bold"
               }}>Jam Mulai</TableCell>
@@ -1440,7 +1605,7 @@ export default function Ujian() {
                 <TableCell component="th" scope="row">
                   {i + 1}
                 </TableCell>
-                <TableCell align="left" >{row.kelas_id}</TableCell>
+                <TableCell align="left" >{row.kelas.nomor_kelas}</TableCell>
                 <TableCell align="left">{row.nama_ujian}</TableCell>
                 <TableCell align="left">{new Date(row.tanggal).toLocaleDateString()}</TableCell>
                 <TableCell align="left">{row.pelajaran.nama}</TableCell>
@@ -1457,14 +1622,15 @@ export default function Ujian() {
                     variant="contained"
                     onClick={async () => {
                       await getPelajaran()
-                      getEditUjian(row.id)
+                      getEditUjian(row.ujian_id)
                       setEditTypeUjian(row.nama_ujian)
                       setEditDurasi(row.durasi)
                       setEditJamMulai(row.jam_mulai.split("")[0] + row.jam_mulai.split("")[1])
                       setEditTanggal(formatDate(new Date(row.tanggal)))
                       setEditSelectedPelajaran(row.pelajaran_id)
-
-                      setEditId(row.id)
+                      setEditKeterangan(row.keterangan)
+                      setEditId(row.ujian_id)
+                      setEditSemester(row.semester)
                       setModalRecreate(true)
                     }}
                   >
@@ -1478,15 +1644,16 @@ export default function Ujian() {
                     variant="contained"
                     onClick={async () => {
                       await getPelajaran()
-                      getEditUjian(row.id)
+                      getEditUjian(row.ujian_id)
                       setEditTypeUjian(row.nama_ujian)
                       setEditDurasi(row.durasi)
                       setEditJamMulai(row.jam_mulai.split("")[0] + row.jam_mulai.split("")[1])
                       setEditTanggal(formatDate(new Date(row.tanggal)))
                       setEditSelectedPelajaran(row.pelajaran_id)
+                      setEditKeterangan(row.keterangan)
+                      setEditId(row.ujian_id)
+                      setEditSemester(row.semester)
                       setShowModalEdit(true)
-                      setEditId(row.id)
-                      setIsEdit(true)
                     }}
                   >
                     Edit
@@ -1503,7 +1670,9 @@ export default function Ujian() {
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell>No</TableCell>
+              <TableCell align="left" style={{
+                fontWeight: "bold"
+              }}>No</TableCell>
               <TableCell align="left" style={{
                 fontWeight: "bold"
               }}>User Id</TableCell>

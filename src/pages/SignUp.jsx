@@ -14,20 +14,15 @@ export default function SignUp() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log(role)
-    if (role === undefined || role === null) {
-      toast.error("Type login wajib dipilih")
-    } else {
-      signUpAccount(name, username, password)
-    }
+    signUpAccount(name, username, password)
+
   };
 
   async function signUpAccount(name, username, password) {
-    await axiosNew.post("/sign-up", {
+    await axiosNew.post("/guru/sign-up", {
       nama: name,
       username: username,
-      password: password,
-      role: role
+      password: password
     }, {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -93,18 +88,6 @@ export default function SignUp() {
                          block w-full rounded-md focus:ring-indigo-500"
             />
           </div>
-          <label htmlFor="password" className="block text-sm text-gray-700">Daftar sebagai</label>
-
-          <select className='mt-1 px-3 py-2 bg-white border shadow-sm border-gray-300 
-                         placeholder-gray-400 focus:outline-none focus:border-indigo-500 
-                         block w-full rounded-md focus:ring-indigo-500 mb-5' onChange={(e) => {
-              setRole(e.target.value)
-            }}>
-            <option disabled>Login Sebagai</option>
-            <option value={1}>Guru</option>
-            <option value={0}>Murid</option>
-
-          </select>
           <p className="mb-5">Sudah Mempunyai akun? <a onClick={() => {
             router.navigate('/sign-in', { replace: true });
           }} className='font-bold text-indigo-500 hover:cursor-pointer'>Masuk</a></p>
