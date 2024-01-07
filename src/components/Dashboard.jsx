@@ -30,6 +30,7 @@ import Nilai from "../pages/Nilai";
 import { useLocation } from 'react-router-dom'
 import Profile from "./Profile";
 import Ujian from "../pages/Ujian";
+import HasilUlangan from "../pages/HasilUlangan";
 
 
 
@@ -78,6 +79,11 @@ function ResponsiveDrawer(props) {
       id: 7,
       name: "Ujian",
       url: "/ujian"
+    },
+    {
+      id: 8,
+      name: "Hasil Ulangan Siswa",
+      url: '/hasil-ulangan-siswa'
     }
   ])
 
@@ -132,6 +138,8 @@ function ResponsiveDrawer(props) {
       navigate("/nilai")
     } else if (id === 7) {
       navigate("/ujian")
+    } else if (id === 8) {
+      navigate("/hasil-ulangan-siswa")
     }
   }
 
@@ -145,6 +153,8 @@ function ResponsiveDrawer(props) {
       navigate("/mapel")
     } else if (id === 3) {
       navigate("/ujian")
+    } else if (id === 4) {
+      navigate("/hasil-ulangan-siswa")
     }
   }
 
@@ -175,6 +185,8 @@ function ResponsiveDrawer(props) {
       setChangeNav(2)
     } else if (location.pathname === "/ujian") {
       setChangeNav(3)
+    } else if (location.pathname === "/hasil-ulangan-siswa") {
+      setChangeNav(4)
     }
   }
 
@@ -371,6 +383,7 @@ function ResponsiveDrawer(props) {
         {location.pathname === "/users" ? <Users /> : null}
         {location.pathname === "/nilai" ? <Nilai /> : null}
         {location.pathname === "/ujian" ? <Ujian /> : null}
+        {location.pathname === "/hasil-ulangan-siswa" ? <HasilUlangan /> : null}
 
 
       </Box>

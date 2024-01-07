@@ -10,6 +10,7 @@ import SignUp from "../pages/SignUp.jsx";
 import Signin from "../pages/Signin.jsx";
 import ErrorNotFound from "../pages/ErrorNotFound.jsx";
 import axiosNew from "../components/AxiosConfig.jsx";
+import HasilUlangan from "../pages/HasilUlangan.jsx";
 
 
 
@@ -39,6 +40,9 @@ export const router = createBrowserRouter([
       }, {
         path: "ujian",
         element: <Ujian />
+      }, {
+        path: "hasil-ulangan-siswa",
+        element: <HasilUlangan />
       }
     ]
   }, {

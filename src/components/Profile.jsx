@@ -50,7 +50,8 @@ const AvatarDemo = () => {
 
   function logout() {
     localStorage.removeItem("token");
-    navigate("/sign-in");
+    localStorage.removeItem("role_id")
+    navigate("/sign-in", { replace: true });
   }
 
   const open = Boolean(avatarEl);
@@ -61,7 +62,7 @@ const AvatarDemo = () => {
   return (
     <div>
       <Stack direction="row" spacing={1}>
-      
+
         <Button aria-describedby={id} onClick={handleAvatarClick}>
           <Avatar>Dio</Avatar>
           <KeyboardArrowDownIcon />
@@ -79,7 +80,7 @@ const AvatarDemo = () => {
         }}
       >
         <List disablePadding>
-         
+
           <ListItem disablePadding>
             <ListItemButton>
               <ListItemText primary="Setting" />

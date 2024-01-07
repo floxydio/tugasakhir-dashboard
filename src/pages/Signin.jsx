@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { router } from '../navigator/router';
 import axiosNew from '../components/AxiosConfig';
 import { ToastContainer, toast } from 'react-toastify';
-
 import 'react-toastify/dist/ReactToastify.css';
+
+
 export default function SignIn() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -40,6 +41,7 @@ export default function SignIn() {
     }).then(res => {
       if (res.status === 200) {
         localStorage.setItem("token", res.data.token)
+        localStorage.setItem("role_id", res.data.id)
         router.navigate("/", { replace: true })
       }
     }).catch((err) => {
@@ -63,7 +65,6 @@ export default function SignIn() {
               name="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              required
               className="mt-1 px-3 py-2 bg-white border shadow-sm border-gray-300 
                          placeholder-gray-400 focus:outline-none focus:border-indigo-500 
                          block w-full rounded-md focus:ring-indigo-500"
@@ -78,7 +79,6 @@ export default function SignIn() {
               name="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
               className="mt-1 px-3 py-2 bg-white border shadow-sm border-gray-300 
                          placeholder-gray-400 focus:outline-none focus:border-indigo-500 
                          block w-full rounded-md focus:ring-indigo-500"

@@ -70,20 +70,32 @@ export default function Ujian() {
   const [isEdit, setIsEdit] = useState(false)
   const [editId, setEditId] = useState()
 
+  // 
+  const [param, setParam] = useState("")
+
+  // filter
+  const [filterKelas, setFilterKelas] = useState()
+  const [filterTipeUjian, setFilterTipeUjian] = useState("Semua")
+
   async function getEditUjian(id) {
-    console.time("Fetch Get Edit Ujian")
     await axiosNew.get(`/ujian-detail/${id}`).then((res) => {
       setEditDataUjian(res.data)
       setEditQuestions(res.data.soal) ?? []
       setEditEssay(res.data.essay) ?? []
-      console.timeEnd("Fetch Get Edit Ujian")
     })
   }
 
   async function fetchKelas() {
-    await axiosNew.get("/kelas").then((res) => {
-      setDataKelas(res.data.data)
-    })
+    setDataKelas([])
+    const userId = localStorage.getItem("role_id")
+    if (userId === undefined || userId === null) {
+      toast.error("Id Guru tidak ditemukan")
+    } else {
+      await axiosNew.get(`/kelas?user_id=${userId}`).then((res) => {
+        setDataKelas(res.data.data)
+      })
+    }
+
   }
 
 
@@ -102,23 +114,41 @@ export default function Ujian() {
 
   async function getUjian() {
     setAnswerUser([])
-    await axiosNew.get("/all-ujian", {
-    }).then((res) => {
-      setDataUjian(res.data.data)
-      setHideModalTrigger(false)
-    }).catch((err) => {
-      console.log(`Err when load ujian: ${err} `)
-    })
+    if (localStorage.getItem("role_id") !== undefined && filterTipeUjian === "Semua") {
+      await axiosNew.get("/all-ujian?guru_id=" + localStorage.getItem("role_id"), {
+      }).then((res) => {
+        setDataUjian(res.data.data)
+        setHideModalTrigger(false)
+      }).catch((err) => {
+        console.log(`Err when load ujian: ${err} `)
+      })
+    } else if (localStorage.getItem("role_id") !== undefined || localStorage.getItem("role_id") !== null && filterTipeUjian !== "Semua") {
+      await axiosNew.get("/all-ujian?guru_id=" + localStorage.getItem("role_id") + "&nama_ujian=" + filterTipeUjian, {
+      }).then((res) => {
+        setDataUjian(res.data.data)
+        setHideModalTrigger(false)
+      }).catch((err) => {
+        console.log(`Err when load ujian: ${err} `)
+      })
+    }
+
   }
 
   async function getPelajaran() {
     setDataPelajaran([])
-    await axiosNew.get("/pelajaran").then((res) => {
-      console.log("Response Pelajaran -> ", res.data.data)
-      setDataPelajaran(res.data.data)
-    }).catch((err) => {
-      console.log(`Err when load pelajaran: ${err} `)
-    })
+
+    const userId = localStorage.getItem("role_id")
+    console.log(userId)
+    if (userId === undefined || userId === null) {
+      toast.error("Id Guru tidak ditemukan")
+    } else {
+      await axiosNew.get(`/pelajaran?user_id=${userId}`).then((res) => {
+        setDataPelajaran(res.data.data)
+      }).catch((err) => {
+        console.log(`Err when load pelajaran: ${err} `)
+      })
+    }
+
   }
 
   const handleFileChange = (file, qIndex, cIndex) => {
@@ -169,6 +199,8 @@ export default function Ujian() {
       }
     }
     getUjian()
+    fetchKelas()
+    getPelajaran()
   }, []);
 
 
@@ -307,8 +339,6 @@ export default function Ujian() {
       <div className='flex flex-col lg:flex-row' style={{
       }}>
         <Button variant='contained' onClick={async () => {
-          await getPelajaran()
-          await fetchKelas()
           setShowModal(true)
         }}>Buat Ujian</Button>
         <Button style={{
@@ -317,7 +347,53 @@ export default function Ujian() {
           marginTop: isDesktopOrLaptop ? 0 : 20,
           marginLeft: isDesktopOrLaptop ? 10 : 0,
         }} variant='contained' onClick={() => getUjian()}>Cek Soal</Button>
-        <Button className='lg:ml-2' variant='contained' onClick={() => onClickJawabanSiswa()}>Cek Jawaban Siswa</Button>
+        {/* <Button className='lg:ml-2' variant='contained' onClick={() => onClickJawabanSiswa()}>Cek Jawaban Siswa</Button> */}
+      </div>
+      <div>
+        <div style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "end"
+        }}>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={filterKelas ?? 999}
+            sx={{
+              height: 40,
+            }}
+            defaultValue={999}
+            onChange={(e) => {
+              setFilterKelas(e.target.value)
+            }}
+          >
+            <MenuItem value={999} disabled>Filter dari Kelas</MenuItem>
+            {dataKelas.map((kelas, i) => (
+              <MenuItem key={i} value={kelas.kelas_id}>{kelas.nomor_kelas}</MenuItem>
+            ))}
+          </Select>
+          <Select
+            sx={{
+              height: 40,
+              marginLeft: 3
+            }}
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={filterTipeUjian ?? ""}
+            defaultValue={"Semua"}
+            onChange={(e) => setFilterTipeUjian(e.target.value)}
+          >
+            <MenuItem value={"Semua"}>Semua</MenuItem>
+            <MenuItem value={"Ujian Tengah Semester"}>Ujian Tengah Semester</MenuItem>
+            <MenuItem value={"Ujian Akhir Semester"}>Ujian Akhir Semester</MenuItem>
+            <MenuItem value={"Ulangan Harian"}>Ulangan Harian</MenuItem>
+          </Select>
+          <Button style={{
+            marginLeft: 20
+          }} variant='contained' onClick={async () => {
+            await getUjian()
+          }}>Search</Button>
+        </div>
       </div>
 
       {/* Modal untuk buat ujian */}
@@ -420,18 +496,18 @@ export default function Ujian() {
                 defaultValue={999}
                 onChange={(e) => setJamMulai(e.target.value)}
               >
-                <MenuItem value={999} disabled>Pilih Durasi Ujian / Ulangan</MenuItem>
-                <MenuItem value={7}>07.00</MenuItem>
-                <MenuItem value={8}>08.00</MenuItem>
-                <MenuItem value={9}>09.00</MenuItem>
-                <MenuItem value={10}>10.00</MenuItem>
-                <MenuItem value={11}>11.00</MenuItem>
-                <MenuItem value={12}>12.00</MenuItem>
-                <MenuItem value={13}>13.00</MenuItem>
-                <MenuItem value={14}>14.00</MenuItem>
-                <MenuItem value={15}>15.00</MenuItem>
-                <MenuItem value={16}>16.00</MenuItem>
-                <MenuItem value={17}>17.00</MenuItem>
+                <MenuItem value={999} disabled>Pilih Jam Mulai Ujian / Ulangan</MenuItem>
+                <MenuItem value={"07"}>07.00</MenuItem>
+                <MenuItem value={"08"}>08.00</MenuItem>
+                <MenuItem value={"09"}>09.00</MenuItem>
+                <MenuItem value={"10"}>10.00</MenuItem>
+                <MenuItem value={"11"}>11.00</MenuItem>
+                <MenuItem value={"12"}>12.00</MenuItem>
+                <MenuItem value={"13"}>13.00</MenuItem>
+                <MenuItem value={"14"}>14.00</MenuItem>
+                <MenuItem value={"15"}>15.00</MenuItem>
+                <MenuItem value={"16"}>16.00</MenuItem>
+                <MenuItem value={"17"}>17.00</MenuItem>
               </Select>
             </FormControl>
 
@@ -505,7 +581,10 @@ export default function Ujian() {
             }}></div>
 
             <p style={{
-              marginBottom: 30
+              marginBottom: 30,
+              textAlign: "center",
+              fontWeight: "bold",
+              fontSize: 22,
             }}>Soal Ujian Input</p>
 
             {questions.map((question, qIndex) => (
@@ -529,57 +608,27 @@ export default function Ujian() {
                   const isImageInput = choiceInputType[inputTypeKey] === 'image';
                   return (
                     <div key={cIndex}>
-                      <Button sx={{
-                        display: "block",
-                        marginBottom: "10px",
-                        marginTop: "10px",
-                        marginLeft: "auto",
-                      }} variant='contained' onClick={() => toggleChoiceInputType(qIndex, cIndex)}>
-                        {isImageInput ? <PhotoCamera sx={{
-                          marginTop: "10px"
-                        }} /> : <span>Switch</span>}
-                      </Button>
-                      {isImageInput ? (
-                        <>
-                          <img src={question.pilihan[cIndex]['isi_plihan[' + cIndex + ']']} alt="" height={100} className='img_soal' style={{
+
+                      <>
+
+                        <TextField
+                          sx={{
+                            width: "100%",
                             marginTop: "20px",
                             marginBottom: "20px",
-                          }} />
-                          <InputLabel id="demo-simple-select-label">{
-                            `Pilihan ${choiceLabel}`
-                          }</InputLabel>
-                          <TextField
-                            type="file"
+                          }}
+                          defaultValue={question.pilihan[cIndex]['isi_plihan[' + cIndex + ']'] || ''}
+                          label={`Pilihan ${choiceLabel}`}
 
-                            variant="outlined"
-                            sx={{
-                              width: "100%"
-                            }}
-                            accept="image/*"
-                            onChange={(e) => handleFileChange(e.target.files[0], qIndex, cIndex)}
-
-                          />
-                        </>
-                      ) : (
-                        <>
-
-                          <TextField
-                            sx={{
-                              width: "100%"
-                            }}
-                            defaultValue={question.pilihan[cIndex]['isi_plihan[' + cIndex + ']'] || ''}
-                            label={`Pilihan ${choiceLabel}`}
-
-                            variant="outlined"
-                            onChange={(e) => {
-                              // Handle text change
-                              const updatedQuestions = [...questions];
-                              updatedQuestions[qIndex].pilihan[cIndex]['isi_plihan[' + cIndex + ']'] = e.target.value;
-                              setQuestions(updatedQuestions);
-                            }}
-                          />
-                        </>
-                      )}
+                          variant="outlined"
+                          onChange={(e) => {
+                            // Handle text change
+                            const updatedQuestions = [...questions];
+                            updatedQuestions[qIndex].pilihan[cIndex]['isi_plihan[' + cIndex + ']'] = e.target.value;
+                            setQuestions(updatedQuestions);
+                          }}
+                        />
+                      </>
                     </div>
                   );
                 })}
@@ -654,15 +703,21 @@ export default function Ujian() {
               setAddEssay(!addEssay)
             }} />} label="Tambahkan Essay" />
 
+            {addEssay && <p style={{
+              marginBottom: 30,
+              textAlign: "center",
+              fontWeight: "bold",
+              fontSize: 22,
+            }}>Soal Ujian Essay</p>}
+
             {addEssay && <>
               {essay.map((s, eIndex) => (
                 <>
                   <div style={{}} key={eIndex}>
-                    <p>Soal Essay ke {eIndex + 1}</p>
                     <FormControl fullWidth>
                       <TextField
                         defaultValue={essay[eIndex].soal || ''}
-                        label="Soal Essay"
+                        label={`Soal Essay - ${eIndex + 1}`}
                         variant="outlined"
                         sx={{ marginTop: "15px" }}
                         onChange={e => {
@@ -673,11 +728,11 @@ export default function Ujian() {
                       />
                       <TextField
                         defaultValue={essay[eIndex].jawaban || ''}
-                        label="Jawaban Essay" onChange={e => {
+                        label={`Jawaban Essay - ${eIndex + 1}`} onChange={e => {
                           const updatedEssay = [...essay];
                           updatedEssay[eIndex].jawaban = e.target.value;
                           setEssay(updatedEssay);
-                        }} variant='outlined' sx={{ marginTop: "15px" }} />
+                        }} variant='outlined' sx={{ marginTop: "15px", marginBottom: "15px" }} />
                     </FormControl>
                   </div>
                 </>
@@ -843,17 +898,17 @@ export default function Ujian() {
                 onChange={(e) => setEditJamMulai(e.target.value)}
               >
                 <MenuItem value={999} disabled>Pilih Jam Mulai Ujian / Ulangan</MenuItem>
-                <MenuItem value={7}>07.00</MenuItem>
-                <MenuItem value={8}>08.00</MenuItem>
-                <MenuItem value={9}>09.00</MenuItem>
-                <MenuItem value={10}>10.00</MenuItem>
-                <MenuItem value={11}>11.00</MenuItem>
-                <MenuItem value={12}>12.00</MenuItem>
-                <MenuItem value={13}>13.00</MenuItem>
-                <MenuItem value={14}>14.00</MenuItem>
-                <MenuItem value={15}>15.00</MenuItem>
-                <MenuItem value={16}>16.00</MenuItem>
-                <MenuItem value={17}>17.00</MenuItem>
+                <MenuItem value={"07"}>07.00</MenuItem>
+                <MenuItem value={"08"}>08.00</MenuItem>
+                <MenuItem value={"09"}>09.00</MenuItem>
+                <MenuItem value={"10"}>10.00</MenuItem>
+                <MenuItem value={"11"}>11.00</MenuItem>
+                <MenuItem value={"12"}>12.00</MenuItem>
+                <MenuItem value={"13"}>13.00</MenuItem>
+                <MenuItem value={"14"}>14.00</MenuItem>
+                <MenuItem value={"15"}>15.00</MenuItem>
+                <MenuItem value={"16"}>16.00</MenuItem>
+                <MenuItem value={"17"}>17.00</MenuItem>
               </Select>
             </FormControl>
 
@@ -1255,17 +1310,17 @@ export default function Ujian() {
                 onChange={(e) => setEditJamMulai(e.target.value)}
               >
                 <MenuItem value={999} disabled>Pilih Jam Mulai Ujian / Ulangan</MenuItem>
-                <MenuItem value={7}>07.00</MenuItem>
-                <MenuItem value={8}>08.00</MenuItem>
-                <MenuItem value={9}>09.00</MenuItem>
-                <MenuItem value={10}>10.00</MenuItem>
-                <MenuItem value={11}>11.00</MenuItem>
-                <MenuItem value={12}>12.00</MenuItem>
-                <MenuItem value={13}>13.00</MenuItem>
-                <MenuItem value={14}>14.00</MenuItem>
-                <MenuItem value={15}>15.00</MenuItem>
-                <MenuItem value={16}>16.00</MenuItem>
-                <MenuItem value={17}>17.00</MenuItem>
+                <MenuItem value={"07"}>07.00</MenuItem>
+                <MenuItem value={"08"}>08.00</MenuItem>
+                <MenuItem value={"09"}>09.00</MenuItem>
+                <MenuItem value={"10"}>10.00</MenuItem>
+                <MenuItem value={"11"}>11.00</MenuItem>
+                <MenuItem value={"12"}>12.00</MenuItem>
+                <MenuItem value={"13"}>13.00</MenuItem>
+                <MenuItem value={"14"}>14.00</MenuItem>
+                <MenuItem value={"15"}>15.00</MenuItem>
+                <MenuItem value={"16"}>16.00</MenuItem>
+                <MenuItem value={"17"}>17.00</MenuItem>
               </Select>
             </FormControl>
 
@@ -1563,7 +1618,7 @@ export default function Ujian() {
         </Box>
       </Modal>
 
-      <TableContainer sx={{ marginTop: 10, display: hideModalTrigger ? 'none' : 'block' }} component={Paper} ref={tableRef}>
+      <TableContainer sx={{ marginTop: 5, display: hideModalTrigger ? 'none' : 'block' }} component={Paper} ref={tableRef}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
@@ -1572,10 +1627,10 @@ export default function Ujian() {
               }}>No</TableCell>
               <TableCell align="left" style={{
                 fontWeight: "bold"
-              }}>No Kelas</TableCell>
+              }}>Jenis Ujian</TableCell>
               <TableCell align="left" style={{
                 fontWeight: "bold"
-              }}>Jenis Ujian</TableCell>
+              }}>Kelas</TableCell>
               <TableCell align="left" style={{
                 fontWeight: "bold"
               }}>Tanggal</TableCell>
@@ -1605,8 +1660,8 @@ export default function Ujian() {
                 <TableCell component="th" scope="row">
                   {i + 1}
                 </TableCell>
-                <TableCell align="left" >{row.kelas.nomor_kelas}</TableCell>
                 <TableCell align="left">{row.nama_ujian}</TableCell>
+                <TableCell align="left" >{row.kelas.nomor_kelas}</TableCell>
                 <TableCell align="left">{new Date(row.tanggal).toLocaleDateString()}</TableCell>
                 <TableCell align="left">{row.pelajaran.nama}</TableCell>
                 <TableCell align="left">{row.jam_mulai}</TableCell>
@@ -1617,20 +1672,48 @@ export default function Ujian() {
                     className="btn_absen"
                     sx={{
                       marginTop: 1,
-                      marginRight: 1
+                      marginRight: 1,
+                      width: '100%'
+
                     }}
                     variant="contained"
                     onClick={async () => {
                       await getPelajaran()
                       getEditUjian(row.ujian_id)
                       setEditTypeUjian(row.nama_ujian)
-                      setEditDurasi(row.durasi)
-                      setEditJamMulai(row.jam_mulai.split("")[0] + row.jam_mulai.split("")[1])
-                      setEditTanggal(formatDate(new Date(row.tanggal)))
-                      setEditSelectedPelajaran(row.pelajaran_id)
-                      setEditKeterangan(row.keterangan)
+                      if (row.durasi === null) {
+                        toast.error("Durasi Kosong - Check Database")
+                      } else {
+                        setEditDurasi(row.durasi)
+                      }
+                      if (row.jam_mulai === null) {
+                        toast.error("Jam Mulai Kosong - Check Database")
+                      } else if (!row.jam_mulai.includes(".00")) {
+                        toast.error("Jam Mulai Tidak Valid - Check Database")
+                      } else {
+                        setEditJamMulai(row.jam_mulai.split("")[0] + row.jam_mulai.split("")[1])
+                      }
+                      if (row.tanggal === null) {
+                        toast.error("Tanggal Kosong - Check Database")
+                      } else {
+                        setEditTanggal(formatDate(new Date(row.tanggal)))
+                      }
+                      if (row.pelajaran_id === null) {
+                        toast.error("Pelajaran Kosong - Check Database")
+                      } else {
+                        setEditSelectedPelajaran(row.pelajaran_id)
+                      }
+                      if (row.keterangan === null) {
+                        toast.error("Keterangan Kosong - Check Database")
+                      } else {
+                        setEditKeterangan(row.keterangan)
+                      }
+                      if (row.semester === null) {
+                        toast.error("Semester Kosong - Check Database")
+                      } else {
+                        setEditSemester(row.semester)
+                      }
                       setEditId(row.ujian_id)
-                      setEditSemester(row.semester)
                       setModalRecreate(true)
                     }}
                   >
@@ -1640,23 +1723,50 @@ export default function Ujian() {
                     className="btn_absen"
                     sx={{
                       marginTop: 1,
+                      width: '100%'
                     }}
                     variant="contained"
                     onClick={async () => {
                       await getPelajaran()
                       getEditUjian(row.ujian_id)
                       setEditTypeUjian(row.nama_ujian)
-                      setEditDurasi(row.durasi)
-                      setEditJamMulai(row.jam_mulai.split("")[0] + row.jam_mulai.split("")[1])
-                      setEditTanggal(formatDate(new Date(row.tanggal)))
-                      setEditSelectedPelajaran(row.pelajaran_id)
-                      setEditKeterangan(row.keterangan)
+                      if (row.durasi === null) {
+                        toast.error("Durasi Kosong - Check Database")
+                      } else {
+                        setEditDurasi(row.durasi)
+                      }
+                      if (row.jam_mulai === null) {
+                        toast.error("Jam Mulai Kosong - Check Database")
+                      } else if (!row.jam_mulai.includes(".00")) {
+                        toast.error("Jam Mulai Tidak Valid - Check Database")
+                      } else {
+                        setEditJamMulai(row.jam_mulai.split("")[0] + row.jam_mulai.split("")[1])
+                      }
+                      if (row.tanggal === null) {
+                        toast.error("Tanggal Kosong - Check Database")
+                      } else {
+                        setEditTanggal(formatDate(new Date(row.tanggal)))
+                      }
+                      if (row.pelajaran_id === null) {
+                        toast.error("Pelajaran Kosong - Check Database")
+                      } else {
+                        setEditSelectedPelajaran(row.pelajaran_id)
+                      }
+                      if (row.keterangan === null) {
+                        toast.error("Keterangan Kosong - Check Database")
+                      } else {
+                        setEditKeterangan(row.keterangan)
+                      }
+                      if (row.semester === null) {
+                        toast.error("Semester Kosong - Check Database")
+                      } else {
+                        setEditSemester(row.semester)
+                      }
                       setEditId(row.ujian_id)
-                      setEditSemester(row.semester)
                       setShowModalEdit(true)
                     }}
                   >
-                    Edit
+                    Ubah Data
                   </Button>
                 </TableCell>
               </TableRow>
