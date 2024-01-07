@@ -18,7 +18,7 @@ export default function App() {
     function checkLogin() {
       if (localStorage.getItem("token") === null) {
         setTimeout(() => {
-          navigate("/sign-in");
+          navigate("/sign-in", { replace: true });
           setLoading(false);
         }, 1000);
       } else {
@@ -32,22 +32,11 @@ export default function App() {
   }, [navigate]);
   return (
     <>
-      {loading ? (
-        <BeatLoader
-          color="#274F99"
-          loading={loading}
-          cssOverride={override}
-          size={50}
-          aria-label="Loading Spinner"
-          data-testid="loader"
-        />
-      ) : (
-        <Dashboard />
-        
-      )}
-        <div style={{
-                marginBottom: 250
-              }}></div>
+      <Dashboard />
+
+      <div style={{
+        marginBottom: 250
+      }}></div>
     </>
   );
 }
