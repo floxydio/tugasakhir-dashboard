@@ -337,16 +337,19 @@ export default function Ujian() {
     <>
       <ToastContainer />
       <div className='flex flex-col lg:flex-row' style={{
+        marginBottom: isTabletOrMobile ? 30 : 0
       }}>
-        <Button variant='contained' onClick={async () => {
+        <Button sx={{
+          width: isDesktopOrLaptop ? 200 : '100%',
+        }} variant='contained' onClick={async () => {
           setShowModal(true)
         }}>Buat Ujian</Button>
-        <Button style={{
+        {/* <Button style={{
           marginRight: isDesktopOrLaptop ? 10 : 0,
           marginBottom: isDesktopOrLaptop ? 0 : 20,
           marginTop: isDesktopOrLaptop ? 0 : 20,
           marginLeft: isDesktopOrLaptop ? 10 : 0,
-        }} variant='contained' onClick={() => getUjian()}>Cek Soal</Button>
+        }} variant='contained' onClick={() => getUjian()}>Cek Soal</Button> */}
         {/* <Button className='lg:ml-2' variant='contained' onClick={() => onClickJawabanSiswa()}>Cek Jawaban Siswa</Button> */}
       </div>
       <div>

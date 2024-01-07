@@ -138,7 +138,9 @@ export default function Mapel() {
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell>No</TableCell>
+              <TableCell align="left" style={{
+                fontWeight: "bold"
+              }}>No</TableCell>
               <TableCell align="left" style={{
                 fontWeight: "bold"
               }}>Nama Pelajaran</TableCell>

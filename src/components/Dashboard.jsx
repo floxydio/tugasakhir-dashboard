@@ -50,11 +50,11 @@ function ResponsiveDrawer(props) {
       name: "Home",
       url: "/",
     },
-    {
-      id: 2,
-      name: "Guru",
-      url: "/guru",
-    },
+    // {
+    //   id: 2,
+    //   name: "Guru",
+    //   url: "/guru",
+    // },
     // {
     //   id: 3,
     //   name: "Absensi",
@@ -144,16 +144,15 @@ function ResponsiveDrawer(props) {
   }
 
   function onChangeNavSpesific(id) {
+    console.log(`ID -> ${id}`)
     setChangeNav(id);
-    if (id === 1) {
-      navigate("/guru")
-    } else if (id === 0) {
+    if (id === 0) {
       navigate("/")
-    } else if (id === 2) {
+    } else if (id === 1) {
       navigate("/mapel")
-    } else if (id === 3) {
+    } else if (id === 2) {
       navigate("/ujian")
-    } else if (id === 4) {
+    } else if (id === 3) {
       navigate("/hasil-ulangan-siswa")
     }
   }
@@ -179,14 +178,12 @@ function ResponsiveDrawer(props) {
   function fromPathSpesific() {
     if (location.pathname === "/") {
       setChangeNav(0)
-    } else if (location.pathname === "/guru") {
-      setChangeNav(1)
     } else if (location.pathname === "/mapel") {
-      setChangeNav(2)
+      setChangeNav(1)
     } else if (location.pathname === "/ujian") {
-      setChangeNav(3)
+      setChangeNav(2)
     } else if (location.pathname === "/hasil-ulangan-siswa") {
-      setChangeNav(4)
+      setChangeNav(3)
     }
   }
 
@@ -377,7 +374,7 @@ function ResponsiveDrawer(props) {
       >
         <Toolbar />
         {location.pathname === "/" ? <Home /> : null}
-        {location.pathname === "/guru" ? <Guru /> : null}
+        {/* {location.pathname === "/guru" ? <Guru /> : null} */}
         {location.pathname === "/absensi" ? <Absensi /> : null}
         {location.pathname === "/mapel" ? <Mapel /> : null}
         {location.pathname === "/users" ? <Users /> : null}

@@ -33,7 +33,6 @@ export default function App() {
   return (
     <>
       <Dashboard />
-
       <div style={{
         marginBottom: 250
       }}></div>
