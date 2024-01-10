@@ -5,3 +5,7 @@ export function FetchHasilUlangan() {
 
     return axiosNew.get(`/all-exam?user_id=${userId}`);
 }
+
+export function FetchHasilUlanganById(id) {
+    return axiosNew.get(`/ujian-detail/${id}`);
+}
