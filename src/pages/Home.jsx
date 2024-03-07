@@ -11,11 +11,12 @@ import axios from "axios";
 import axiosNew from "../components/AxiosConfig";
 import cryptoJS from "crypto-js";
 
-
 export default function Home() {
   const [murid, setMurid] = useState([]);
   const [guru, setGuru] = useState([]);
+
   const token = localStorage.getItem("token");
+
   useEffect(() => {
     function getDataUser() {
       const decrypt = cryptoJS.AES.decrypt(
@@ -25,7 +26,8 @@ export default function Home() {
       axiosNew
         .get("/list-users", {
           headers: {
-            "x-access-token": token
+            "x-access-token": token,
+            "ngrok-skip-browser-warning": "any",
           },
         })
         .then(function (res) {
@@ -47,6 +49,9 @@ export default function Home() {
         style={{
           display: "flex",
           flexDirection: "row",
+          justifyContent: "space-evenly",
+          marginTop: "20px",
+          marginBottom: "30px",
         }}
       >
         <Card sx={{ maxWidth: 300 }}>
@@ -55,7 +60,7 @@ export default function Home() {
               style={{
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "space-between",
+                justifyContent: "space-evenly",
                 marginLeft: 10,
                 marginRight: 10,
               }}
@@ -63,12 +68,17 @@ export default function Home() {
               <Diversity3TwoTone
                 sx={{
                   fontSize: 40,
-
-                  marginRight: 10,
+                  marginRight: 7,
                 }}
               />
               <div>
-                <span>{murid.length}</span>
+                <span
+                  style={{
+                    fontWeight: "400",
+                  }}
+                >
+                  {murid.length}
+                </span>
                 <Typography variant="body2" color="text.secondary">
                   Total Murid
                 </Typography>
@@ -82,7 +92,7 @@ export default function Home() {
               style={{
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "space-between",
+                justifyContent: "space-evenly",
                 marginLeft: 10,
                 marginRight: 10,
               }}
@@ -90,11 +100,17 @@ export default function Home() {
               <Diversity3TwoTone
                 sx={{
                   fontSize: 40,
-                  marginRight: 10,
+                  marginRight: 7,
                 }}
               />
               <div>
-                <span>{guru.length}</span>
+                <span
+                  style={{
+                    fontWeight: "400",
+                  }}
+                >
+                  {guru.length}
+                </span>
                 <Typography variant="body2" color="text.secondary">
                   Total Guru
                 </Typography>

@@ -25,7 +25,7 @@ export default function SignUp() {
       password: password
     }, {
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "application/x-www-form-urlencoded", 'ngrok-skip-browser-warning': 'any',
       }
     }).then((res) => {
       console.log(res)
