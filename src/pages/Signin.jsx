@@ -9,6 +9,7 @@ export default function SignIn() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [rememberUsername, setRememberUsername] = useState(false);
+  const [role, setRole] = useState("")
 
   useEffect(() => {
     const savedUsername = localStorage.getItem('rememberedUsername');
@@ -31,23 +32,47 @@ export default function SignIn() {
     } else {
       localStorage.removeItem('rememberedUsername');
     }
-    await axiosNew.post("/guru/sign-in", {
-      username: username,
-      password: password,
-    }, {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded", 'ngrok-skip-browser-warning': 'any',
-      }
-    }).then(res => {
-      if (res.status === 200) {
-        localStorage.setItem("token", res.data.token)
-        localStorage.setItem("role_id", res.data.id)
-        router.navigate("/", { replace: true })
-      }
-    }).catch((err) => {
-      console.log(err)
-      toast.error(err.response.data.message)
-    })
+
+    if (role === "guru") {
+      await axiosNew.post("/guru/sign-in", {
+        username: username,
+        password: password,
+      }, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded", 'ngrok-skip-browser-warning': 'any',
+        }
+      }).then(res => {
+        if (res.status === 200) {
+          localStorage.setItem("token", res.data.token)
+          localStorage.setItem("role_id", res.data.id)
+          router.navigate("/", { replace: true })
+        }
+      }).catch((err) => {
+        // console.log(err)
+        toast.error(err.response.data.message)
+      })
+    } else if (role === "admin") {
+      await axiosNew.post("/admin/sign-in", {
+        username: username,
+        password: password,
+      }, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded", 'ngrok-skip-browser-warning': 'any',
+        }
+      }).then(res => {
+        console.log(res.data)
+        if (res.status === 200) {
+          // localStorage.setItem("token", res.data.token)
+          // localStorage.setItem("role_id", res.data.id)
+          // router.navigate("/", { replace: true })
+        }
+      }).catch((err) => {
+        // console.log(err)
+        toast.error(err.response.data.message)
+      })
+    }
+
+
   };
 
   return (
@@ -71,7 +96,7 @@ export default function SignIn() {
             />
           </div>
 
-          <div className="mb-6">
+          <div className="mb-3">
             <label htmlFor="password" className="block text-sm text-gray-700">Password</label>
             <input
               type="password"
@@ -85,6 +110,21 @@ export default function SignIn() {
             />
           </div>
           <div className="mb-4">
+            <label className="block text-sm text-gray-700">Login Sebagai</label>
+            <select
+              value={role ?? "guru"}
+              onChange={(e) => setRole(e.target.value)}
+              name="role"
+              id="role"
+              className="mt-1 px-3 py-2 bg-white border shadow-sm border-gray-300 
+                         placeholder-gray-400 focus:outline-none focus:border-indigo-500 
+                         block w-full rounded-md focus:ring-indigo-500"
+            >
+              <option value="guru">Guru</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div className="mb-4">
             <label className="inline-flex items-center">
               <input
                 type="checkbox"
@@ -95,17 +135,18 @@ export default function SignIn() {
               <span className="ml-2 text-sm text-gray-600">Ingat Username</span>
             </label>
           </div>
-          <p className="mb-5">
-            Tidak punya akun? 
-            <a href='#' 
+
+          {/* <p className="mb-5">
+            Tidak punya akun?
+            <a href='#'
               onClick={() => {
                 router.navigate('/sign-up');
-              }} 
+              }}
               className='font-bold text-indigo-500 hover:cursor-pointer'
             >
               Daftar
             </a>
-          </p>
+          </p> */}
           <button
             type="submit"
             className="w-full px-4 py-2 text-sm text-white bg-indigo-600 rounded-md 

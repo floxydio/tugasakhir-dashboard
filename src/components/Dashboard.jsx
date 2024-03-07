@@ -149,7 +149,7 @@ function ResponsiveDrawer(props) {
   }
 
   function onChangeNavSpesific(id) {
-    console.log(`ID -> ${id}`);
+    // // console.log(`ID -> ${id}`);
     setChangeNav(id);
     if (id === 0) {
       navigate("/");
@@ -212,7 +212,7 @@ function ResponsiveDrawer(props) {
     setMobileOpen(!mobileOpen);
   };
 
-  
+
   const drawer = (
     <div>
       <p
@@ -242,9 +242,8 @@ function ResponsiveDrawer(props) {
         {menu.map((text, index) => (
           <div key={text.id} className="last:mb-0 mb-2">
             <div
-              className={`${
-                changeNav === index ? "bg-white text-black" : "text-white"
-              }`}
+              className={`${changeNav === index ? "bg-white text-black" : "text-white"
+                }`}
               onClick={() => onChangeNavSpesific(index)}
               style={{
                 padding: 10,
@@ -258,9 +257,8 @@ function ResponsiveDrawer(props) {
               }}
             >
               <div
-                className={`flex-shrink-0 ${
-                  changeNav === index ? "text-black" : "text-white"
-                }`}
+                className={`flex-shrink-0 ${changeNav === index ? "text-black" : "text-white"
+                  }`}
               >
                 {index == 0 ? <House /> : null}
                 {index == 1 ? <Book /> : null}

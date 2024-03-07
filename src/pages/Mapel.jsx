@@ -58,13 +58,13 @@ export default function Mapel() {
   const [handleJadwalId, setHandlerJadwalId] = useState();
 
   const [handleWaktu, setHandlerWaktu] = useState();
-  
+
   async function getMapel() {
     setDataPelajaran([]);
     await axiosNew.get(`/find-pelajaran?user_id=${1}`).then((res) => {
-      console.log(res.data.data);
+      // // console.log(res.data.data);
       setDataPelajaran(res.data.data);
-      // console.log(dataPelajaran[0].nama);
+      // // console.log(dataPelajaran[0].nama);
     });
   }
 

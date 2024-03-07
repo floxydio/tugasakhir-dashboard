@@ -26,30 +26,25 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { useUjian } from "../store/ujian.store";
+import { useKelas } from "../store/ujian.store";
 import { PhotoCamera } from "@mui/icons-material";
 import { useMediaQuery } from "react-responsive";
 import { formatDate } from "../helper/DateConverter";
 
 export default function Ujian() {
+  // Store
+  const kelasDatas = useKelas((state) => state.kelas)
+  const fetchKelasData = useKelas((state) => state.fetchKelas)
+
+
+  // Media Query
   const isDesktopOrLaptop = useMediaQuery({
     query: "(min-width: 880px)",
   });
   const isTabletOrMobile = useMediaQuery({ query: "(max-width: 880px)" });
 
-  const [keterangan, setKeterangan] = useState("");
-  const [editKeterangan, setEditKeterangan] = useState("");
 
-  const [semester, setSemester] = useState(0);
-  const [editSemester, setEditSemester] = useState(0);
-
-  const [dataKelas, setDataKelas] = useState([]);
-  const [handleKelas, setHandlerKelas] = useState();
-
-  const [editDataKelas, setEditDataKelas] = useState([]);
-  const [editHandleKelas, setEditHandlerKelas] = useState();
-
-  // For Create
+  // State buat Create
   const [showModal, setShowModal] = useState(false);
   const [typeUjian, setTypeUjian] = useState();
   const [durasi, setDurasi] = useState();
@@ -65,10 +60,13 @@ export default function Ujian() {
   const [selectedPelajaran, setSelectedPelajaran] = useState();
   const tableRef = useRef(null);
 
-  const [hideModalTrigger, setHideModalTrigger] = useState(false);
-  const [modalRecreate, setModalRecreate] = useState(false);
 
-  // For Edit
+
+  // State buat Edit
+  const [keterangan, setKeterangan] = useState("");
+  const [editKeterangan, setEditKeterangan] = useState("")
+  const [semester, setSemester] = useState(0);
+  const [editSemester, setEditSemester] = useState(0);
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [editTypeUjian, setEditTypeUjian] = useState();
   const [editDurasi, setEditDurasi] = useState();
@@ -81,8 +79,18 @@ export default function Ujian() {
   const [editSelectedPelajaran, setEditSelectedPelajaran] = useState();
   const [isEdit, setIsEdit] = useState(false);
   const [editId, setEditId] = useState();
+  const [editDataKelas, setEditDataKelas] = useState([]);
+  const [editHandleKelas, setEditHandlerKelas] = useState();
 
-  //
+
+
+
+  const [dataKelas, setDataKelas] = useState([]);
+  const [handleKelas, setHandlerKelas] = useState();
+
+
+  const [hideModalTrigger, setHideModalTrigger] = useState(false);
+  const [modalRecreate, setModalRecreate] = useState(false);
   const [param, setParam] = useState("");
 
   // filter
@@ -97,17 +105,17 @@ export default function Ujian() {
     });
   }
 
-  async function fetchKelas() {
-    setDataKelas([]);
-    const userId = localStorage.getItem("role_id");
-    if (userId === undefined || userId === null) {
-      toast.error("Id Guru tidak ditemukan");
-    } else {
-      await axiosNew.get(`/kelas?user_id=${userId}`).then((res) => {
-        setDataKelas(res.data.data);
-      });
-    }
-  }
+  // async function fetchKelas() {
+  //   setDataKelas([]);
+  //   const userId = localStorage.getItem("role_id");
+  //   if (userId === undefined || userId === null) {
+  //     toast.error("Id Guru tidak ditemukan");
+  //   } else {
+  //     await axiosNew.get(`/kelas?user_id=${userId}`).then((res) => {
+  //       setDataKelas(res.data.data);
+  //     });
+  //   }
+  // }
 
   const onHideModal = () => {
     setShowModal(false);
@@ -134,7 +142,7 @@ export default function Ujian() {
           setHideModalTrigger(false);
         })
         .catch((err) => {
-          console.log(`Err when load ujian: ${err} `);
+          // console.log(`Err when load ujian: ${err} `);
         });
     } else if (
       localStorage.getItem("role_id") !== undefined ||
@@ -143,9 +151,9 @@ export default function Ujian() {
       await axiosNew
         .get(
           "/all-ujian?guru_id=" +
-            localStorage.getItem("role_id") +
-            "&nama_ujian=" +
-            filterTipeUjian,
+          localStorage.getItem("role_id") +
+          "&nama_ujian=" +
+          filterTipeUjian,
           {}
         )
         .then((res) => {
@@ -153,7 +161,7 @@ export default function Ujian() {
           setHideModalTrigger(false);
         })
         .catch((err) => {
-          console.log(`Err when load ujian: ${err} `);
+          // console.log(`Err when load ujian: ${err} `);
         });
     }
   }
@@ -162,7 +170,7 @@ export default function Ujian() {
     setDataPelajaran([]);
 
     const userId = localStorage.getItem("role_id");
-    console.log(userId);
+    // console.log(userId);
     if (userId === undefined || userId === null) {
       toast.error("Id Guru tidak ditemukan");
     } else {
@@ -172,7 +180,7 @@ export default function Ujian() {
           setDataPelajaran(res.data.data);
         })
         .catch((err) => {
-          console.log(`Err when load pelajaran: ${err} `);
+          // console.log(`Err when load pelajaran: ${err} `);
         });
     }
   }
@@ -180,7 +188,7 @@ export default function Ujian() {
   const handleFileChange = (file, qIndex, cIndex) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
-    console.log(`Reader Result -> ${reader.result}`);
+    // console.log(`Reader Result -> ${reader.result}`);
     reader.onloadend = () => {
       const updatedQuestions = [...questions];
       updatedQuestions[qIndex].pilihan[cIndex]["isi_pilihan[" + cIndex + "]"] =
@@ -192,7 +200,7 @@ export default function Ujian() {
   const handleFileChangeEdit = (file, qIndex, cIndex) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
-    console.log(`Reader Result -> ${reader.result}`);
+    // console.log(`Reader Result -> ${reader.result}`);
     reader.onloadend = () => {
       const updatedQuestions = [...editQuestions];
 
@@ -206,9 +214,14 @@ export default function Ujian() {
     await axiosNew.get("/all-exam", {}).then((res) => {
       setAnswerUser(res.data.data);
       setHideModalTrigger(true);
-      console.log("Data Jawaban Siswa ->", res.data.data);
+      // console.log("Data Jawaban Siswa ->", res.data.data);
     });
   }
+
+
+
+
+
 
   useEffect(() => {
     const savedQuestions = localStorage.getItem("questions");
@@ -226,7 +239,10 @@ export default function Ujian() {
       }
     }
     getUjian();
-    fetchKelas();
+    // fetchKelas();
+    fetchKelasData()
+
+    // console.log(`Kelas -> ${kelasDatas}`)
     getPelajaran();
   }, []);
 
@@ -268,11 +284,11 @@ export default function Ujian() {
           getUjian();
           setShowModal(false);
         } else {
-          console.log(res);
+          // console.log(res);
         }
       })
       .catch((err) => {
-        console.log(err);
+        // console.log(err);
         toast.error(err.response.data.message);
       });
   }
@@ -334,7 +350,7 @@ export default function Ujian() {
         }
       )
       .then((res) => {
-        console.log("Sukses Edit Ujian");
+        // console.log("Sukses Edit Ujian");
         getUjian();
         toast.success("Berhasil Edit Ujian");
       })
@@ -535,6 +551,8 @@ export default function Ujian() {
                     e.target.value === "Ujian Akhir Semester"
                   ) {
                     setDurasi(60);
+                  } else {
+                    setDurasi(null)
                   }
                 }}
               >
@@ -675,7 +693,7 @@ export default function Ujian() {
                 <MenuItem value={999} disabled>
                   Pilih Kelas
                 </MenuItem>
-                {dataKelas.map((kelas, i) => (
+                {kelasDatas.map((kelas, i) => (
                   <MenuItem key={i} value={kelas.kelas_id}>
                     {kelas.nomor_kelas}
                   </MenuItem>
@@ -764,7 +782,7 @@ export default function Ujian() {
                           }}
                           defaultValue={
                             question.pilihan[cIndex][
-                              "isi_pilihan[" + cIndex + "]"
+                            "isi_pilihan[" + cIndex + "]"
                             ] || ""
                           }
                           label={`Pilihan ${choiceLabel}`}
@@ -829,7 +847,7 @@ export default function Ujian() {
                     toast.error("Jawaban tidak boleh kosong!");
                     return;
                   } else {
-                    console.log(questions);
+                    // console.log(questions);
                     setQuestions([
                       ...questions,
                       {
@@ -1343,7 +1361,7 @@ export default function Ujian() {
                     toast.error("Jawaban tidak boleh kosong!");
                     return;
                   } else {
-                    console.log(questions);
+                    // console.log(questions);
                     setEditQuestions([
                       ...questions,
                       {
@@ -1875,7 +1893,7 @@ export default function Ujian() {
                     toast.error("Jawaban tidak boleh kosong!");
                     return;
                   } else {
-                    console.log(questions);
+                    // console.log(questions);
                     setEditQuestions([
                       ...questions,
                       {
@@ -2205,7 +2223,7 @@ export default function Ujian() {
                           } else {
                             setEditJamMulai(
                               row.jam_mulai.split("")[0] +
-                                row.jam_mulai.split("")[1]
+                              row.jam_mulai.split("")[1]
                             );
                           }
                           if (row.tanggal === null) {
@@ -2259,7 +2277,7 @@ export default function Ujian() {
                           } else {
                             setEditJamMulai(
                               row.jam_mulai.split("")[0] +
-                                row.jam_mulai.split("")[1]
+                              row.jam_mulai.split("")[1]
                             );
                           }
                           if (row.tanggal === null) {

@@ -28,15 +28,15 @@ export default function SignUp() {
         "Content-Type": "application/x-www-form-urlencoded", 'ngrok-skip-browser-warning': 'any',
       }
     }).then((res) => {
-      console.log(res)
+      // console.log(res)
       if (res.status === 201 || res.status === 200) {
-        console.log("Successfully")
+        // console.log("Successfully")
         router.navigate("/sign-in", { replace: true })
 
       }
     }).catch((err) => {
       toast.error(err.response.data.message)
-      console.log("ERRR ->", err)
+      // console.log("ERRR ->", err)
     })
   }
 

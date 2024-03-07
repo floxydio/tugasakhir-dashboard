@@ -12,7 +12,7 @@ export const usePelajaran = create((set, get) => ({
                 "x-access-token": localStorage.getItem("token"),
             }
         }).then((res) => {
-            console.log(res.data.data)
+            // console.log(res.data.data)
             set({ pelajaran: res.data.data })
             set({ isLoading: false })
         })

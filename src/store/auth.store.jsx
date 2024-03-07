@@ -1,11 +1,11 @@
-import {create} from "zustand"
+import { create } from "zustand"
 import axiosNew from "../components/AxiosConfig"
 import { toast } from 'react-toastify';
 
 export const useAuth = create((set) => ({
     user: {},
     signInFetchAndNavigate: async (username, password, navigate) => {
-      
+
         await axiosNew.post("/sign-in", {
             username: username,
             password: password
@@ -19,7 +19,7 @@ export const useAuth = create((set) => ({
                 navigate("/")
             }
         }).catch((err) => {
-            console.log(err)
+            // console.log(err)
             toast.error("Username atau Password Salah!")
         })
     }

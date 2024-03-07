@@ -65,7 +65,7 @@ export default function HasilUlangan() {
         fetchDataHasilUlangan();
       })
       .catch((err) => {
-        console.log("error", err);
+        // // console.log("error", err);
         toast.error("Gagal submit nilai");
       });
   };
@@ -77,7 +77,7 @@ export default function HasilUlangan() {
         setDataJawaban(res.data.data);
       })
       .catch((err) => {
-        console.log("error", err);
+        // // console.log("error", err);
       });
   };
 
@@ -89,7 +89,7 @@ export default function HasilUlangan() {
         setSwitchTotalBenar(Array(res.data.essay.length).fill(false));
       })
       .catch((err) => {
-        console.log("error", err);
+        // // console.log("error", err);
       });
   };
 
