@@ -22,7 +22,7 @@ import {
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer, toast } from "react-toastify";
 import cryptoJS from "crypto-js";
 import { JadwalModels } from "../models/Jadwal_models";
 
@@ -45,45 +45,41 @@ export default function Mapel() {
   const handleOpen = () => setOpen(true);
 
   //
-  const [dataGuru, setDataGuru] = useState([])
-  const [dataKelas, setDataKelas] = useState([])
+  const [dataGuru, setDataGuru] = useState([]);
+  const [dataKelas, setDataKelas] = useState([]);
 
   //
-  const [handlePelajaran, setHandlerPelajaran] = useState()
+  const [handlePelajaran, setHandlerPelajaran] = useState();
 
-  const [handleGuru, setHandlerGuru] = useState()
+  const [handleGuru, setHandlerGuru] = useState();
 
+  const [handleKelas, setHandlerKelas] = useState();
 
-  const [handleKelas, setHandlerKelas] = useState()
+  const [handleJadwalId, setHandlerJadwalId] = useState();
 
-
-  const [handleJadwalId, setHandlerJadwalId] = useState()
-
-  const [handleWaktu, setHandlerWaktu] = useState()
+  const [handleWaktu, setHandlerWaktu] = useState();
+  
   async function getMapel() {
-    setDataPelajaran([])
-    await axiosNew.get("/find-pelajaran").then((res) => {
-      console.log(res.data.data)
+    setDataPelajaran([]);
+    await axiosNew.get(`/find-pelajaran?user_id=${1}`).then((res) => {
+      console.log(res.data.data);
       setDataPelajaran(res.data.data);
-      console.log(dataPelajaran[0].nama)
-
+      // console.log(dataPelajaran[0].nama);
     });
   }
 
   useEffect(() => {
-    getMapel()
+    getMapel();
   }, []);
 
-
   async function openModalApi() {
-    setOpen(true)
+    setOpen(true);
     async function getGuruByRole() {
       await axiosNew.get("/list-user-guru").then(function (res) {
         setDataGuru(res.data.data);
       });
     }
     async function getKelas() {
-
       await axiosNew.get("/kelas").then(function (res) {
         setDataKelas(res.data.data);
       });
@@ -91,7 +87,6 @@ export default function Mapel() {
 
     await getGuruByRole();
     await getKelas();
-
   }
   const token = localStorage.getItem("token");
 
@@ -101,24 +96,33 @@ export default function Mapel() {
       `${import.meta.env.VITE_KEY_ENCRYPT}`
     );
     let date = new Date(2022, 3, 13);
-    await axiosNew.post("/create-pelajaran", {
-      nama: handlePelajaran,
-      guruId: handleGuru,
-      kelasId: handleKelas,
-      jadwalId: handleJadwalId,
-      jam: handleWaktu,
-      createdAt: new Date().toISOString()
-    }, {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "x-access-token": token,
-      },
-    }).then((res) => {
-      if (res.status === 200 || res.status === 201) {
-        setOpen(false)
-        getMapel()
-      }
-    }).catch((err) => toast.error(err.response.data.message ?? "Something went wrong"))
+    await axiosNew
+      .post(
+        "/create-pelajaran",
+        {
+          nama: handlePelajaran,
+          guruId: handleGuru,
+          kelasId: handleKelas,
+          jadwalId: handleJadwalId,
+          jam: handleWaktu,
+          createdAt: new Date().toISOString(),
+        },
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "x-access-token": token,
+          },
+        }
+      )
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          setOpen(false);
+          getMapel();
+        }
+      })
+      .catch((err) =>
+        toast.error(err.response.data.message ?? "Something went wrong")
+      );
   }
 
   return (
@@ -128,31 +132,58 @@ export default function Mapel() {
       <Button
         onClick={openModalApi}
         style={{
-          marginBottom: "40px"
+          marginTop: "20px",
+          marginBottom: "30px",
         }}
         variant="contained"
       >
         Tambah Mata Pelajaran
       </Button>
+
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell align="left" style={{
-                fontWeight: "bold"
-              }}>No</TableCell>
-              <TableCell align="left" style={{
-                fontWeight: "bold"
-              }}>Nama Pelajaran</TableCell>
-              <TableCell align="left" style={{
-                fontWeight: "bold"
-              }} >Nama Guru</TableCell>
-              <TableCell align="left" style={{
-                fontWeight: "bold"
-              }}>Nomor Kelas</TableCell>
-              <TableCell align="left" style={{
-                fontWeight: "bold"
-              }} >Waktu</TableCell>
+              <TableCell
+                align="center"
+                style={{
+                  fontWeight: "bold",
+                }}
+              >
+                No
+              </TableCell>
+              <TableCell
+                align="center"
+                style={{
+                  fontWeight: "bold",
+                }}
+              >
+                Nama Pelajaran
+              </TableCell>
+              <TableCell
+                align="center"
+                style={{
+                  fontWeight: "bold",
+                }}
+              >
+                Nama Guru
+              </TableCell>
+              <TableCell
+                align="center"
+                style={{
+                  fontWeight: "bold",
+                }}
+              >
+                Nomor Kelas
+              </TableCell>
+              <TableCell
+                align="center"
+                style={{
+                  fontWeight: "bold",
+                }}
+              >
+                Waktu
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -161,13 +192,13 @@ export default function Mapel() {
                 key={i}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
-                <TableCell component="th" scope="row">
+                <TableCell component="th" scope="row" align="center">
                   {i + 1}
                 </TableCell>
-                <TableCell align="left">{row.nama}</TableCell>
-                <TableCell align="left">{row.users.nama}</TableCell>
-                <TableCell align="left">{row.kelas.nomor_kelas}</TableCell>
-                <TableCell align="left">{row.jam}</TableCell>
+                <TableCell align="center">{row.nama}</TableCell>
+                <TableCell align="center">{row.users.nama}</TableCell>
+                <TableCell align="center">{row.kelas.nomor_kelas}</TableCell>
+                <TableCell align="center">{row.jam}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -190,7 +221,10 @@ export default function Mapel() {
             <Typography variant="h5" sx={{ textAlign: "center" }}>
               Tambah Pelajaran
             </Typography>
-            <FormControl sx={{ m: 1, minWidth: 120, marginTop: 5 }} size="small">
+            <FormControl
+              sx={{ m: 1, minWidth: 120, marginTop: 5 }}
+              size="small"
+            >
               <TextField
                 size="small"
                 id="outlined"
@@ -200,7 +234,6 @@ export default function Mapel() {
               />
             </FormControl>
             <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-
               <Select
                 sx={{
                   height: 40,
@@ -221,7 +254,6 @@ export default function Mapel() {
               </Select>
             </FormControl>
             <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-
               <Select
                 sx={{
                   height: 40,
@@ -242,7 +274,6 @@ export default function Mapel() {
               </Select>
             </FormControl>
             <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-
               <Select
                 sx={{
                   height: 40,
@@ -283,7 +314,6 @@ export default function Mapel() {
           </div>
         </Box>
       </Modal>
-
     </>
   );
 }

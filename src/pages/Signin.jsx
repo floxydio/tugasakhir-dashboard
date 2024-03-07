@@ -36,7 +36,7 @@ export default function SignIn() {
       password: password,
     }, {
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
+        "Content-Type": "application/x-www-form-urlencoded", 'ngrok-skip-browser-warning': 'any',
       }
     }).then(res => {
       if (res.status === 200) {
@@ -95,10 +95,17 @@ export default function SignIn() {
               <span className="ml-2 text-sm text-gray-600">Ingat Username</span>
             </label>
           </div>
-          <p className="mb-5">Tidak punya akun? <a href='#' onClick={() => {
-            router.navigate('/sign-up');
-
-          }} className='font-bold text-indigo-500 hover:cursor-pointer'>Daftar</a></p>
+          <p className="mb-5">
+            Tidak punya akun? 
+            <a href='#' 
+              onClick={() => {
+                router.navigate('/sign-up');
+              }} 
+              className='font-bold text-indigo-500 hover:cursor-pointer'
+            >
+              Daftar
+            </a>
+          </p>
           <button
             type="submit"
             className="w-full px-4 py-2 text-sm text-white bg-indigo-600 rounded-md 

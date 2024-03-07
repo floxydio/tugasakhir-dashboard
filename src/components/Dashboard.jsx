@@ -24,14 +24,23 @@ import Home from "../pages/Home";
 import imgIcon from "../assets/icon.jpg";
 import Mapel from "../pages/Mapel";
 import axiosNew from "./AxiosConfig";
-import { AccountBox, Book, Event, House, Logout, PermIdentity, School, Star } from "@mui/icons-material";
+import {
+  AccountBox,
+  Book,
+  BookOutlined,
+  Event,
+  House,
+  Logout,
+  PermIdentity,
+  School,
+  Star,
+} from "@mui/icons-material";
 import Users from "../pages/Users";
 import Nilai from "../pages/Nilai";
-import { useLocation } from 'react-router-dom'
+import { useLocation } from "react-router-dom";
 import Profile from "./Profile";
 import Ujian from "../pages/Ujian";
 import HasilUlangan from "../pages/HasilUlangan";
-
 
 
 function ResponsiveDrawer(props) {
@@ -41,12 +50,12 @@ function ResponsiveDrawer(props) {
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
   const [changeNav, setChangeNav] = useState(0);
-  const [changeMenuName, setChangeMenuName] = useState('');
+  const [changeMenuName, setChangeMenuName] = useState("");
   const location = useLocation();
-  const [roleId, setRoleId] = useState()
+  const [roleId, setRoleId] = useState();
   const [menu, setMenu] = useState([
     {
-      id: 1,
+      id: 0,
       name: "Home",
       url: "/",
     },
@@ -61,7 +70,7 @@ function ResponsiveDrawer(props) {
     //   url: "/absensi",
     // },
     {
-      id: 4,
+      id: 1,
       name: "Mata Pelajaran",
       url: "/mapel",
     },
@@ -76,25 +85,20 @@ function ResponsiveDrawer(props) {
     //   url: "/nilai"
     // },
     {
-      id: 7,
+      id: 2,
       name: "Ujian",
-      url: "/ujian"
+      url: "/ujian",
     },
     {
-      id: 8,
+      id: 3,
       name: "Hasil Ulangan Siswa",
-      url: '/hasil-ulangan-siswa'
-    }
-  ])
-
-
-
+      url: "/hasil-ulangan-siswa",
+    },
+  ]);
 
   useEffect(() => {
     async function fetchDataRefresh() {
-      if (
-        token === null || token === undefined
-      ) {
+      if (token === null || token === undefined) {
         navigate("/sign-in");
         localStorage.removeItem("token");
       } else {
@@ -102,6 +106,7 @@ function ResponsiveDrawer(props) {
           .get("/refresh-token", {
             headers: {
               "x-access-token": token,
+              "ngrok-skip-browser-warning": "any",
             },
           })
           .then((res) => {
@@ -109,7 +114,8 @@ function ResponsiveDrawer(props) {
               setData(res.data.data);
               // fetchRole(res.data.data.role)
             }
-          }).catch((err) => {
+          })
+          .catch((err) => {
             if (err.response.status === 400) {
               navigate("/sign-in");
               localStorage.removeItem("token");
@@ -117,126 +123,149 @@ function ResponsiveDrawer(props) {
           });
       }
     }
-    fromPathSpesific()
+    fromPathSpesific();
     fetchDataRefresh();
   }, [location]);
-
 
   function onChangeNav(id) {
     setChangeNav(id);
     if (id === 2) {
-      navigate("/guru")
+      navigate("/guru");
     } else if (id === 1) {
-      navigate("/")
+      navigate("/");
     } else if (id === 3) {
-      navigate("/absensi")
+      navigate("/absensi");
     } else if (id === 4) {
-      navigate("/mapel")
+      navigate("/mapel");
     } else if (id === 5) {
-      navigate("/users")
+      navigate("/users");
     } else if (id === 6) {
-      navigate("/nilai")
+      navigate("/nilai");
     } else if (id === 7) {
-      navigate("/ujian")
+      navigate("/ujian");
     } else if (id === 8) {
-      navigate("/hasil-ulangan-siswa")
+      navigate("/hasil-ulangan-siswa");
     }
   }
 
   function onChangeNavSpesific(id) {
-    console.log(`ID -> ${id}`)
+    console.log(`ID -> ${id}`);
     setChangeNav(id);
     if (id === 0) {
-      navigate("/")
+      navigate("/");
     } else if (id === 1) {
-      navigate("/mapel")
+      navigate("/mapel");
     } else if (id === 2) {
-      navigate("/ujian")
+      navigate("/ujian");
     } else if (id === 3) {
-      navigate("/hasil-ulangan-siswa")
+      navigate("/hasil-ulangan-siswa");
     }
   }
 
   function fromPath() {
     if (location.pathname === "/") {
-      setChangeNav(1)
+      setChangeNav(1);
     } else if (location.pathname === "/guru") {
-      setChangeNav(2)
+      setChangeNav(2);
     } else if (location.pathname === "/absensi") {
-      setChangeNav(3)
+      setChangeNav(3);
     } else if (location.pathname === "/mapel") {
-      setChangeNav(4)
+      setChangeNav(4);
     } else if (location.pathname === "/users") {
-      setChangeNav(5)
+      setChangeNav(5);
     } else if (location.pathname === "/nilai") {
-      setChangeNav(6)
+      setChangeNav(6);
     } else if (location.pathname === "/ujian") {
-      setChangeNav(7)
+      setChangeNav(7);
     }
   }
 
   function fromPathSpesific() {
     if (location.pathname === "/") {
-      setChangeNav(0)
+      setChangeNav(0);
     } else if (location.pathname === "/mapel") {
-      setChangeNav(1)
+      setChangeNav(1);
     } else if (location.pathname === "/ujian") {
-      setChangeNav(2)
+      setChangeNav(2);
     } else if (location.pathname === "/hasil-ulangan-siswa") {
-      setChangeNav(3)
+      setChangeNav(3);
     }
   }
 
   function iconByName(name) {
     if (name === "Guru") {
-      return <AccountBox className="h-5 w-5" />
+      return <AccountBox className="h-5 w-5" />;
     } else if (name === "Absensi") {
-      return <Book className="h-5 w-5" />
+      return <Book className="h-5 w-5" />;
     } else if (name === "Ujian") {
-      return <School className="h-5 w-5" />
+      return <School className="h-5 w-5" />;
     } else if (name === "Nilai") {
-      return <School className="h-5 w-5" />
+      return <School className="h-5 w-5" />;
     } else if (name === "Users") {
-      return <Star className="h-5 w-5" />
+      return <Star className="h-5 w-5" />;
     } else if (name === "Mapel") {
-      return <AccountBox className="h-5 w-5" />
+      return <AccountBox className="h-5 w-5" />;
     }
   }
-
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
+  
   const drawer = (
     <div>
-      <p style={{
-        textAlign: "center", color: "white",
-        marginTop: 40, fontSize: 42
-      }}>INISS</p>
-      <p style={{
-        textAlign: "center", color: "white",
-        fontSize: 8
-      }}>
+      <p
+        style={{
+          textAlign: "center",
+          color: "white",
+          marginTop: "60px",
+          fontSize: 42,
+        }}
+      >
+        INISS
+      </p>
+      <p
+        style={{
+          textAlign: "center",
+          color: "white",
+          fontSize: 10,
+        }}
+      >
         (Intelligentsia Nurul Ilmi Secondary School)
       </p>
       <List
         sx={{
-          marginTop: 10,
+          marginTop: "66px",
         }}
       >
         {menu.map((text, index) => (
           <div key={text.id} className="last:mb-0 mb-2">
             <div
-              className={`flex items-center p-2 cursor-pointer ${changeNav === index ? 'bg-white text-black' : 'text-white'}`}
+              className={`${
+                changeNav === index ? "bg-white text-black" : "text-white"
+              }`}
               onClick={() => onChangeNavSpesific(index)}
+              style={{
+                padding: 10,
+                margin: 8,
+                marginBottom: 8,
+                borderRadius: 10,
+                gap: 10,
+                display: "flex",
+                alignItems: "center",
+                cursor: "pointer",
+              }}
             >
-              <div className={`flex-shrink-0 ${changeNav === index ? 'text-black' : 'text-white'}`}>
-
+              <div
+                className={`flex-shrink-0 ${
+                  changeNav === index ? "text-black" : "text-white"
+                }`}
+              >
                 {index == 0 ? <House /> : null}
-                {index == 1 ? <PermIdentity /> : null}
+                {index == 1 ? <Book /> : null}
                 {index == 2 ? <Event /> : null}
-                {index == 3 ? <Book /> : null}
+                {index == 3 ? <BookOutlined /> : null}
                 {index == 4 ? <AccountBox /> : null}
                 {/* Icon For Nilai */}
                 {index == 5 ? <Book /> : null}
@@ -244,7 +273,7 @@ function ResponsiveDrawer(props) {
               </div>
               <span className="ml-3">{text.name}</span>
             </div>
-            {index < menu.length && <hr className="border-t border-gray-200" />}
+            {/* {index < menu.length && <hr className="border-t border-gray-200" />} */}
           </div>
         ))}
       </List>
@@ -335,8 +364,7 @@ function ResponsiveDrawer(props) {
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: drawerWidth,
-
-              backgroundColor: "#233044"
+              backgroundColor: "#182237",
             },
           }}
         >
@@ -345,7 +373,7 @@ function ResponsiveDrawer(props) {
         <Drawer
           PaperProps={{
             sx: {
-              backgroundColor: "#233044",
+              backgroundColor: "#182237",
               color: "white",
             },
           }}
@@ -366,9 +394,9 @@ function ResponsiveDrawer(props) {
         component="main"
         sx={{
           backgroundColor: "#F4F6F9",
-          flexGrow: 1,
           height: "100vh",
-          p: 3,
+          overflow: "auto",
+          padding: 3,
           width: { sm: `calc(100% - ${drawerWidth}px)` },
         }}
       >
@@ -381,11 +409,8 @@ function ResponsiveDrawer(props) {
         {location.pathname === "/nilai" ? <Nilai /> : null}
         {location.pathname === "/ujian" ? <Ujian /> : null}
         {location.pathname === "/hasil-ulangan-siswa" ? <HasilUlangan /> : null}
-
-
       </Box>
     </Box>
-
   );
 }
 

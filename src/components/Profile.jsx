@@ -14,9 +14,7 @@ import Badge from "@mui/material/Badge";
 import { useNavigate } from "react-router-dom";
 
 const AvatarDemo = () => {
-  const [avatarEl, setAvatarEl] = React.useState(
-    null
-  );
+  const [avatarEl, setAvatarEl] = React.useState(null);
 
   const [invisible, setInvisible] = React.useState(false);
 
@@ -28,9 +26,7 @@ const AvatarDemo = () => {
     setAvatarEl(null);
   };
 
-  const [notifyEl, setNotifyEl] = React.useState(
-    null
-  );
+  const [notifyEl, setNotifyEl] = React.useState(null);
 
   const handleBadgeVisibility = () => {
     setInvisible(!invisible);
@@ -50,19 +46,18 @@ const AvatarDemo = () => {
 
   function logout() {
     localStorage.removeItem("token");
-    localStorage.removeItem("role_id")
+    localStorage.removeItem("role_id");
     navigate("/sign-in", { replace: true });
   }
 
   const open = Boolean(avatarEl);
-  const id = open ? "simpe-popover" : undefined;
+  const id = open ? "simple-popover" : undefined;
 
   const notifyOpen = Boolean(notifyEl);
-  const notifyId = notifyOpen ? "simpe-notify" : undefined;
+  const notifyId = notifyOpen ? "simple-notify" : undefined;
   return (
     <div>
       <Stack direction="row" spacing={1}>
-
         <Button aria-describedby={id} onClick={handleAvatarClick}>
           <Avatar>Dio</Avatar>
           <KeyboardArrowDownIcon />
@@ -76,11 +71,10 @@ const AvatarDemo = () => {
         onClose={handleAvatarClose}
         anchorOrigin={{
           vertical: "bottom",
-          horizontal: "left"
+          horizontal: "left",
         }}
       >
         <List disablePadding>
-
           <ListItem disablePadding>
             <ListItemButton>
               <ListItemText primary="Setting" />
@@ -102,7 +96,7 @@ const AvatarDemo = () => {
         onClose={handleNotifyClose}
         anchorOrigin={{
           vertical: "bottom",
-          horizontal: "left"
+          horizontal: "left",
         }}
       >
         <List disablePadding>
