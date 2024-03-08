@@ -11,7 +11,8 @@ import Signin from "../pages/Signin.jsx";
 import ErrorNotFound from "../pages/ErrorNotFound.jsx";
 import axiosNew from "../components/AxiosConfig.jsx";
 import HasilUlangan from "../pages/HasilUlangan.jsx";
-
+import AppAdmin from "../AppAdmin.jsx"
+import AdminGuru from "../pages/Admin/AdminGuru.jsx";
 
 
 export const router = createBrowserRouter([
@@ -45,7 +46,19 @@ export const router = createBrowserRouter([
         element: <HasilUlangan />
       }
     ]
-  }, {
+  },
+  {
+    path: "/admin",
+    element: <AppAdmin />,
+    children: [
+      {
+        path: "guru-adm",
+        element: <AdminGuru />
+      }
+
+    ]
+  },
+  {
     path: "/sign-in",
     element: <Signin />
   }, {

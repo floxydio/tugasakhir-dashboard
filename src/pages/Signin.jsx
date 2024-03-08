@@ -9,7 +9,7 @@ export default function SignIn() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [rememberUsername, setRememberUsername] = useState(false);
-  const [role, setRole] = useState("")
+  const [role, setRole] = useState("guru")
 
   useEffect(() => {
     const savedUsername = localStorage.getItem('rememberedUsername');
@@ -62,9 +62,9 @@ export default function SignIn() {
       }).then(res => {
         console.log(res.data)
         if (res.status === 200) {
-          // localStorage.setItem("token", res.data.token)
-          // localStorage.setItem("role_id", res.data.id)
-          // router.navigate("/", { replace: true })
+          localStorage.setItem("token", res.data.token)
+          localStorage.setItem("role_id", res.data.id)
+          router.navigate("/admin", { replace: true })
         }
       }).catch((err) => {
         // console.log(err)
