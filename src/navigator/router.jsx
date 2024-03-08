@@ -11,9 +11,9 @@ import Signin from "../pages/Signin.jsx";
 import ErrorNotFound from "../pages/ErrorNotFound.jsx";
 import axiosNew from "../components/AxiosConfig.jsx";
 import HasilUlangan from "../pages/HasilUlangan.jsx";
-import AppAdmin from "../AppAdmin.jsx"
+import AppAdmin from "../AppAdmin.jsx";
 import AdminGuru from "../pages/Admin/AdminGuru.jsx";
-
+import AdminKelas from "../pages/Admin/AdminKelas.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -22,30 +22,33 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "guru",
-        element: <Guru />
-      }, {
+        element: <Guru />,
+      },
+      {
         path: "mapel",
-        element: <Mapel />
+        element: <Mapel />,
       },
       {
         path: "absensi",
-        element: <Absensi />
+        element: <Absensi />,
       },
       {
         path: "users",
-        element: <Users />
+        element: <Users />,
       },
       {
         path: "nilai",
-        element: <Nilai />
-      }, {
+        element: <Nilai />,
+      },
+      {
         path: "ujian",
-        element: <Ujian />
-      }, {
+        element: <Ujian />,
+      },
+      {
         path: "hasil-ulangan-siswa",
-        element: <HasilUlangan />
-      }
-    ]
+        element: <HasilUlangan />,
+      },
+    ],
   },
   {
     path: "/admin",
@@ -53,19 +56,24 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "guru-adm",
-        element: <AdminGuru />
-      }
-
-    ]
+        element: <AdminGuru />,
+      },
+      {
+        path: "kelas-adm",
+        element: <AdminKelas />
+      },
+    ],
   },
   {
     path: "/sign-in",
-    element: <Signin />
-  }, {
+    element: <Signin />,
+  },
+  {
     path: "/sign-up",
-    element: <SignUp />
-  }, {
+    element: <SignUp />,
+  },
+  {
     path: "*",
-    element: <ErrorNotFound />
-  }
-])
+    element: <ErrorNotFound />,
+  },
+]);

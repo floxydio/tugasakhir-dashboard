@@ -6,15 +6,10 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import axios from "axios";
 import axiosNew from "../components/AxiosConfig";
 import {
   Button,
-  Chip,
   FormControl,
-  IconButton,
-  InputAdornment,
-  InputLabel,
   MenuItem,
   Select,
   TextField,
@@ -44,27 +39,21 @@ export default function Mapel() {
   const handleClose = () => setOpen(false);
   const handleOpen = () => setOpen(true);
 
-  //
   const [dataGuru, setDataGuru] = useState([]);
   const [dataKelas, setDataKelas] = useState([]);
 
-  //
   const [handlePelajaran, setHandlerPelajaran] = useState();
-
   const [handleGuru, setHandlerGuru] = useState();
-
   const [handleKelas, setHandlerKelas] = useState();
-
   const [handleJadwalId, setHandlerJadwalId] = useState();
-
   const [handleWaktu, setHandlerWaktu] = useState();
 
   async function getMapel() {
     setDataPelajaran([]);
     await axiosNew.get(`/find-pelajaran?user_id=${1}`).then((res) => {
-      // // console.log(res.data.data);
+      // console.log(res.data.data);
       setDataPelajaran(res.data.data);
-      // // console.log(dataPelajaran[0].nama);
+      // console.log(dataPelajaran[0].nama);
     });
   }
 

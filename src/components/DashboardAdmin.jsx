@@ -26,12 +26,14 @@ import { useLocation } from "react-router-dom";
 import Profile from "./Profile";
 import Ujian from "../pages/Ujian";
 import AdminGuru from "../pages/Admin/AdminGuru";
-import { useChangeNavbarAdmin, useMenuAdmin, useToggleSidebarAdmin } from "../store/admin_home.store";
+import { useChangeNavbarAdmin, useMenuAdmin, useToggleSidebarAdmin } from "../store/admin/admin_home.store";
 import { useRefresh, useToken } from "../store/global_store";
+import AdminKelas from "../pages/Admin/AdminKelas";
 
 
 
 function DrawerAdmin(props) {
+    
     // Store
     const menuStore = useMenuAdmin((state) => state.menuAdmin)
     const checkAuth = useRefresh((state) => state)
@@ -255,7 +257,7 @@ function DrawerAdmin(props) {
                 {location.pathname === "/admin/guru-adm" ? <AdminGuru /> : null}
                 {location.pathname === "/admin/murid-adm" ? <Mapel /> : null}
                 {location.pathname === "/admin/mapel-adm" ? <Users /> : null}
-                {location.pathname === "/admin/kelas-adm" ? <Nilai /> : null}
+                {location.pathname === "/admin/kelas-adm" ? <AdminKelas /> : null}
                 {location.pathname === "/admin/admins-adm" ? <Ujian /> : null}
             </Box>
         </Box>
