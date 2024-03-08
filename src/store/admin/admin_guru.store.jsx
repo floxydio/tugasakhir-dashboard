@@ -19,4 +19,5 @@ export const useAdminGuru = create((set, get) => ({
         }
       });
   },
+  createGuru: async () => {}
 }));
