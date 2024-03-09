@@ -38,7 +38,7 @@ export const useAdminGuru = create((set, get) => ({
         }
       )
       .then((res) => {
-        if (res.status === 200) {
+        if (res.status === 200 || res.status === 201) {
           getGuru();
         }
       })
