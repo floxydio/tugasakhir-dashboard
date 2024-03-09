@@ -45,6 +45,7 @@ export default function SignIn() {
         if (res.status === 200) {
           localStorage.setItem("token", res.data.token)
           localStorage.setItem("role_id", res.data.id)
+          localStorage.setItem("role", "guru")
           router.navigate("/", { replace: true })
         }
       }).catch((err) => {
@@ -64,6 +65,7 @@ export default function SignIn() {
         if (res.status === 200) {
           localStorage.setItem("token", res.data.token)
           localStorage.setItem("role_id", res.data.id)
+          localStorage.setItem("role", "admin")
           router.navigate("/admin", { replace: true })
         }
       }).catch((err) => {

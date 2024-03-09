@@ -53,14 +53,13 @@ export default function AdminSiswa() {
 
     return (
         <>
-            <h1 className='text-4xl mb-10'>Konfigurasi Siswa</h1>
             {/* Create Button */}
             <Button variant="contained" color="primary" onClick={() => siswaState.onOpenModal()}>
                 Tambah Siswa
             </Button>
 
             {/* Table */}
-            <TableContainer component={Paper} className='mt-[70px]'>
+            <TableContainer component={Paper} className='mt-[30px]'>
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
                     <TableHead>
                         <TableRow>
@@ -118,18 +117,7 @@ export default function AdminSiswa() {
                 setPassword('')
                 setKelas('')
             }}>
-                <Box sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    width: "60%",
-                    bgcolor: "white",
-                    border: "2px solid #000",
-                    boxShadow: 24,
-                    p: 4,
-                    overflowY: "auto",
-                }} noValidate autoComplete="off">
+                <Box sx={boxStyle} noValidate autoComplete="off">
                     <Typography
                         variant="h5"
                         sx={{ textAlign: "center", fontWeight: "bold" }}

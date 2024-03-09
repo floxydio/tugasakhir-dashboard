@@ -40,12 +40,17 @@ function DrawerAdmin(props) {
     const checkAuth = useRefresh((state) => state)
     const toggle = useToggleSidebarAdmin((state) => state)
     const changeNavbar = useChangeNavbarAdmin((state) => state)
+    const checkRole = useRefresh((state) => state);
+
 
     const navigate = useNavigate();
     const location = useLocation();
     const { window } = props;
     const drawerWidth = 240;
 
+    useEffect(() => {
+        checkRole.checkNavigateRole(navigate)
+    }, [])
 
     useEffect(() => {
         checkAuth.check()

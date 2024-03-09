@@ -41,8 +41,13 @@ import { useLocation } from "react-router-dom";
 import Profile from "./Profile";
 import Ujian from "../pages/Ujian";
 import HasilUlangan from "../pages/HasilUlangan";
+import { useRefresh } from "../store/global_store";
 
 function ResponsiveDrawer(props) {
+  // State
+  const checkRole = useRefresh((state) => state);
+
+
   const { window } = props;
   const [mobileOpen, setMobileOpen] = useState(false);
   const [data, setData] = useState([]);
@@ -125,6 +130,10 @@ function ResponsiveDrawer(props) {
     fromPathSpesific();
     fetchDataRefresh();
   }, [location]);
+
+  useEffect(() => {
+    checkRole.checkNavigateRole(navigate)
+  }, [])
 
   function onChangeNav(id) {
     setChangeNav(id);
@@ -240,9 +249,8 @@ function ResponsiveDrawer(props) {
         {menu.map((text, index) => (
           <div key={text.id} className="last:mb-0 mb-2">
             <div
-              className={`${
-                changeNav === index ? "bg-white text-black" : "text-white"
-              }`}
+              className={`${changeNav === index ? "bg-white text-black" : "text-white"
+                }`}
               onClick={() => onChangeNavSpesific(index)}
               style={{
                 padding: 10,
@@ -256,9 +264,8 @@ function ResponsiveDrawer(props) {
               }}
             >
               <div
-                className={`flex-shrink-0 ${
-                  changeNav === index ? "text-black" : "text-white"
-                }`}
+                className={`flex-shrink-0 ${changeNav === index ? "text-black" : "text-white"
+                  }`}
               >
                 {index == 0 ? <House /> : null}
                 {index == 1 ? <Book /> : null}
