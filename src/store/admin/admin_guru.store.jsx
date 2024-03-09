@@ -19,17 +19,15 @@ export const useAdminGuru = create((set, get) => ({
         }
       });
   },
-  createGuru: async (guru_id, nama, username, status_guru) => {
-    const userAgent = window.navigator.userAgent;
+  createGuru: async (nama, username, password) => {
     await axiosNew
       .post(
         "/admin/create-guru",
         {
-          guru_id: guru_id,
           nama: nama,
           username: username,
-          status_guru: status_guru,
-          user_agent: userAgent,
+          password: password,
+          // user_agent: user_agent,
         },
         {
           headers: {
