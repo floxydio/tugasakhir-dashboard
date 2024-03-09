@@ -29,11 +29,12 @@ import AdminGuru from "../pages/Admin/AdminGuru";
 import { useChangeNavbarAdmin, useMenuAdmin, useToggleSidebarAdmin } from "../store/admin/admin_home.store";
 import { useRefresh, useToken } from "../store/global_store";
 import AdminKelas from "../pages/Admin/AdminKelas";
+import AdminSiswa from "../pages/Admin/AdminSiswa";
 
 
 
 function DrawerAdmin(props) {
-    
+
     // Store
     const menuStore = useMenuAdmin((state) => state.menuAdmin)
     const checkAuth = useRefresh((state) => state)
@@ -255,7 +256,7 @@ function DrawerAdmin(props) {
                 {/* Ini Diubah untuk connect ke page */}
                 {location.pathname === "/" ? <Home /> : null}
                 {location.pathname === "/admin/guru-adm" ? <AdminGuru /> : null}
-                {location.pathname === "/admin/murid-adm" ? <Mapel /> : null}
+                {location.pathname === "/admin/murid-adm" ? <AdminSiswa /> : null}
                 {location.pathname === "/admin/mapel-adm" ? <Users /> : null}
                 {location.pathname === "/admin/kelas-adm" ? <AdminKelas /> : null}
                 {location.pathname === "/admin/admins-adm" ? <Ujian /> : null}
