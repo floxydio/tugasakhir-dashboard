@@ -148,11 +148,17 @@ export default function AdminKelas() {
                   <TableCell align="center" component="th" scope="row">
                     {data.jumlah_orang}
                   </TableCell>
-                  <TableCell
-                    align="center"
-                    component="th"
-                    scope="row"
-                  ></TableCell>
+                  <TableCell align="center" component="th" scope="row">
+                    <Button
+                      onClick={() => {
+                        console.log("Masuk Nihhh");
+                      }}
+                      sx={{ float: "center" }}
+                      variant="contained"
+                    >
+                      Edit
+                    </Button>
+                  </TableCell>
                 </TableRow>
               );
             })}
