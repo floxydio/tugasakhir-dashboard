@@ -2,32 +2,36 @@ import { create } from "zustand";
 import axiosNew from "../../components/AxiosConfig";
 import { toast } from "react-toastify";
 
-export const useAdminGuru = create((set, get) => ({
-  guru: [],
+export const useKelasAdmin = create((set, get) => ({
+  kelas: [],
   isLoading: false,
-  getGuru: async () => {
+
+  getDataKelas: async () => {
     set({ isLoading: true });
     await axiosNew
-      .get("/admin/find-guru", {
+      .get(`/kelas`, {
         headers: {
           "x-access-token": localStorage.getItem("token"),
         },
       })
       .then((res) => {
         if (res.status === 200) {
-          set({ guru: res.data.data });
           set({ isLoading: false });
+          set({ kelas: res.data.data });
         }
       });
   },
-  createGuru: async (nama, username, password) => {
+
+  submitKelas: async (guru_id, nomor_kelas, jumlah_orang) => {
+    set({ isLoading: true });
+
     await axiosNew
       .post(
-        "/admin/create-guru",
+        "/admin/create-kelas",
         {
-          nama: nama,
-          username: username,
-          password: password,
+          guru_id: guru_id,
+          nomor_kelas: nomor_kelas,
+          jumlah_orang: jumlah_orang,
         },
         {
           headers: {
@@ -40,9 +44,7 @@ export const useAdminGuru = create((set, get) => ({
         if (res.status === 200 || res.status === 201) {
           window.location.reload();
         }
-      })
-      .catch((err) => {
-        toast.error(err.response.data.message ?? "Something Went Wrong");
       });
+    // .catch((err) => console.log(err));
   },
 }));
