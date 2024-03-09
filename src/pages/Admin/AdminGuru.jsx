@@ -5,6 +5,7 @@ import { useAdminGuru } from "../../store/admin/admin_guru.store";
 import {
   Box,
   Button,
+  Chip,
   FormControl,
   IconButton,
   InputAdornment,
@@ -188,10 +189,25 @@ export default function AdminGuru() {
                     {data.username}
                   </TableCell>
                   <TableCell component="th" scope="row" align="left">
-                    {data.status_user}
+                    {data.status_user === 1 ? (
+                      <Chip label={"Active"} color="success" />
+                    ) : (
+                      <Chip label={"Inactive"} color="error" />
+                    )}
                   </TableCell>
                   <TableCell component="th" scope="row" align="left">
                     {data.user_agent}
+                  </TableCell>
+                  <TableCell component="th" scope="row" align="left">
+                    <Button
+                      onClick={() => {
+                        console.log("Masuk Nihhh");
+                      }}
+                      sx={{ float: "left" }}
+                      variant="contained"
+                    >
+                      Edit
+                    </Button>
                   </TableCell>
                 </TableRow>
               );
