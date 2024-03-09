@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import axiosNew from "../../components/AxiosConfig";
+import { toast } from "react-toastify";
 
 export const useAdminGuru = create((set, get) => ({
   guru: [],
@@ -40,6 +41,9 @@ export const useAdminGuru = create((set, get) => ({
         if (res.status === 200) {
           getGuru();
         }
+      })
+      .catch((err) => {
+        toast.error(err.response.data.message ?? "Something Went Wrong");
       });
   },
 }));

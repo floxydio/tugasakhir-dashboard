@@ -21,6 +21,7 @@ import {
   Typography,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { ToastContainer } from "react-toastify";
 
 const override = (React.CSSProperties = {
   transform: "translate(-50%, -50%)",
@@ -119,6 +120,7 @@ export default function AdminGuru() {
 
   return (
     <>
+      <ToastContainer />
       <div className="filter_style">
         <Button onClick={handleOpenCreateGuru}>Create Guru</Button>
       </div>
