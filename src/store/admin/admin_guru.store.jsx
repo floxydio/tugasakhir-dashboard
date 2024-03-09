@@ -28,7 +28,6 @@ export const useAdminGuru = create((set, get) => ({
           nama: nama,
           username: username,
           password: password,
-          // user_agent: user_agent,
         },
         {
           headers: {
@@ -39,7 +38,7 @@ export const useAdminGuru = create((set, get) => ({
       )
       .then((res) => {
         if (res.status === 200 || res.status === 201) {
-          getGuru();
+          window.location.reload();
         }
       })
       .catch((err) => {
