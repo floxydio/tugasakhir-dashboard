@@ -36,11 +36,10 @@ const style = {
 
 export default function AdminKelas() {
   const [open, setOpen] = useState(false);
-  const handleClose = () => setOpen(false);
 
   const [addNamaKelas, setAddNamaKelas] = useState("");
   const [addNomorKelas, setAddNomorKelas] = useState("");
-  const [addJumlahMurid, setAddJumlahMurid] = useState("");
+  const [addJumlahMurid, setAddJumlahMurid] = useState(0);
 
   const [dataGuru, setDataGuru] = useState([]);
   const [handleGuru, setHandleGuru] = useState(999);
@@ -49,6 +48,11 @@ export default function AdminKelas() {
   const kelasStore = useKelasAdmin((state) => state);
   // const submitKelasStore = useKelasAdmin((state) => state);
 
+  const handleClose = () => {
+    setOpen(false);
+    setAddNomorKelas("");
+    setAddJumlahMurid(0);
+  };
 
   async function openModalApi() {
     setOpen(true);
@@ -250,18 +254,17 @@ export default function AdminKelas() {
 
               <Button
                 variant="contained"
-                onClick={() => 
+                onClick={() =>
                   kelasStore.submitKelas(
                     handleGuru,
                     addNomorKelas,
-                    addJumlahMurid,
+                    addJumlahMurid
                   )
                 }
               >
                 Submit Data
               </Button>
             </div>
-
           </div>
         </Box>
       </Modal>

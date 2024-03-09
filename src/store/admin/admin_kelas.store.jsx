@@ -42,11 +42,9 @@ export const useKelasAdmin = create((set, get) => ({
       )
       .then((res) => {
         if (res.status === 200 || res.status === 201) {
-          getDataKelas();
+          window.location.reload();
         }
-      })
-      .catch((err) =>
-        toast.error(err.response.data.message ?? "Something went wrong")
-      );
+      });
+    // .catch((err) => console.log(err));
   },
 }));
