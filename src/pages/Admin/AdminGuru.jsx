@@ -206,10 +206,13 @@ export default function AdminGuru() {
                   <TableCell component="th" scope="row" align="left">
                     <Typography fontFamily={"Poppins"}>{data.nama}</Typography>
                   </TableCell>
-                  <TableCell component="th" scope="row" align="left">
-                    <Typography fontFamily={"Poppins"}>
-                      {data.username}
-                    </Typography>
+                  <TableCell
+                    component="th"
+                    scope="row"
+                    align="left"
+                    sx={{ fontFamily: "Poppins" }}
+                  >
+                    {data.username}
                   </TableCell>
                   <TableCell component="th" scope="row" align="left">
                     {data.status_user === 1 ? (
@@ -218,10 +221,16 @@ export default function AdminGuru() {
                       <Chip label={"Inactive"} color="error" />
                     )}
                   </TableCell>
-                  <TableCell component="th" scope="row" align="left">
-                    <Typography sx={{ width: "100px" }} fontFamily={"Poppins"}>
+                  <TableCell
+                    component="th"
+                    scope="row"
+                    align="left"
+                    sx={{ width: "100px", fontFamily: "Poppins" }}
+                  >
+                    {/* <Typography sx={{ width: "100px" }} fontFamily={"Poppins"}>
                       {data.user_agent}
-                    </Typography>
+                    </Typography> */}
+                    {data.user_agent}
                   </TableCell>
                   <TableCell component="th" scope="row" align="left">
                     <Button
