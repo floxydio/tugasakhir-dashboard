@@ -185,7 +185,7 @@ export default function AdminGuru() {
                   fontFamily: "Poppins",
                 }}
               >
-                Edit
+                Ubah
               </TableCell>
             </TableRow>
           </TableHead>
@@ -198,13 +198,21 @@ export default function AdminGuru() {
                     "&:last-child td, &:lastchild th": { border: 0 },
                   }}
                 >
-                  <TableCell component="th" scope="row" align="left">
-                    <Typography fontFamily={"Poppins"}>
-                      {data.guru_id}
-                    </Typography>
+                  <TableCell
+                    component="th"
+                    scope="row"
+                    align="left"
+                    sx={{ fontFamily: "Poppins" }}
+                  >
+                    {data.guru_id}
                   </TableCell>
-                  <TableCell component="th" scope="row" align="left">
-                    <Typography fontFamily={"Poppins"}>{data.nama}</Typography>
+                  <TableCell
+                    component="th"
+                    scope="row"
+                    align="left"
+                    sx={{ fontFamily: "Poppins" }}
+                  >
+                    {data.nama}
                   </TableCell>
                   <TableCell
                     component="th"
@@ -214,7 +222,12 @@ export default function AdminGuru() {
                   >
                     {data.username}
                   </TableCell>
-                  <TableCell component="th" scope="row" align="left">
+                  <TableCell
+                    component="th"
+                    scope="row"
+                    align="left"
+                    sx={{ fontFamily: "Poppins" }}
+                  >
                     {data.status_user === 1 ? (
                       <Chip label={"Active"} color="success" />
                     ) : (
@@ -227,9 +240,6 @@ export default function AdminGuru() {
                     align="left"
                     sx={{ width: "100px", fontFamily: "Poppins" }}
                   >
-                    {/* <Typography sx={{ width: "100px" }} fontFamily={"Poppins"}>
-                      {data.user_agent}
-                    </Typography> */}
                     {data.user_agent}
                   </TableCell>
                   <TableCell component="th" scope="row" align="left">
@@ -238,7 +248,7 @@ export default function AdminGuru() {
                       sx={{ float: "left" }}
                       variant="contained"
                     >
-                      Ubah
+                      Edit
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -362,6 +372,76 @@ export default function AdminGuru() {
             <Typography variant="h5" sx={{ textAlign: "center" }}>
               Edit Data Guru
             </Typography>
+            <FormControl sx={{ m: 1, minWidth: 120 }}>
+              <TextField
+                size="small"
+                id="outlined"
+                label="Nama Guru"
+                type="text"
+                // value={}
+                onChange={(e) => {
+                  console.log(e.target.value);
+                }}
+              />
+            </FormControl>
+            <FormControl sx={{ m: 1, minWidth: 120 }}>
+              <TextField
+                size="small"
+                id="outlined"
+                label="Username"
+                type="text"
+                // value={}
+                onChange={(e) => {
+                  console.log(e.target.value);
+                }}
+              />
+            </FormControl>
+            <FormControl sx={{ m: 1, minWidth: 120 }}>
+              <TextField
+                size="small"
+                id="outlined"
+                label="Password"
+                type={showPassword ? "text" : "password"}
+                // value={
+                //   dataPassword === null
+                //     ? addPassword
+                //     : generatePassword(passwordLength, passwordOptions)
+                // }
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={toggleVisibilityPassword}
+                        edge="end"
+                      >
+                        {showPassword ? <Visibility /> : <VisibilityOff />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                onChange={(e) => setAddPassword(e.target.value)}
+              />
+            </FormControl>
+            <div className="flex flex-row items-center justify-between mt-[40px]">
+              <Button
+                style={{ marginTop: 30 }}
+                onClick={handleCloseEditGuru}
+                variant="contained"
+                color="error"
+              >
+                Close
+              </Button>
+              <Button
+                style={{ marginTop: 30 }}
+                onClick={() => {
+                  console.log("Click Submit");
+                }}
+                variant="contained"
+              >
+                Submit
+              </Button>
+            </div>
           </div>
         </Box>
       </Modal>
