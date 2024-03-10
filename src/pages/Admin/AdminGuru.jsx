@@ -9,8 +9,10 @@ import {
   FormControl,
   IconButton,
   InputAdornment,
+  MenuItem,
   Modal,
   Paper,
+  Select,
   Table,
   TableBody,
   TableCell,
@@ -43,12 +45,19 @@ const style = {
 };
 
 export default function AdminGuru() {
-  const [openCreateGuru, setOpenCreateGuru] = useState(false);
-  const [openEditGuru, setOpenEditGuru] = useState(false);
+  //Use State For Input
   const [addNama, setAddNama] = useState("");
   const [addUsername, setAddUsername] = useState("");
   const [addPassword, setAddPassword] = useState("");
+  const [editId, setEditId] = useState(0);
+  const [editNama, setEditNama] = useState("");
+  const [editUsername, setEditUsername] = useState("");
+  // const [editPassword, setEditPassword] = useState("");
+  const [editStatusGuru, setEditStatusGuru] = useState(0);
 
+  //Use State For Modal and Etc
+  const [openCreateGuru, setOpenCreateGuru] = useState(false);
+  const [openEditGuru, setOpenEditGuru] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [dataPassword, setDataPassword] = useState(null);
 
@@ -56,9 +65,14 @@ export default function AdminGuru() {
   const dataGuru = useAdminGuru((state) => state);
 
   //Modal Open For Edit Data Guru
-  const handleOpenEditGuru = () => setOpenEditGuru(true);
+  function handleOpenEditGuru(id, nama, username, password) {
+    setEditId(id);
+    setEditNama(nama);
+    setEditUsername(username);
+    setOpenEditGuru(true);
+  }
 
-  //Modal Open For Edit Data Guru
+  //Modal Close For Edit Data Guru
   const handleCloseEditGuru = () => setOpenEditGuru(false);
 
   //Modal Open For Create Guru
@@ -123,6 +137,18 @@ export default function AdminGuru() {
   const inputRandomizePassword = () =>
     setAddPassword(passwordLength, passwordOptions);
 
+  const statusGuru = [
+    {
+      id: 1,
+      value: 0,
+      render: "Inactive",
+    },
+    {
+      id: 2,
+      value: 1,
+      render: "Active",
+    },
+  ];
   useEffect(() => {
     dataGuru.getGuru();
   }, []);
@@ -244,7 +270,19 @@ export default function AdminGuru() {
                   </TableCell>
                   <TableCell component="th" scope="row" align="left">
                     <Button
-                      onClick={handleOpenEditGuru}
+                      onClick={
+                        () => {
+                          handleOpenEditGuru(
+                            data.guru_id,
+                            data.nama,
+                            data.username,
+                            data.status_user
+                          );
+                        }
+                        // console.log(data.guru_id);
+                        // console.log(data.nama);
+                        // console.log(data.username);
+                      }
                       sx={{ float: "left" }}
                       variant="contained"
                     >
@@ -378,9 +416,9 @@ export default function AdminGuru() {
                 id="outlined"
                 label="Nama Guru"
                 type="text"
-                // value={}
+                value={editNama}
                 onChange={(e) => {
-                  console.log(e.target.value);
+                  setEditNama(e.target.value);
                 }}
               />
             </FormControl>
@@ -390,23 +428,42 @@ export default function AdminGuru() {
                 id="outlined"
                 label="Username"
                 type="text"
-                // value={}
+                value={editUsername}
                 onChange={(e) => {
-                  console.log(e.target.value);
+                  setEditUsername(e.target.value);
                 }}
               />
             </FormControl>
             <FormControl sx={{ m: 1, minWidth: 120 }}>
+              <Select
+                labelId="demo-simple-select-autowidth-label"
+                id="demo-simple-select-autowidth"
+                value={editStatusGuru}
+                autoWidth
+                label="Status Guru"
+                onChange={(e) => {
+                  setEditStatusGuru(e.target.value);
+                }}
+              >
+                {/* <MenuItem>
+                  <em>None</em>
+                </MenuItem> */}
+                {statusGuru.map((data) => {
+                  return (
+                    <MenuItem key={data.id} value={data.value}>
+                      {data.render}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+            {/* <FormControl sx={{ m: 1, minWidth: 120 }}>
               <TextField
                 size="small"
                 id="outlined"
                 label="Password"
                 type={showPassword ? "text" : "password"}
-                // value={
-                //   dataPassword === null
-                //     ? addPassword
-                //     : generatePassword(passwordLength, passwordOptions)
-                // }
+                value={editPassword}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -422,7 +479,7 @@ export default function AdminGuru() {
                 }}
                 onChange={(e) => setAddPassword(e.target.value)}
               />
-            </FormControl>
+            </FormControl> */}
             <div className="flex flex-row items-center justify-between mt-[40px]">
               <Button
                 style={{ marginTop: 30 }}
