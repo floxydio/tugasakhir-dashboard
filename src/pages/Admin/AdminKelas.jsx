@@ -37,7 +37,6 @@ const style = {
 export default function AdminKelas() {
   const [open, setOpen] = useState(false);
 
-  const [addNamaKelas, setAddNamaKelas] = useState("");
   const [addNomorKelas, setAddNomorKelas] = useState("");
   const [addJumlahMurid, setAddJumlahMurid] = useState(0);
 
@@ -46,7 +45,6 @@ export default function AdminKelas() {
 
   //Store
   const kelasStore = useKelasAdmin((state) => state);
-  // const submitKelasStore = useKelasAdmin((state) => state);
 
   const handleClose = () => {
     setOpen(false);
@@ -79,6 +77,7 @@ export default function AdminKelas() {
           marginBottom: "30px",
         }}
         variant="contained"
+        color="primary"
       >
         Tambah Kelas
       </Button>
@@ -91,6 +90,16 @@ export default function AdminKelas() {
                 align="center"
                 style={{
                   fontWeight: "bold",
+                  fontFamily: "Poppins",
+                }}
+              >
+                No
+              </TableCell>
+              <TableCell
+                align="center"
+                style={{
+                  fontWeight: "bold",
+                  fontFamily: "Poppins",
                 }}
               >
                 Kelas ID
@@ -99,6 +108,7 @@ export default function AdminKelas() {
                 align="center"
                 style={{
                   fontWeight: "bold",
+                  fontFamily: "Poppins",
                 }}
               >
                 Nama Guru
@@ -107,6 +117,7 @@ export default function AdminKelas() {
                 align="center"
                 style={{
                   fontWeight: "bold",
+                  fontFamily: "Poppins",
                 }}
               >
                 Nomor Kelas
@@ -115,6 +126,7 @@ export default function AdminKelas() {
                 align="center"
                 style={{
                   fontWeight: "bold",
+                  fontFamily: "Poppins",
                 }}
               >
                 Jumlah Murid
@@ -123,37 +135,56 @@ export default function AdminKelas() {
                 align="center"
                 style={{
                   fontWeight: "bold",
+                  fontFamily: "Poppins",
                 }}
               >
-                Edit
+                Ubah Data
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {kelasStore.kelas?.map((data) => {
+            {kelasStore.kelas?.map((data, i) => {
               return (
                 <TableRow
-                  key={data.kelas_id}
+                  key={i}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
                   <TableCell align="center" component="th" scope="row">
-                    {data.kelas_id}
+                    <Typography sx={{ fontFamily: "Poppins" }}>
+                      {i + 1}
+                    </Typography>
                   </TableCell>
+
                   <TableCell align="center" component="th" scope="row">
-                    {data.guru_id}
+                    <Typography sx={{ fontFamily: "Poppins" }}>
+                      {data.kelas_id}
+                    </Typography>
                   </TableCell>
+
                   <TableCell align="center" component="th" scope="row">
-                    {data.nomor_kelas}
+                    <Typography sx={{ fontFamily: "Poppins" }}>
+                      {data.guru_users.nama}
+                    </Typography>
                   </TableCell>
+
                   <TableCell align="center" component="th" scope="row">
-                    {data.jumlah_orang}
+                    <Typography sx={{ fontFamily: "Poppins" }}>
+                      {data.nomor_kelas}
+                    </Typography>
                   </TableCell>
+
+                  <TableCell align="center" component="th" scope="row">
+                    <Typography sx={{ fontFamily: "Poppins" }}>
+                      {data.jumlah_orang}
+                    </Typography>
+                  </TableCell>
+
                   <TableCell align="center" component="th" scope="row">
                     <Button
                       onClick={() => {
                         console.log("Masuk Nihhh");
                       }}
-                      sx={{ float: "center" }}
+                      sx={{ float: "center", fontFamily: "Poppins" }}
                       variant="contained"
                     >
                       Edit

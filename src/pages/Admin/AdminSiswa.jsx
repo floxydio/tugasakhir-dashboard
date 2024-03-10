@@ -68,6 +68,7 @@ export default function AdminSiswa() {
                 style={{
                   fontWeight: "bold",
                 }}
+                align="center"
               >
                 No
               </TableCell>
@@ -75,6 +76,7 @@ export default function AdminSiswa() {
                 style={{
                   fontWeight: "bold",
                 }}
+                align="center"
               >
                 Nama Siswa
               </TableCell>
@@ -82,6 +84,7 @@ export default function AdminSiswa() {
                 style={{
                   fontWeight: "bold",
                 }}
+                align="center"
               >
                 Username
               </TableCell>
@@ -89,6 +92,7 @@ export default function AdminSiswa() {
                 style={{
                   fontWeight: "bold",
                 }}
+                align="center"
               >
                 Nomor Kelas
               </TableCell>
@@ -97,10 +101,10 @@ export default function AdminSiswa() {
           <TableBody>
             {siswaState.siswa.map((item, i) => (
               <TableRow key={i}>
-                <TableCell>{i + 1}</TableCell>
-                <TableCell>{item.nama}</TableCell>
-                <TableCell>{item.username}</TableCell>
-                <TableCell>{item.kelas.nomor_kelas}</TableCell>
+                <TableCell align="center">{i + 1}</TableCell>
+                <TableCell align="center">{item.nama}</TableCell>
+                <TableCell align="center">{item.username}</TableCell>
+                <TableCell align="center">{item.kelas.nomor_kelas}</TableCell>
               </TableRow>
             ))}
           </TableBody>
