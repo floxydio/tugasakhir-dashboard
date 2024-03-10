@@ -45,4 +45,7 @@ export const useAdminGuru = create((set, get) => ({
         toast.error(err.response.data.message ?? "Something Went Wrong");
       });
   },
+  updateGuru: async() => {
+    await axiosNew.put()
+  }
 }));

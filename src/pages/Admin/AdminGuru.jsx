@@ -44,20 +44,29 @@ const style = {
 
 export default function AdminGuru() {
   const [openCreateGuru, setOpenCreateGuru] = useState(false);
+  const [openEditGuru, setOpenEditGuru] = useState(false);
   const [addNama, setAddNama] = useState("");
   const [addUsername, setAddUsername] = useState("");
   const [addPassword, setAddPassword] = useState("");
-  const [addUserAgent, setAddUserAgent] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
   const [dataPassword, setDataPassword] = useState(null);
 
+  //zustand store
   const dataGuru = useAdminGuru((state) => state);
 
+  //Modal Open For Edit Data Guru
+  const handleOpenEditGuru = () => setOpenEditGuru(true);
+
+  //Modal Open For Edit Data Guru
+  const handleCloseEditGuru = () => setOpenEditGuru(false);
+
+  //Modal Open For Create Guru
   async function handleOpenCreateGuru() {
     setOpenCreateGuru(true);
   }
 
+  //Modal Close For Create Guru
   const handleCloseCreateGuru = () => {
     setOpenCreateGuru(false);
     setAddNama("");
@@ -69,6 +78,7 @@ export default function AdminGuru() {
 
   const userAgent = navigator.userAgent;
 
+  //Generate Password
   function generatePassword(length, options) {
     const optionsChars = {
       digits: "1234567890",
@@ -110,9 +120,8 @@ export default function AdminGuru() {
     symbols: true,
   };
 
-  function InputRandomizePassword() {
-    setAddPassword(generatePassword(passwordLength, passwordOptions));
-  }
+  const inputRandomizePassword = () =>
+    setAddPassword(passwordLength, passwordOptions);
 
   useEffect(() => {
     dataGuru.getGuru();
@@ -122,7 +131,9 @@ export default function AdminGuru() {
     <>
       <ToastContainer />
       <div className="filter_style">
-        <Button onClick={handleOpenCreateGuru}>Create Guru</Button>
+        <Button onClick={handleOpenCreateGuru} variant="contained">
+          Create Guru
+        </Button>
       </div>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -131,6 +142,7 @@ export default function AdminGuru() {
               <TableCell
                 style={{
                   fontWeight: "bold",
+                  fontFamily: "Poppins",
                 }}
               >
                 No
@@ -138,6 +150,7 @@ export default function AdminGuru() {
               <TableCell
                 style={{
                   fontWeight: "bold",
+                  fontFamily: "Poppins",
                 }}
               >
                 Nama Guru
@@ -145,6 +158,7 @@ export default function AdminGuru() {
               <TableCell
                 style={{
                   fontWeight: "bold",
+                  fontFamily: "Poppins",
                 }}
               >
                 Username
@@ -152,6 +166,7 @@ export default function AdminGuru() {
               <TableCell
                 style={{
                   fontWeight: "bold",
+                  fontFamily: "Poppins",
                 }}
               >
                 Status Guru
@@ -159,6 +174,7 @@ export default function AdminGuru() {
               <TableCell
                 style={{
                   fontWeight: "bold",
+                  fontFamily: "Poppins",
                 }}
               >
                 User Agent
@@ -166,6 +182,7 @@ export default function AdminGuru() {
               <TableCell
                 style={{
                   fontWeight: "bold",
+                  fontFamily: "Poppins",
                 }}
               >
                 Edit
@@ -182,13 +199,17 @@ export default function AdminGuru() {
                   }}
                 >
                   <TableCell component="th" scope="row" align="left">
-                    {data.guru_id}
+                    <Typography fontFamily={"Poppins"}>
+                      {data.guru_id}
+                    </Typography>
                   </TableCell>
                   <TableCell component="th" scope="row" align="left">
-                    {data.nama}
+                    <Typography fontFamily={"Poppins"}>{data.nama}</Typography>
                   </TableCell>
                   <TableCell component="th" scope="row" align="left">
-                    {data.username}
+                    <Typography fontFamily={"Poppins"}>
+                      {data.username}
+                    </Typography>
                   </TableCell>
                   <TableCell component="th" scope="row" align="left">
                     {data.status_user === 1 ? (
@@ -198,17 +219,17 @@ export default function AdminGuru() {
                     )}
                   </TableCell>
                   <TableCell component="th" scope="row" align="left">
-                    {data.user_agent}
+                    <Typography sx={{ width: "100px" }} fontFamily={"Poppins"}>
+                      {data.user_agent}
+                    </Typography>
                   </TableCell>
                   <TableCell component="th" scope="row" align="left">
                     <Button
-                      onClick={() => {
-                        console.log("Masuk Nihhh");
-                      }}
+                      onClick={handleOpenEditGuru}
                       sx={{ float: "left" }}
                       variant="contained"
                     >
-                      Edit
+                      Ubah
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -217,6 +238,7 @@ export default function AdminGuru() {
           </TableBody>
         </Table>
       </TableContainer>
+      {/* `Modal For Create Guru` */}
       <Modal
         open={openCreateGuru}
         onClose={handleCloseCreateGuru}
@@ -281,7 +303,7 @@ export default function AdminGuru() {
               />
             </FormControl>
             <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-              <Button onClick={InputRandomizePassword}>
+              <Button onClick={inputRandomizePassword}>
                 Generate Password
               </Button>
             </FormControl>
@@ -299,11 +321,6 @@ export default function AdminGuru() {
               style={{
                 marginTop: 30,
               }}
-              // onClick={() => {
-              //   console.log(addNama);
-              //   console.log(addUsername);
-              //   console.log(addPassword);
-              // }}
               onClick={() =>
                 dataGuru.createGuru(
                   addNama,
@@ -316,6 +333,26 @@ export default function AdminGuru() {
             >
               Submit
             </Button>
+          </div>
+        </Box>
+      </Modal>
+      {/* Modal For Edit Guru */}
+      <Modal
+        open={openEditGuru}
+        onClose={handleCloseEditGuru}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <Typography variant="h5" sx={{ textAlign: "center" }}>
+              Edit Data Guru
+            </Typography>
           </div>
         </Box>
       </Modal>
