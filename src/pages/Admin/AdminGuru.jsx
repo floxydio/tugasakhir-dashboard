@@ -54,13 +54,6 @@ export default function AdminGuru() {
   const [editUsername, setEditUsername] = useState("");
   const [editStatusUser, setEditStatusUser] = useState(0);
 
-  //Use State For Modal and Etc
-  const [openCreateGuru, setOpenCreateGuru] = useState(false);
-  const [openEditGuru, setOpenEditGuru] = useState(false);
-  // const [showPassword, setShowPassword] = useState(false);
-  const [dataPassword, setDataPassword] = useState(null);
-  const [openDeleteGuru, setOpenDeleteGuru] = useState(false);
-
   //zustand store
   const guruState = useAdminGuru((state) => state);
 
@@ -72,28 +65,19 @@ export default function AdminGuru() {
     guruState.onOpenEditModal();
   }
 
-  //Modal Close For Edit Data Guru
-  const handleCloseEditGuru = () => guruState.onCloseEditModal();
-
-  //Modal Open For Create Guru
-  // async function handleOpenCreateGuru() {
-  //   guruState.onOpenAddModal();
-  // }
-
   //Modal Close For Create Guru
   const handleCloseCreateGuru = () => {
-    guruState.onCloseAddModal();
     setAddNama("");
     setAddUsername("");
+    setAddPassword("");
+    guruState.onCloseAddModal();
   };
 
   //Modal Open For Delete Guru
-  const handleOpenDeleteGuru = () => setOpenDeleteGuru(true);
-
-  //Modal Close For Delete Guru
-  const handleCloseDeleteGuru = () => setOpenDeleteGuru(false);
-
-  // const toggleVisibilityPassword = () => guruState.onShowPassword();
+  function handleOpenDeleteGuru(id) {
+    setEditId(id);
+    guruState.onOpenDeleteModal();
+  }
 
   const userAgent = navigator.userAgent;
 
@@ -139,8 +123,9 @@ export default function AdminGuru() {
     symbols: true,
   };
 
-  const inputRandomizePassword = () =>
-    setAddPassword(passwordLength, passwordOptions);
+  function randomizePassword() {
+    setAddPassword(generatePassword(passwordLength, passwordOptions));
+  }
 
   const statusGuru = [
     {
@@ -299,7 +284,10 @@ export default function AdminGuru() {
                     </Button>
                   </TableCell>
                   <TableCell component="th" scope="row" align="left">
-                    <Button onClick={handleOpenDeleteGuru} variant="contained">
+                    <Button
+                      onClick={() => handleOpenDeleteGuru(data.guru_id)}
+                      variant="contained"
+                    >
                       Hapus
                     </Button>
                   </TableCell>
@@ -333,7 +321,10 @@ export default function AdminGuru() {
                 label="Nama Guru"
                 type="text"
                 value={addNama}
-                onChange={(e) => setAddNama(e.target.value)}
+                onChange={(e) =>
+                  //Only Alphabet
+                  setAddNama(e.target.value.replace(/[^a-zA-Z\s]/g, ""))
+                }
               />
             </FormControl>
             <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
@@ -343,45 +334,49 @@ export default function AdminGuru() {
                 label="Username"
                 type="text"
                 value={addUsername}
-                onChange={(e) => setAddUsername(e.target.value)}
+                onChange={(e) =>
+                  //Remove Space
+                  setAddUsername(e.target.value.replace(/\s/g, ""))
+                }
               />
             </FormControl>
-            {generatePassword(passwordLength, passwordOptions)}
+
             <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
               <TextField
                 size="small"
                 id="outlined"
                 label="Password"
                 type={guruState.showPasswordTrigger ? "text" : "password"}
-                value={
-                  guruState.dataPasswordTrigger
-                    ? addPassword
-                    : generatePassword(passwordLength, passwordOptions)
-                }
+                value={addPassword}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton
                         aria-label="toggle password visibility"
-                        onClick={() => guruState.onShowPassword()}
+                        onClick={() => {
+                          guruState.showPasswordTrigger
+                            ? guruState.onHidePassword()
+                            : guruState.onShowPassword();
+                        }}
                         edge="end"
                       >
                         {guruState.showPasswordTrigger ? (
-                          <VisibilityOff />
-                        ) : (
                           <Visibility />
+                        ) : (
+                          <VisibilityOff />
                         )}
                       </IconButton>
                     </InputAdornment>
                   ),
                 }}
-                onChange={(e) => setAddPassword(e.target.value)}
+                onChange={(e) => {
+                  //Remove Space
+                  setAddPassword(e.target.value.replace(/\s/g, ""));
+                }}
               />
             </FormControl>
             <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-              <Button onClick={inputRandomizePassword}>
-                Generate Password
-              </Button>
+              <Button onClick={randomizePassword}>Generate Password</Button>
             </FormControl>
             <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
               <TextField
@@ -393,22 +388,29 @@ export default function AdminGuru() {
                 disabled
               />
             </FormControl>
-            <Button
-              style={{
-                marginTop: 30,
-              }}
-              onClick={() =>
-                guruState.createGuru(
-                  addNama,
-                  addUsername,
-                  addPassword
-                  // addUserAgent
-                )
-              }
-              variant="contained"
-            >
-              Submit
-            </Button>
+            <div className="flex flex-row items-center justify-between mt-[40px]">
+              <Button
+                style={{
+                  marginTop: 30,
+                }}
+                onClick={() => guruState.onCloseAddModal()}
+                variant="contained"
+                color="error"
+              >
+                Tutup
+              </Button>
+              <Button
+                style={{
+                  marginTop: 30,
+                }}
+                onClick={() =>
+                  guruState.createGuru(addNama, addUsername, addPassword)
+                }
+                variant="contained"
+              >
+                Kirim
+              </Button>
+            </div>
           </div>
         </Box>
       </Modal>
@@ -416,7 +418,7 @@ export default function AdminGuru() {
       {/* Start Modal For Edit Guru */}
       <Modal
         open={guruState.editModalTrigger}
-        onClose={handleCloseEditGuru}
+        onClose={() => guruState.onCloseEditModal()}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
@@ -438,7 +440,8 @@ export default function AdminGuru() {
                 type="text"
                 value={editNama}
                 onChange={(e) => {
-                  setEditNama(e.target.value);
+                  //Only Alphabet
+                  setEditNama(e.target.value.replace(/[^a-zA-Z\s]/g, ""));
                 }}
               />
             </FormControl>
@@ -450,7 +453,8 @@ export default function AdminGuru() {
                 type="text"
                 value={editUsername}
                 onChange={(e) => {
-                  setEditUsername(e.target.value);
+                  //Remove Space
+                  setEditUsername(e.target.value.replace(/\s/g, ""));
                 }}
               />
             </FormControl>
@@ -478,11 +482,11 @@ export default function AdminGuru() {
             <div className="flex flex-row items-center justify-between mt-[40px]">
               <Button
                 style={{ marginTop: 30 }}
-                onClick={handleCloseEditGuru}
+                onClick={() => guruState.onCloseEditModal()}
                 variant="contained"
                 color="error"
               >
-                Close
+                Tutup
               </Button>
               <Button
                 style={{ marginTop: 30 }}
@@ -494,24 +498,19 @@ export default function AdminGuru() {
                     editStatusUser
                   );
                 }}
-                // onClick={() => {
-                //   console.log(editNama);
-                //   console.log(editUsername);
-                //   console.log(editStatusGuru);
-                // }}
                 variant="contained"
               >
-                Submit
+                Kirim
               </Button>
             </div>
           </div>
         </Box>
       </Modal>
       {/* End Modal For Edit Guru */}
-      {/* Start Modal For Delete Guru */}\
+      {/* Start Modal For Delete Guru */}
       <Modal
-        open={openDeleteGuru}
-        onClose={handleCloseDeleteGuru}
+        open={guruState.deleteModalTrigger}
+        onClose={() => guruState.onCloseDeleteModal()}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
@@ -531,7 +530,7 @@ export default function AdminGuru() {
             <div className="flex flex-row items-center justify-between mt-[40px]">
               <Button
                 style={{ marginTop: 30 }}
-                onClick={handleCloseDeleteGuru}
+                onClick={() => guruState.onCloseDeleteModal()}
                 variant="contained"
                 color="error"
               >
@@ -539,7 +538,10 @@ export default function AdminGuru() {
               </Button>
               <Button
                 style={{ marginTop: 30 }}
-                onClick={() => console.log("Di Click Nih")}
+                onClick={() => {
+                  console.log(editId);
+                  guruState.deleteGuru(editId);
+                }}
                 variant="contained"
               >
                 Kirim

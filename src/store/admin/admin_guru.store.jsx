@@ -40,7 +40,7 @@ export const useAdminGuru = create((set, get) => ({
   },
 
   getGuru: async () => {
-    set({ isLoading: true });
+    set({ guru: [] });
     await axiosNew
       .get("/admin/find-guru", {
         headers: {
@@ -54,7 +54,7 @@ export const useAdminGuru = create((set, get) => ({
         }
       });
   },
-  createGuru: async (nama, username, password) => {
+  createGuru: async (nama, username, password, user_agent) => {
     await axiosNew
       .post(
         "/admin/create-guru",
@@ -62,6 +62,7 @@ export const useAdminGuru = create((set, get) => ({
           nama: nama,
           username: username,
           password: password,
+          user_agent: user_agent,
         },
         {
           headers: {
@@ -106,7 +107,7 @@ export const useAdminGuru = create((set, get) => ({
   },
   deleteGuru: async (id) => {
     await axiosNew
-      .delete(`/admin/delete/${id}`, {
+      .delete(`/admin/delete-guru/${id}`, {
         headers: {
           "x-access-token": localStorage.getItem("token"),
         },
