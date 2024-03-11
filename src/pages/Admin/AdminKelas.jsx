@@ -21,6 +21,7 @@ import { useKelasAdmin } from "../../store/admin/admin_kelas.store";
 import { useEffect } from "react";
 import { useState } from "react";
 import axiosNew from "../../components/AxiosConfig";
+import cryptoJS from "crypto-js";
 
 const style = {
   position: "absolute",
@@ -36,21 +37,41 @@ const style = {
 
 export default function AdminKelas() {
   const [open, setOpen] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
 
+  // State Create
+  const [handleGuru, setHandleGuru] = useState(999);
   const [addNomorKelas, setAddNomorKelas] = useState("");
   const [addJumlahMurid, setAddJumlahMurid] = useState(0);
 
+  // State Edit
+  const [editId, setEditId] = useState("");
+  const [editHandleGuru, setEditHandleGuru] = useState(999);
+  const [editNomorKelas, setEditNomorKelas] = useState("");
+  const [editJumlahMurid, setEditJumlahMurid] = useState(0);
+
   const [dataGuru, setDataGuru] = useState([]);
-  const [handleGuru, setHandleGuru] = useState(999);
+  const [dataKelas, setDataKelas] = useState([]);
 
   //Store
   const kelasStore = useKelasAdmin((state) => state);
 
   const handleClose = () => {
     setOpen(false);
+    setHandleGuru(999);
     setAddNomorKelas("");
     setAddJumlahMurid(0);
   };
+
+  // Open Modal for Edit
+  const handleOpenEdit = (kelas_id, guru_id, nomor_kelas, jumlah_orang) => {
+    setEditId(kelas_id);
+    setEditHandleGuru(guru_id);
+    setEditNomorKelas(nomor_kelas);
+    setEditJumlahMurid(jumlah_orang);
+    setOpenEdit(true);
+  };
+  const handleCloseEdit = () => setOpenEdit(false);
 
   async function openModalApi() {
     setOpen(true);
@@ -62,8 +83,60 @@ export default function AdminKelas() {
     await getGuruByRole();
   }
 
+  async function handleSubmitEdit(e) {
+    e.preventDefault();
+    const decrypt = cryptoJS.AES.decrypt(
+      token,
+      `${import.meta.env.VITE_KEY_ENCRYPT}`
+    );
+    await axiosNew
+      .put(
+        `/edit-kelas/${editId}`,
+        {
+          guru_id: editHandleGuru,
+          nomor_kelas: editNomorKelas,
+          jumlah_orang: editJumlahMurid,
+        },
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "x-access-token": token,
+          },
+        }
+      )
+      .then((res) => {
+        if (res.status === 200 || res.status === 201) {
+          setOpenEdit(false);
+          async function findKelas() {
+            await axiosNew.get("/kelas").then((result) => {
+              setDataKelas(result.data.data);
+              setLoading(false);
+            });
+          }
+          findKelas();
+        }
+      });
+  }
+
   useEffect(() => {
     kelasStore.getDataKelas();
+    async function findKelas() {
+      const decrypt = cryptoJS.AES.decrypt(
+        token,
+        `${import.meta.env.VITE_KEY_ENCRYPT}`
+      );
+      await axiosNew
+        .get("/kelas", {
+          headers: {
+            "x-access-token": token,
+          },
+        })
+        .then((result) => {
+          setGuru(result.data.data);
+          setLoading(false);
+        });
+    }
+    findKelas();
   }, []);
 
   return (
@@ -181,13 +254,16 @@ export default function AdminKelas() {
 
                   <TableCell align="center" component="th" scope="row">
                     <Button
-                      onClick={() => {
-                        console.log("Masuk Nihhh");
-                      }}
+                      onClick={() => handleOpenEdit(
+                        data.kelas_id,
+                        data.guru_id,
+                        data.nomor_kelas,
+                        data.jumlah_orang,
+                      )}
                       sx={{ float: "center", fontFamily: "Poppins" }}
                       variant="contained"
                     >
-                      Edit
+                      Ubah
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -197,6 +273,7 @@ export default function AdminKelas() {
         </Table>
       </TableContainer>
 
+      {/* Modal Create */}
       <Modal
         open={open}
         onClose={handleClose}
@@ -210,7 +287,10 @@ export default function AdminKelas() {
               flexDirection: "column",
             }}
           >
-            <Typography variant="h5" sx={{ textAlign: "center" }}>
+            <Typography
+              variant="h5"
+              sx={{ textAlign: "center", fontWeight: "bold" }}
+            >
               Tambah Kelas
             </Typography>
             <FormControl
@@ -305,6 +385,112 @@ export default function AdminKelas() {
           </div>
         </Box>
       </Modal>
+      {/* End Modal Create */}
+
+      {/* Modal Edit */}
+      <Modal
+        open={openEdit}
+        onClose={handleCloseEdit}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style} autoComplete="off">
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <Typography
+              variant="h5"
+              sx={{ textAlign: "center", fontWeight: "bold" }}
+            >
+              Edit Data Kelas
+            </Typography>
+            <FormControl
+              fullWidth
+              style={{
+                marginTop: "40px",
+              }}
+            >
+              <Select
+                sx={{
+                  height: 40,
+                }}
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={handleGuru}
+                onChange={(e) => setEditHandleGuru(e.target.value)}
+              >
+                <MenuItem value={999} disabled>
+                  Pilih Guru
+                </MenuItem>
+                {dataGuru.map((e) => (
+                  <MenuItem key={e.guru_id} value={e.guru_id}>
+                    {e.nama}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl
+              fullWidth
+              style={{
+                marginTop: "20px",
+              }}
+            >
+              <TextField
+                size="small"
+                id="outlined"
+                label="Kelas"
+                type="text"
+                value={editNomorKelas}
+                onChange={(e) => setEditNomorKelas(e.target.value)}
+              />
+            </FormControl>
+            <FormControl
+              fullWidth
+              style={{
+                marginTop: "20px",
+              }}
+            >
+              <TextField
+                size="small"
+                id="outlined"
+                label="Jumlah Murid"
+                type="number"
+                value={editJumlahMurid}
+                onChange={(e) => setEditJumlahMurid(e.target.value)}
+              />
+            </FormControl>
+
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginTop: "40px",
+              }}
+            >
+              <Button
+                variant="contained"
+                color="error"
+                onClick={handleCloseEdit}
+              >
+                Close Form
+              </Button>
+
+              <Button 
+                variant="contained" 
+                onClick={handleSubmitEdit}
+              >
+                Submit Data
+              </Button>
+            </div>
+          </div>
+        </Box>
+      </Modal>
+      {/* End Modal Edit */}
     </>
   );
 }
