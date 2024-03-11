@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   FormControl,
+  Menu,
   MenuItem,
   Modal,
   Paper,
@@ -45,13 +46,10 @@ export default function AdminKelas() {
   const [addJumlahMurid, setAddJumlahMurid] = useState(0);
 
   // State Edit
-  const [editId, setEditId] = useState("");
+  const [editId, setEditId] = useState(0);
   const [editHandleGuru, setEditHandleGuru] = useState(999);
   const [editNomorKelas, setEditNomorKelas] = useState("");
   const [editJumlahMurid, setEditJumlahMurid] = useState(0);
-
-  const [dataGuru, setDataGuru] = useState([]);
-  const [dataKelas, setDataKelas] = useState([]);
 
   //Store
   const kelasStore = useKelasAdmin((state) => state);
@@ -64,8 +62,8 @@ export default function AdminKelas() {
   };
 
   // Open Modal for Edit
-  const handleOpenEdit = (kelas_id, guru_id, nomor_kelas, jumlah_orang) => {
-    setEditId(kelas_id);
+  const handleOpenEdit = (id, guru_id, nomor_kelas, jumlah_orang) => {
+    setEditId(id);
     setEditHandleGuru(guru_id);
     setEditNomorKelas(nomor_kelas);
     setEditJumlahMurid(jumlah_orang);
@@ -74,69 +72,29 @@ export default function AdminKelas() {
   const handleCloseEdit = () => setOpenEdit(false);
 
   async function openModalApi() {
+    kelasStore.getGuruByRole();
     setOpen(true);
-    async function getGuruByRole() {
-      await axiosNew.get("/list-user-guru").then(function (res) {
-        setDataGuru(res.data.data);
-      });
-    }
-    await getGuruByRole();
-  }
-
-  async function handleSubmitEdit(e) {
-    e.preventDefault();
-    const decrypt = cryptoJS.AES.decrypt(
-      token,
-      `${import.meta.env.VITE_KEY_ENCRYPT}`
-    );
-    await axiosNew
-      .put(
-        `/edit-kelas/${editId}`,
-        {
-          guru_id: editHandleGuru,
-          nomor_kelas: editNomorKelas,
-          jumlah_orang: editJumlahMurid,
-        },
-        {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-            "x-access-token": token,
-          },
-        }
-      )
-      .then((res) => {
-        if (res.status === 200 || res.status === 201) {
-          setOpenEdit(false);
-          async function findKelas() {
-            await axiosNew.get("/kelas").then((result) => {
-              setDataKelas(result.data.data);
-              setLoading(false);
-            });
-          }
-          findKelas();
-        }
-      });
   }
 
   useEffect(() => {
     kelasStore.getDataKelas();
-    async function findKelas() {
-      const decrypt = cryptoJS.AES.decrypt(
-        token,
-        `${import.meta.env.VITE_KEY_ENCRYPT}`
-      );
-      await axiosNew
-        .get("/kelas", {
-          headers: {
-            "x-access-token": token,
-          },
-        })
-        .then((result) => {
-          setGuru(result.data.data);
-          setLoading(false);
-        });
-    }
-    findKelas();
+    // async function findKelas() {
+    //   // const decrypt = cryptoJS.AES.decrypt(
+    //   //   token,
+    //   //   `${import.meta.env.VITE_KEY_ENCRYPT}`
+    //   // );
+    //   await axiosNew
+    //     .get("/kelas", {
+    //       headers: {
+    //         "x-access-token": localStorage.getItem("token:"),
+    //       },
+    //     })
+    //     .then((result) => {
+    //       setGuru(result.data.data);
+    //       setLoading(false);
+    //     });
+    // }
+    // findKelas();
   }, []);
 
   return (
@@ -254,12 +212,14 @@ export default function AdminKelas() {
 
                   <TableCell align="center" component="th" scope="row">
                     <Button
-                      onClick={() => handleOpenEdit(
-                        data.kelas_id,
-                        data.guru_id,
-                        data.nomor_kelas,
-                        data.jumlah_orang,
-                      )}
+                      onClick={() =>
+                        handleOpenEdit(
+                          data.kelas_id,
+                          data.guru_id,
+                          data.nomor_kelas,
+                          data.jumlah_orang
+                        )
+                      }
                       sx={{ float: "center", fontFamily: "Poppins" }}
                       variant="contained"
                     >
@@ -312,11 +272,15 @@ export default function AdminKelas() {
                 <MenuItem value={999} disabled>
                   Pilih Guru
                 </MenuItem>
-                {dataGuru.map((e) => (
-                  <MenuItem key={e.guru_id} value={e.guru_id}>
-                    {e.nama}
-                  </MenuItem>
-                ))}
+                {kelasStore.role?.map((data, i) => {
+                  return (
+                    <div key={i}>
+                      <MenuItem key={data.guru_id} value={data.guru_id}>
+                        {data.nama}
+                      </MenuItem>
+                    </div>
+                  );
+                })}
               </Select>
             </FormControl>
             <FormControl
@@ -419,15 +383,15 @@ export default function AdminKelas() {
                 }}
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                value={handleGuru}
+                value={editHandleGuru}
                 onChange={(e) => setEditHandleGuru(e.target.value)}
               >
                 <MenuItem value={999} disabled>
                   Pilih Guru
                 </MenuItem>
-                {dataGuru.map((e) => (
-                  <MenuItem key={e.guru_id} value={e.guru_id}>
-                    {e.nama}
+                {kelasStore.role?.map((data) => (
+                  <MenuItem key={data.guru_id} value={data.guru_id}>
+                    {data.nama}
                   </MenuItem>
                 ))}
               </Select>
@@ -480,9 +444,22 @@ export default function AdminKelas() {
                 Close Form
               </Button>
 
-              <Button 
-                variant="contained" 
-                onClick={handleSubmitEdit}
+              <Button
+                variant="contained"
+                onClick={() => {
+                  kelasStore.editKelas(
+                    editId,
+                    editHandleGuru,
+                    editJumlahMurid,
+                    editNomorKelas
+                  );
+                }}
+                // onClick={() => {
+                //   console.log(editId);
+                //   console.log(editHandleGuru);
+                //   console.log(editJumlahMurid);
+                //   console.log(editNomorKelas);
+                // }}
               >
                 Submit Data
               </Button>

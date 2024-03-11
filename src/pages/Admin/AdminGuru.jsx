@@ -57,32 +57,32 @@ export default function AdminGuru() {
   //Use State For Modal and Etc
   const [openCreateGuru, setOpenCreateGuru] = useState(false);
   const [openEditGuru, setOpenEditGuru] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  // const [showPassword, setShowPassword] = useState(false);
   const [dataPassword, setDataPassword] = useState(null);
   const [openDeleteGuru, setOpenDeleteGuru] = useState(false);
 
   //zustand store
-  const dataGuru = useAdminGuru((state) => state);
+  const guruState = useAdminGuru((state) => state);
 
   //Modal Open For Edit Data Guru
   function handleOpenEditGuru(id, nama, username, password) {
     setEditId(id);
     setEditNama(nama);
     setEditUsername(username);
-    setOpenEditGuru(true);
+    guruState.onOpenEditModal();
   }
 
   //Modal Close For Edit Data Guru
-  const handleCloseEditGuru = () => setOpenEditGuru(false);
+  const handleCloseEditGuru = () => guruState.onCloseEditModal();
 
   //Modal Open For Create Guru
-  async function handleOpenCreateGuru() {
-    setOpenCreateGuru(true);
-  }
+  // async function handleOpenCreateGuru() {
+  //   guruState.onOpenAddModal();
+  // }
 
   //Modal Close For Create Guru
   const handleCloseCreateGuru = () => {
-    setOpenCreateGuru(false);
+    guruState.onCloseAddModal();
     setAddNama("");
     setAddUsername("");
   };
@@ -93,7 +93,7 @@ export default function AdminGuru() {
   //Modal Close For Delete Guru
   const handleCloseDeleteGuru = () => setOpenDeleteGuru(false);
 
-  const toggleVisibilityPassword = () => setShowPassword(!showPassword);
+  // const toggleVisibilityPassword = () => guruState.onShowPassword();
 
   const userAgent = navigator.userAgent;
 
@@ -156,14 +156,14 @@ export default function AdminGuru() {
   ];
 
   useEffect(() => {
-    dataGuru.getGuru();
+    guruState.getGuru();
   }, []);
 
   return (
     <>
       <ToastContainer />
       <div className="filter_style">
-        <Button onClick={handleOpenCreateGuru} variant="contained">
+        <Button onClick={() => guruState.onOpenAddModal()} variant="contained">
           Create Guru
         </Button>
       </div>
@@ -230,7 +230,7 @@ export default function AdminGuru() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {dataGuru.guru?.map((data) => {
+            {guruState.guru?.map((data) => {
               return (
                 <TableRow
                   key={data.guru_id}
@@ -311,7 +311,7 @@ export default function AdminGuru() {
       </TableContainer>
       {/* `Start Modal For Create Guru` */}
       <Modal
-        open={openCreateGuru}
+        open={guruState.addModalTrigger}
         onClose={handleCloseCreateGuru}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
@@ -346,14 +346,15 @@ export default function AdminGuru() {
                 onChange={(e) => setAddUsername(e.target.value)}
               />
             </FormControl>
+            {generatePassword(passwordLength, passwordOptions)}
             <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
               <TextField
                 size="small"
                 id="outlined"
                 label="Password"
-                type={showPassword ? "text" : "password"}
+                type={guruState.showPasswordTrigger ? "text" : "password"}
                 value={
-                  dataPassword === null
+                  guruState.dataPasswordTrigger
                     ? addPassword
                     : generatePassword(passwordLength, passwordOptions)
                 }
@@ -362,10 +363,14 @@ export default function AdminGuru() {
                     <InputAdornment position="end">
                       <IconButton
                         aria-label="toggle password visibility"
-                        onClick={toggleVisibilityPassword}
+                        onClick={() => guruState.onShowPassword()}
                         edge="end"
                       >
-                        {showPassword ? <Visibility /> : <VisibilityOff />}
+                        {guruState.showPasswordTrigger ? (
+                          <VisibilityOff />
+                        ) : (
+                          <Visibility />
+                        )}
                       </IconButton>
                     </InputAdornment>
                   ),
@@ -393,7 +398,7 @@ export default function AdminGuru() {
                 marginTop: 30,
               }}
               onClick={() =>
-                dataGuru.createGuru(
+                guruState.createGuru(
                   addNama,
                   addUsername,
                   addPassword
@@ -410,7 +415,7 @@ export default function AdminGuru() {
       {/* End Modal For Create Guru */}
       {/* Start Modal For Edit Guru */}
       <Modal
-        open={openEditGuru}
+        open={guruState.editModalTrigger}
         onClose={handleCloseEditGuru}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
@@ -482,7 +487,7 @@ export default function AdminGuru() {
               <Button
                 style={{ marginTop: 30 }}
                 onClick={() => {
-                  dataGuru.updateGuru(
+                  guruState.updateGuru(
                     editId,
                     editNama,
                     editUsername,

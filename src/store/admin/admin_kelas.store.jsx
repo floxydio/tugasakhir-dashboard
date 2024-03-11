@@ -47,7 +47,22 @@ export const useKelasAdmin = create((set, get) => ({
     // .catch((err) => console.log(err));
   },
 
-  editKelas: async (id) => {
+  getGuruByRole: async () => {
+    await axiosNew
+      .get("/list-user-guru", {
+        headers: {
+          "x-access-token": localStorage.getItem("token"),
+        },
+      })
+      .then((res) => {
+        console.log(res.data.data);
+        if (res.status === 200) {
+          set({ role: res.data.data });
+        }
+      });
+  },
+
+  editKelas: async (id, guru_id, nomor_kelas, jumlah_orang) => {
     await axiosNew
       .put(
         `/admin/edit-kelas/${id}`,

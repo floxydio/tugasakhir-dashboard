@@ -5,6 +5,40 @@ import { toast } from "react-toastify";
 export const useAdminGuru = create((set, get) => ({
   guru: [],
   isLoading: false,
+  addModalTrigger: false,
+  editModalTrigger: false,
+  deleteModalTrigger: false,
+  showPasswordTrigger: false,
+  dataPasswordTrigger: null,
+
+  onOpenAddModal: async () => {
+    set({ addModalTrigger: true });
+  },
+  onCloseAddModal: async () => {
+    set({ addModalTrigger: false });
+  },
+
+  onOpenEditModal: async () => {
+    set({ editModalTrigger: true });
+  },
+  onCloseEditModal: async () => {
+    set({ editModalTrigger: false });
+  },
+
+  onShowPassword: async () => {
+    set({ showPasswordTrigger: true });
+  },
+  onHidePassword: async () => {
+    set({ showPasswordTrigger: false });
+  },
+
+  onOpenDeleteModal: async () => {
+    set({ deleteModalTrigger: true });
+  },
+  onCloseDeleteModal: async () => {
+    set({ deleteModalTrigger: false });
+  },
+
   getGuru: async () => {
     set({ isLoading: true });
     await axiosNew
