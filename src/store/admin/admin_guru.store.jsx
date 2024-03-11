@@ -70,4 +70,20 @@ export const useAdminGuru = create((set, get) => ({
         toast.error(err.response.data.message ?? "Something Went Wrong");
       });
   },
+  deleteGuru: async (id) => {
+    await axiosNew
+      .delete(`/admin/delete/${id}`, {
+        headers: {
+          "x-access-token": localStorage.getItem("token"),
+        },
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          window.location.reload();
+        }
+      })
+      .catch((err) => {
+        toast.error(err.response.data.message ?? "Something Went Wrong");
+      });
+  },
 }));

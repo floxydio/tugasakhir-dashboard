@@ -52,14 +52,14 @@ export default function AdminGuru() {
   const [editId, setEditId] = useState(0);
   const [editNama, setEditNama] = useState("");
   const [editUsername, setEditUsername] = useState("");
-  // const [editPassword, setEditPassword] = useState("");
-  const [editStatusGuru, setEditStatusGuru] = useState(0);
+  const [editStatusUser, setEditStatusUser] = useState(0);
 
   //Use State For Modal and Etc
   const [openCreateGuru, setOpenCreateGuru] = useState(false);
   const [openEditGuru, setOpenEditGuru] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [dataPassword, setDataPassword] = useState(null);
+  const [openDeleteGuru, setOpenDeleteGuru] = useState(false);
 
   //zustand store
   const dataGuru = useAdminGuru((state) => state);
@@ -85,8 +85,13 @@ export default function AdminGuru() {
     setOpenCreateGuru(false);
     setAddNama("");
     setAddUsername("");
-    setAddPassword("");
   };
+
+  //Modal Open For Delete Guru
+  const handleOpenDeleteGuru = () => setOpenDeleteGuru(true);
+
+  //Modal Close For Delete Guru
+  const handleCloseDeleteGuru = () => setOpenDeleteGuru(false);
 
   const toggleVisibilityPassword = () => setShowPassword(!showPassword);
 
@@ -149,6 +154,7 @@ export default function AdminGuru() {
       render: "Active",
     },
   ];
+
   useEffect(() => {
     dataGuru.getGuru();
   }, []);
@@ -213,6 +219,14 @@ export default function AdminGuru() {
               >
                 Ubah
               </TableCell>
+              <TableCell
+                sx={{
+                  fontWeight: "bold",
+                  fontFamily: "Poppins",
+                }}
+              >
+                Hapus
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -270,23 +284,23 @@ export default function AdminGuru() {
                   </TableCell>
                   <TableCell component="th" scope="row" align="left">
                     <Button
-                      onClick={
-                        () => {
-                          handleOpenEditGuru(
-                            data.guru_id,
-                            data.nama,
-                            data.username,
-                            data.status_user
-                          );
-                        }
-                        // console.log(data.guru_id);
-                        // console.log(data.nama);
-                        // console.log(data.username);
-                      }
+                      onClick={() => {
+                        handleOpenEditGuru(
+                          data.guru_id,
+                          data.nama,
+                          data.username,
+                          data.status_user
+                        );
+                      }}
                       sx={{ float: "left" }}
                       variant="contained"
                     >
                       Edit
+                    </Button>
+                  </TableCell>
+                  <TableCell component="th" scope="row" align="left">
+                    <Button onClick={handleOpenDeleteGuru} variant="contained">
+                      Hapus
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -295,7 +309,7 @@ export default function AdminGuru() {
           </TableBody>
         </Table>
       </TableContainer>
-      {/* `Modal For Create Guru` */}
+      {/* `Start Modal For Create Guru` */}
       <Modal
         open={openCreateGuru}
         onClose={handleCloseCreateGuru}
@@ -393,7 +407,8 @@ export default function AdminGuru() {
           </div>
         </Box>
       </Modal>
-      {/* Modal For Edit Guru */}
+      {/* End Modal For Create Guru */}
+      {/* Start Modal For Edit Guru */}
       <Modal
         open={openEditGuru}
         onClose={handleCloseEditGuru}
@@ -438,16 +453,13 @@ export default function AdminGuru() {
               <Select
                 labelId="demo-simple-select-autowidth-label"
                 id="demo-simple-select-autowidth"
-                value={editStatusGuru}
+                value={editStatusUser}
                 autoWidth
                 label="Status Guru"
                 onChange={(e) => {
-                  setEditStatusGuru(e.target.value);
+                  setEditStatusUser(e.target.value);
                 }}
               >
-                {/* <MenuItem>
-                  <em>None</em>
-                </MenuItem> */}
                 {statusGuru.map((data) => {
                   return (
                     <MenuItem key={data.id} value={data.value}>
@@ -457,29 +469,7 @@ export default function AdminGuru() {
                 })}
               </Select>
             </FormControl>
-            {/* <FormControl sx={{ m: 1, minWidth: 120 }}>
-              <TextField
-                size="small"
-                id="outlined"
-                label="Password"
-                type={showPassword ? "text" : "password"}
-                value={editPassword}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={toggleVisibilityPassword}
-                        edge="end"
-                      >
-                        {showPassword ? <Visibility /> : <VisibilityOff />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-                onChange={(e) => setAddPassword(e.target.value)}
-              />
-            </FormControl> */}
+
             <div className="flex flex-row items-center justify-between mt-[40px]">
               <Button
                 style={{ marginTop: 30 }}
@@ -492,8 +482,18 @@ export default function AdminGuru() {
               <Button
                 style={{ marginTop: 30 }}
                 onClick={() => {
-                  console.log("Click Submit");
+                  dataGuru.updateGuru(
+                    editId,
+                    editNama,
+                    editUsername,
+                    editStatusUser
+                  );
                 }}
+                // onClick={() => {
+                //   console.log(editNama);
+                //   console.log(editUsername);
+                //   console.log(editStatusGuru);
+                // }}
                 variant="contained"
               >
                 Submit
@@ -502,6 +502,48 @@ export default function AdminGuru() {
           </div>
         </Box>
       </Modal>
+      {/* End Modal For Edit Guru */}
+      {/* Start Modal For Delete Guru */}\
+      <Modal
+        open={openDeleteGuru}
+        onClose={handleCloseDeleteGuru}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <Typography variant="h5" sx={{ textAlign: "center" }}>
+              Delete Guru
+            </Typography>
+            <Typography>
+              Apakah Kamu Yakin Ingin Menghapus Guru Ini ??
+            </Typography>
+            <div className="flex flex-row items-center justify-between mt-[40px]">
+              <Button
+                style={{ marginTop: 30 }}
+                onClick={handleCloseDeleteGuru}
+                variant="contained"
+                color="error"
+              >
+                Tutup
+              </Button>
+              <Button
+                style={{ marginTop: 30 }}
+                onClick={() => console.log("Di Click Nih")}
+                variant="contained"
+              >
+                Kirim
+              </Button>
+            </div>
+          </div>
+        </Box>
+      </Modal>
+      {/* End Modal For Delete Guru */}
     </>
   );
 }
