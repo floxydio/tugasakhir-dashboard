@@ -37,10 +37,6 @@ const style = {
 };
 
 export default function AdminKelas() {
-
-  // const [open, setOpen] = useState(false);
-  // const [openEdit, setOpenEdit] = useState(false);
-
   // State Create
   const [handleGuru, setHandleGuru] = useState(999);
   const [addNomorKelas, setAddNomorKelas] = useState("");
@@ -51,6 +47,9 @@ export default function AdminKelas() {
   const [editHandleGuru, setEditHandleGuru] = useState(999);
   const [editNomorKelas, setEditNomorKelas] = useState("");
   const [editJumlahMurid, setEditJumlahMurid] = useState(0);
+
+  // State Delete
+  const [deleteId, setDeleteId] = useState();
 
   //Store
   const kelasStore = useKelasAdmin((state) => state);
@@ -78,9 +77,9 @@ export default function AdminKelas() {
   };
 
   const handleOpenDelete = (id) => {
-    setEditId(id);
+    setDeleteId(id);
     kelasStore.openDeleteModal();
-  }
+  };
 
   useEffect(() => {
     kelasStore.getDataKelas();
@@ -160,6 +159,15 @@ export default function AdminKelas() {
               >
                 Ubah Data
               </TableCell>
+              <TableCell
+                align="center"
+                style={{
+                  fontWeight: "bold",
+                  fontFamily: "Poppins",
+                }}
+              >
+                Hapus Data
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -217,7 +225,7 @@ export default function AdminKelas() {
                   </TableCell>
                   <TableCell component="th" scope="row" align="left">
                     <Button
-                      onClick={() => handleOpenDelete(data.guru_id)}
+                      onClick={() => handleOpenDelete(data.kelas_id)}
                       variant="contained"
                     >
                       Hapus
@@ -271,9 +279,9 @@ export default function AdminKelas() {
                 </MenuItem>
                 {kelasStore.guru?.map((data) => {
                   return (
-                      <MenuItem key={data.guru_id} value={data.guru_id}>
-                        {data.nama}
-                      </MenuItem>
+                    <MenuItem key={data.guru_id} value={data.guru_id}>
+                      {data.nama}
+                    </MenuItem>
                   );
                 })}
               </Select>
@@ -318,11 +326,7 @@ export default function AdminKelas() {
                 marginTop: "40px",
               }}
             >
-              <Button
-                variant="contained"
-                color="error"
-                onClick={handleClose}
-              >
+              <Button variant="contained" color="error" onClick={handleClose}>
                 Tutup
               </Button>
 
@@ -444,7 +448,7 @@ export default function AdminKelas() {
                     editId,
                     editHandleGuru,
                     editNomorKelas,
-                    Number(editJumlahMurid),
+                    Number(editJumlahMurid)
                   );
                 }}
               >
@@ -457,7 +461,66 @@ export default function AdminKelas() {
       {/* End Modal Edit */}
 
       {/* Modal for Delete */}
+      <Modal
+        open={kelasStore.deleteModalTrigger}
+        onClose={() => kelasStore.closeDeleteModal()}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <Typography
+              variant="h5"
+              sx={{
+                textAlign: "center",
+                marginBottom: "30px",
+                fontWeight: "bold",
+                fontFamily: "Poppins",
+              }}
+            >
+              Hapus Data Kelas
+            </Typography>
+            <Typography
+              sx={{
+                fontFamily: "Poppins",
+              }}
+            >
+              Apakah Kamu Yakin Ingin Menghapus Kelas Ini ??
+            </Typography>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginTop: "40px",
+              }}
+            >
+              <Button
+                variant="contained"
+                color="error"
+                onClick={() => kelasStore.closeDeleteModal()}
+              >
+                Tutup
+              </Button>
 
+              <Button
+                variant="contained"
+                onClick={() => {
+                  kelasStore.deleteKelas(deleteId);
+                }}
+              >
+                Hapus Data
+              </Button>
+            </div>
+          </div>
+        </Box>
+      </Modal>
       {/* End Modal Delete */}
     </>
   );
