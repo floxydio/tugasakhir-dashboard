@@ -539,7 +539,6 @@ export default function AdminGuru() {
               <Button
                 style={{ marginTop: 30 }}
                 onClick={() => {
-                  console.log(editId);
                   guruState.deleteGuru(editId);
                 }}
                 variant="contained"
