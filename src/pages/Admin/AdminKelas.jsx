@@ -37,8 +37,9 @@ const style = {
 };
 
 export default function AdminKelas() {
-  const [open, setOpen] = useState(false);
-  const [openEdit, setOpenEdit] = useState(false);
+
+  // const [open, setOpen] = useState(false);
+  // const [openEdit, setOpenEdit] = useState(false);
 
   // State Create
   const [handleGuru, setHandleGuru] = useState(999);
@@ -55,46 +56,34 @@ export default function AdminKelas() {
   const kelasStore = useKelasAdmin((state) => state);
 
   const handleClose = () => {
-    setOpen(false);
     setHandleGuru(999);
     setAddNomorKelas("");
     setAddJumlahMurid(0);
+    kelasStore.closeAddModal();
   };
+
+  async function openModalApi() {
+    kelasStore.getGuruForAdmin();
+    kelasStore.openAddModal();
+  }
 
   // Open Modal for Edit
   const handleOpenEdit = (id, guru_id, nomor_kelas, jumlah_orang) => {
     setEditId(id);
     setEditHandleGuru(guru_id);
     setEditNomorKelas(nomor_kelas);
-    setEditJumlahMurid(jumlah_orang);
-    setOpenEdit(true);
+    setEditJumlahMurid(Number(jumlah_orang));
+    kelasStore.getGuruForAdmin();
+    kelasStore.openEditModal();
   };
-  const handleCloseEdit = () => setOpenEdit(false);
 
-  async function openModalApi() {
-    kelasStore.getGuruByRole();
-    setOpen(true);
+  const handleOpenDelete = (id) => {
+    setEditId(id);
+    kelasStore.openDeleteModal();
   }
 
   useEffect(() => {
     kelasStore.getDataKelas();
-    // async function findKelas() {
-    //   // const decrypt = cryptoJS.AES.decrypt(
-    //   //   token,
-    //   //   `${import.meta.env.VITE_KEY_ENCRYPT}`
-    //   // );
-    //   await axiosNew
-    //     .get("/kelas", {
-    //       headers: {
-    //         "x-access-token": localStorage.getItem("token:"),
-    //       },
-    //     })
-    //     .then((result) => {
-    //       setGuru(result.data.data);
-    //       setLoading(false);
-    //     });
-    // }
-    // findKelas();
   }, []);
 
   return (
@@ -226,6 +215,14 @@ export default function AdminKelas() {
                       Ubah
                     </Button>
                   </TableCell>
+                  <TableCell component="th" scope="row" align="left">
+                    <Button
+                      onClick={() => handleOpenDelete(data.guru_id)}
+                      variant="contained"
+                    >
+                      Hapus
+                    </Button>
+                  </TableCell>
                 </TableRow>
               );
             })}
@@ -235,12 +232,12 @@ export default function AdminKelas() {
 
       {/* Modal Create */}
       <Modal
-        open={open}
+        open={kelasStore.addModalTrigger}
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={style}>
+        <Box sx={style} autoComplete="off">
           <div
             style={{
               display: "flex",
@@ -265,20 +262,18 @@ export default function AdminKelas() {
                 }}
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                defaultValue={999}
-                value={handleGuru}
+                label="Pilih Guru"
+                value={handleGuru ?? 999}
                 onChange={(e) => setHandleGuru(e.target.value)}
               >
                 <MenuItem value={999} disabled>
                   Pilih Guru
                 </MenuItem>
-                {kelasStore.role?.map((data, i) => {
+                {kelasStore.guru?.map((data) => {
                   return (
-                    <div key={i}>
                       <MenuItem key={data.guru_id} value={data.guru_id}>
                         {data.nama}
                       </MenuItem>
-                    </div>
                   );
                 })}
               </Select>
@@ -326,11 +321,9 @@ export default function AdminKelas() {
               <Button
                 variant="contained"
                 color="error"
-                onClick={() => {
-                  setOpen(false);
-                }}
+                onClick={handleClose}
               >
-                Close Form
+                Tutup
               </Button>
 
               <Button
@@ -343,7 +336,7 @@ export default function AdminKelas() {
                   )
                 }
               >
-                Submit Data
+                Kirim Data
               </Button>
             </div>
           </div>
@@ -353,8 +346,8 @@ export default function AdminKelas() {
 
       {/* Modal Edit */}
       <Modal
-        open={openEdit}
-        onClose={handleCloseEdit}
+        open={kelasStore.editModalTrigger}
+        onClose={() => kelasStore.closeEditModal()}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
@@ -389,7 +382,7 @@ export default function AdminKelas() {
                 <MenuItem value={999} disabled>
                   Pilih Guru
                 </MenuItem>
-                {kelasStore.role?.map((data) => (
+                {kelasStore.guru?.map((data) => (
                   <MenuItem key={data.guru_id} value={data.guru_id}>
                     {data.nama}
                   </MenuItem>
@@ -422,7 +415,7 @@ export default function AdminKelas() {
                 id="outlined"
                 label="Jumlah Murid"
                 type="number"
-                value={editJumlahMurid}
+                value={Number(editJumlahMurid)}
                 onChange={(e) => setEditJumlahMurid(e.target.value)}
               />
             </FormControl>
@@ -439,9 +432,9 @@ export default function AdminKelas() {
               <Button
                 variant="contained"
                 color="error"
-                onClick={handleCloseEdit}
+                onClick={() => kelasStore.closeEditModal()}
               >
-                Close Form
+                Tutup
               </Button>
 
               <Button
@@ -450,24 +443,22 @@ export default function AdminKelas() {
                   kelasStore.editKelas(
                     editId,
                     editHandleGuru,
-                    editJumlahMurid,
-                    editNomorKelas
+                    editNomorKelas,
+                    Number(editJumlahMurid),
                   );
                 }}
-                // onClick={() => {
-                //   console.log(editId);
-                //   console.log(editHandleGuru);
-                //   console.log(editJumlahMurid);
-                //   console.log(editNomorKelas);
-                // }}
               >
-                Submit Data
+                Update Data
               </Button>
             </div>
           </div>
         </Box>
       </Modal>
       {/* End Modal Edit */}
+
+      {/* Modal for Delete */}
+
+      {/* End Modal Delete */}
     </>
   );
 }
