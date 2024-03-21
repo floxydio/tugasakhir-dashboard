@@ -48,6 +48,9 @@ export default function AdminSiswa() {
   const [editPassword, setEditPassword] = useState("");
   const [editKelas, setEditKelas] = useState("");
 
+  // State Delete
+  const [deleteId, setDeleteId] = useState();
+
   const handleClose = () => {
     setNama("");
     setUsername("");
@@ -324,7 +327,12 @@ export default function AdminSiswa() {
               <Button
                 variant="contained"
                 onClick={() => {
-                  siswaState.sendCreateSiswa(nama, username, password, kelas);
+                  siswaState.sendCreateSiswa(
+                    nama, 
+                    username, 
+                    password, 
+                    kelas
+                  );
                 }}
               >
                 Submit Data
@@ -444,9 +452,9 @@ export default function AdminSiswa() {
                 marginTop: "40px",
               }}
             >
-              <Button 
-                variant="contained" 
-                color="error" 
+              <Button
+                variant="contained"
+                color="error"
                 onClick={() => siswaState.closeEditModal()}
               >
                 Tutup
@@ -456,10 +464,10 @@ export default function AdminSiswa() {
                 onClick={() => {
                   siswaState.editSiswa(
                     editId,
-                    editNama, 
-                    editUsername, 
-                    editPassword, 
-                    editKelas,
+                    editNama,
+                    editUsername,
+                    editPassword,
+                    editKelas
                   );
                 }}
               >
