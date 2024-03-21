@@ -39,14 +39,14 @@ export default function AdminSiswa() {
   const [nama, setNama] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [kelas, setKelas] = useState("");
+  const [kelas, setKelas] = useState(999);
 
   // State Edit
   const [editId, setEditId] = useState(0);
   const [editNama, setEditNama] = useState("");
   const [editUsername, setEditUsername] = useState("");
   const [editPassword, setEditPassword] = useState("");
-  const [editKelas, setEditKelas] = useState("");
+  const [editKelas, setEditKelas] = useState(999);
 
   // State Delete
   const [deleteId, setDeleteId] = useState();
@@ -55,7 +55,7 @@ export default function AdminSiswa() {
     setNama("");
     setUsername("");
     setPassword("");
-    setKelas("");
+    setKelas(999);
     siswaState.onCloseModal();
   };
 
@@ -64,7 +64,7 @@ export default function AdminSiswa() {
     setEditNama(nama);
     setEditUsername(username);
     setEditPassword(password);
-    setEditKelas(kelas);
+    setEditKelas(Number(kelas));
     siswaState.editSiswa();
     siswaState.openEditModal();
   };
@@ -189,7 +189,7 @@ export default function AdminSiswa() {
                         item.nama,
                         item.username,
                         item.password,
-                        item.kelas_id
+                        item.kelasid
                       );
                     }}
                     sx={{ float: "center", fontFamily: "Poppins" }}
@@ -298,10 +298,10 @@ export default function AdminSiswa() {
                 }}
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                value={kelas === "" ? "999" : kelas}
+                value={kelas ?? 999}
                 onChange={(e) => setKelas(e.target.value)}
               >
-                <MenuItem value="999" disabled>
+                <MenuItem value={999} disabled>
                   Pilih Kelas
                 </MenuItem>
                 {siswaState.kelas.map((item, i) => (
@@ -331,7 +331,7 @@ export default function AdminSiswa() {
                     nama, 
                     username, 
                     password, 
-                    kelas
+                    Number(kelas)
                   );
                 }}
               >
@@ -429,10 +429,10 @@ export default function AdminSiswa() {
                 }}
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                value={editKelas === "" ? "999" : editKelas}
+                value={editKelas ?? 999}
                 onChange={(e) => setEditKelas(e.target.value)}
               >
-                <MenuItem value="999" disabled>
+                <MenuItem value={999} disabled>
                   Pilih Kelas
                 </MenuItem>
                 {siswaState.kelas.map((item, i) => (
@@ -467,7 +467,7 @@ export default function AdminSiswa() {
                     editNama,
                     editUsername,
                     editPassword,
-                    editKelas
+                    Number(editKelas)
                   );
                 }}
               >
