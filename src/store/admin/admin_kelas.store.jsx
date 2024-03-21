@@ -34,6 +34,7 @@ export const useKelasAdmin = create((set, get) => ({
 
   getDataKelas: async () => {
     set({ isLoading: true });
+    set({ kelas: [] });
     await axiosNew
       .get(`/kelas`, {
         headers: {
@@ -44,6 +45,20 @@ export const useKelasAdmin = create((set, get) => ({
         if (res.status === 200) {
           set({ isLoading: false });
           set({ kelas: res.data.data });
+        }
+      });
+  },
+
+  getGuruForAdmin: async () => {
+    await axiosNew
+      .get("/list-user-guru", {
+        headers: {
+          "x-access-token": localStorage.getItem("token"),
+        },
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          set({ guru: res.data.data });
         }
       });
   },
@@ -67,25 +82,12 @@ export const useKelasAdmin = create((set, get) => ({
       )
       .then((res) => {
         if (res.status === 200 || res.status === 201) {
-          window.location.reload();
+          get().getDataKelas();
+          get().closeAddModal();
         }
       })
       .catch((err) => {
         toast.error(err.response.data.message ?? "Something Went Wrong");
-      });
-  },
-
-  getGuruForAdmin: async () => {
-    await axiosNew
-      .get("/list-user-guru", {
-        headers: {
-          "x-access-token": localStorage.getItem("token"),
-        },
-      })
-      .then((res) => {
-        if (res.status === 200) {
-          set({ guru: res.data.data });
-        }
       });
   },
 
@@ -108,7 +110,8 @@ export const useKelasAdmin = create((set, get) => ({
       )
       .then((res) => {
         if (res.status === 200 || res.status === 201) {
-          window.location.reload();
+          get().getDataKelas();
+          get().closeEditModal();
         }
       })
       .catch((err) => {
@@ -125,7 +128,8 @@ export const useKelasAdmin = create((set, get) => ({
       })
       .then((res) => {
         if (res.status === 200) {
-          window.location.reload();
+          get().getDataKelas();
+          get().closeDeleteModal();
         }
       })
       .catch((err) => {

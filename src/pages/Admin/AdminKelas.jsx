@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   FormControl,
-  Menu,
   MenuItem,
   Modal,
   Paper,
@@ -21,8 +20,6 @@ import { ToastContainer } from "react-toastify";
 import { useKelasAdmin } from "../../store/admin/admin_kelas.store";
 import { useEffect } from "react";
 import { useState } from "react";
-import axiosNew from "../../components/AxiosConfig";
-import cryptoJS from "crypto-js";
 
 const style = {
   position: "absolute",
@@ -37,6 +34,7 @@ const style = {
 };
 
 export default function AdminKelas() {
+
   // State Create
   const [handleGuru, setHandleGuru] = useState(999);
   const [addNomorKelas, setAddNomorKelas] = useState("");
@@ -61,10 +59,10 @@ export default function AdminKelas() {
     kelasStore.closeAddModal();
   };
 
-  async function openModalApi() {
-    kelasStore.getGuruForAdmin();
-    kelasStore.openAddModal();
-  }
+  // async function openModalApi() {
+  //   kelasStore.getGuruForAdmin();
+  //   kelasStore.openAddModal();
+  // }
 
   // Open Modal for Edit
   const handleOpenEdit = (id, guru_id, nomor_kelas, jumlah_orang) => {
@@ -83,6 +81,7 @@ export default function AdminKelas() {
 
   useEffect(() => {
     kelasStore.getDataKelas();
+    kelasStore.getGuruForAdmin();
   }, []);
 
   return (
@@ -90,7 +89,7 @@ export default function AdminKelas() {
       <ToastContainer />
 
       <Button
-        onClick={openModalApi}
+        onClick={() => kelasStore.openAddModal()}
         style={{
           marginTop: "20px",
           marginBottom: "30px",
@@ -223,7 +222,7 @@ export default function AdminKelas() {
                       Ubah
                     </Button>
                   </TableCell>
-                  <TableCell component="th" scope="row" align="left">
+                  <TableCell component="th" scope="row" align="center">
                     <Button
                       onClick={() => handleOpenDelete(data.kelas_id)}
                       variant="contained"
@@ -270,7 +269,6 @@ export default function AdminKelas() {
                 }}
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                label="Pilih Guru"
                 value={handleGuru ?? 999}
                 onChange={(e) => setHandleGuru(e.target.value)}
               >

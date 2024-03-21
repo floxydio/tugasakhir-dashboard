@@ -2,15 +2,34 @@ import { create } from "zustand";
 import axiosNew from "../../components/AxiosConfig";
 
 export const useAdminSiswa = create((set, get) => ({
+
   siswa: [],
   kelas: [],
   addModalTrigger: false,
+  editModalTrigger: false,
+  deleteModalTrigger: false,
+
   onOpenModal: async () => {
     set({ addModalTrigger: true });
   },
   onCloseModal: async () => {
     set({ addModalTrigger: false });
   },
+
+  openEditModal: async () => {
+    set({ editModalTrigger: true });
+  },
+  closeEditModal: async () => {
+    set({ editModalTrigger: false });
+  },
+
+  openDeleteModal: async () => {
+    set({ deleteModalTrigger: true });
+  },
+  closeDeleteModal: async () => {
+    set({ deleteModalTrigger: false });
+  },
+
   fetchKelas: async () => {
     set({ kelas: [] });
     await axiosNew
@@ -25,6 +44,7 @@ export const useAdminSiswa = create((set, get) => ({
         }
       });
   },
+
   fetchSiswa: async () => {
     set({ siswa: [] });
     await axiosNew
@@ -39,6 +59,7 @@ export const useAdminSiswa = create((set, get) => ({
         }
       });
   },
+
   sendCreateSiswa: async (nama, username, password, kelas) => {
     await axiosNew
       .post(
@@ -61,6 +82,59 @@ export const useAdminSiswa = create((set, get) => ({
           get().fetchSiswa();
           get().onCloseModal();
         }
+      })
+      .catch((err) => {
+        toast.error(err.response.data.message ?? "Something Went Wrong");
       });
   },
+
+  editSiswa: async (id, nama, username, password, kelas) => {
+    await axiosNew
+    .put(
+      `/admin/edit-siswa/${id}`,
+      {
+        nama: nama,
+        username: username,
+        password: password,
+        kelasid: Number(kelas),
+      },
+      {
+        headers: {
+          "x-access-token": localStorage.getItem("token"),
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    )
+    .then((res) => {
+      if (res.status === 200 || res.status === 201) {
+        get().fetchSiswa();
+        get().closeEditModal();
+      }
+    })
+    .catch((err) => {
+      toast.error(err.response.data.message ?? "Something Went Wrong");
+    });
+  },
+
+  deleteSiswa: async (id) => {
+    await axiosNew
+    .delete(
+      `/admin/delete-siswa/${id}`,
+      {
+        headers: {
+          "x-access-token": localStorage.getItem("token"),
+        },
+      }
+    )
+    .then((res) => {
+      if (res.status === 200 || res.status === 201) {
+        get().fetchSiswa();
+        get().closeDeleteModal();
+      }
+    })
+    .catch((err) => {
+      toast.error(err.response.data.message ?? "Something Went Wrong");
+    });
+  },
+
 }));
