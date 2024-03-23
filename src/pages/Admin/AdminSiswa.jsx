@@ -65,8 +65,13 @@ export default function AdminSiswa() {
     setEditUsername(username);
     setEditPassword(password);
     setEditKelas(Number(kelas));
-    siswaState.editSiswa();
+    // siswaState.editSiswa();
     siswaState.openEditModal();
+  };
+
+  const handleOpenDelete = (id) => {
+    setDeleteId(id);
+    siswaState.openDeleteModal();
   };
 
   useEffect(() => {
@@ -186,10 +191,11 @@ export default function AdminSiswa() {
                   <Button
                     onClick={() => {
                       handleOpenEdit(
+                        item.id,
                         item.nama,
                         item.username,
                         item.password,
-                        item.kelasid
+                        item.kelas_id
                       );
                     }}
                     sx={{ float: "center", fontFamily: "Poppins" }}
@@ -200,7 +206,7 @@ export default function AdminSiswa() {
                 </TableCell>
                 <TableCell component="th" scope="row" align="center">
                   <Button
-                    // onClick={() => handleOpenDelete(data.kelas_id)}
+                    onClick={() => handleOpenDelete(item.siswa_id)}
                     variant="contained"
                   >
                     Hapus
@@ -469,7 +475,6 @@ export default function AdminSiswa() {
                     editPassword,
                     Number(editKelas)
                   );
-
                 }}
               >
                 Update Data
@@ -479,6 +484,69 @@ export default function AdminSiswa() {
         </Box>
       </Modal>
       {/* End Modal Edit*/}
+
+      {/* Modal for Delete */}
+      <Modal
+        open={siswaState.deleteModalTrigger}
+        onClose={() => siswaState.closeDeleteModal()}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={boxStyle}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <Typography
+              variant="h5"
+              sx={{
+                textAlign: "center",
+                marginBottom: "30px",
+                fontWeight: "bold",
+                fontFamily: "Poppins",
+              }}
+            >
+              Hapus Data Siswa
+            </Typography>
+            <Typography
+              sx={{
+                fontFamily: "Poppins",
+              }}
+            >
+              Apakah Kamu Yakin Ingin Menghapus Siswa Ini ??
+            </Typography>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginTop: "40px",
+              }}
+            >
+              <Button
+                variant="contained"
+                color="error"
+                onClick={() => siswaState.closeDeleteModal()}
+              >
+                Tutup
+              </Button>
+
+              <Button
+                variant="contained"
+                onClick={() => {
+                  siswaState.deleteSiswa(deleteId);
+                }}
+              >
+                Hapus Data
+              </Button>
+            </div>
+          </div>
+        </Box>
+      </Modal>
+      {/* End Modal Delete */}
     </>
   );
 }

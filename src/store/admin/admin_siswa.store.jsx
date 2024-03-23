@@ -68,7 +68,7 @@ export const useAdminSiswa = create((set, get) => ({
           nama: nama,
           username: username,
           password: password,
-          kelasid: Number(kelas),
+          kelas_id: Number(kelas),
         },
         {
           headers: {
@@ -96,7 +96,8 @@ export const useAdminSiswa = create((set, get) => ({
         nama: nama,
         username: username,
         password: password,
-        kelasid: Number(kelas),
+        status_user: 1,
+        kelas_id: Number(kelas),
       },
       {
         headers: {
