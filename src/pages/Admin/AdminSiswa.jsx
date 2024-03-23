@@ -39,14 +39,14 @@ export default function AdminSiswa() {
   const [nama, setNama] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [kelas, setKelas] = useState(999);
+  const [kelas, setKelas] = useState(null);
 
   // State Edit
   const [editId, setEditId] = useState(0);
   const [editNama, setEditNama] = useState("");
   const [editUsername, setEditUsername] = useState("");
   const [editPassword, setEditPassword] = useState("");
-  const [editKelas, setEditKelas] = useState(999);
+  const [editKelas, setEditKelas] = useState(null);
 
   // State Delete
   const [deleteId, setDeleteId] = useState();
@@ -298,14 +298,14 @@ export default function AdminSiswa() {
                 }}
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                value={kelas ?? 999}
+                value={kelas === null ? 999 : Number(kelas)}
                 onChange={(e) => setKelas(e.target.value)}
               >
                 <MenuItem value={999} disabled>
                   Pilih Kelas
                 </MenuItem>
                 {siswaState.kelas.map((item, i) => (
-                  <MenuItem key={i} value={item.kelas_id}>
+                  <MenuItem key={i} value={Number(item.kelas_id)}>
                     {item.nomor_kelas}
                   </MenuItem>
                 ))}
@@ -328,9 +328,9 @@ export default function AdminSiswa() {
                 variant="contained"
                 onClick={() => {
                   siswaState.sendCreateSiswa(
-                    nama, 
-                    username, 
-                    password, 
+                    nama,
+                    username,
+                    password,
                     Number(kelas)
                   );
                 }}
@@ -429,14 +429,14 @@ export default function AdminSiswa() {
                 }}
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
-                value={editKelas ?? 999}
+                value={isNaN(editKelas) ? 999 : Number(editKelas)}
                 onChange={(e) => setEditKelas(e.target.value)}
               >
                 <MenuItem value={999} disabled>
                   Pilih Kelas
                 </MenuItem>
                 {siswaState.kelas.map((item, i) => (
-                  <MenuItem key={i} value={item.kelas_id}>
+                  <MenuItem key={i} value={Number(item.kelas_id)}>
                     {item.nomor_kelas}
                   </MenuItem>
                 ))}
@@ -469,6 +469,7 @@ export default function AdminSiswa() {
                     editPassword,
                     Number(editKelas)
                   );
+
                 }}
               >
                 Update Data
