@@ -8,7 +8,7 @@ export const useAdminMapel = create((set, get) => ({
 
   getMapel: async () => {
     set({ mapel: [] });
-    await axiosNew.get(`/admin/find-pelajaran`).then((res) => {
+    await axiosNew.get(`/find-pelajaran?user_id=${1}`).then((res) => {
       if (res.status === 200) {
         set({ mapel: res.data.data });
       }

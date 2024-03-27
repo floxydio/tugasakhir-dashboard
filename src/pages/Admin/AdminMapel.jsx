@@ -181,8 +181,6 @@ export default function AdminMapel() {
           </TableHead>
           <TableBody>
             {mapelState.mapel?.map((row, i) => {
-              console.log(row.nama);
-
               return (
                 <TableRow
                   key={i}
@@ -193,7 +191,7 @@ export default function AdminMapel() {
                   </TableCell>
                   <TableCell align="center">{row.nama}</TableCell>
                   <TableCell align="center">{row.users.nama}</TableCell>
-                  <TableCell align="center">{row.kelas.nomor_kelas}</TableCell>
+                  <TableCell align="center">{row.kelas.kelas_id}</TableCell>
                   <TableCell align="center">{row.jam}</TableCell>
                 </TableRow>
               );
