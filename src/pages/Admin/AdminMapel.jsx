@@ -180,20 +180,24 @@ export default function AdminMapel() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {mapelState.mapel?.map((row, i) => (
-              <TableRow
-                key={i}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell component="th" scope="row" align="center">
-                  {i + 1}
-                </TableCell>
-                <TableCell align="center">{row.nama}</TableCell>
-                <TableCell align="center">{row.users.nama}</TableCell>
-                <TableCell align="center">{row.kelas.nomor_kelas}</TableCell>
-                <TableCell align="center">{row.jam}</TableCell>
-              </TableRow>
-            ))}
+            {mapelState.mapel?.map((row, i) => {
+              console.log(row.nama);
+
+              return (
+                <TableRow
+                  key={i}
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <TableCell component="th" scope="row" align="center">
+                    {i + 1}
+                  </TableCell>
+                  <TableCell align="center">{row.nama}</TableCell>
+                  <TableCell align="center">{row.users.nama}</TableCell>
+                  <TableCell align="center">{row.kelas.nomor_kelas}</TableCell>
+                  <TableCell align="center">{row.jam}</TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>
@@ -299,7 +303,20 @@ export default function AdminMapel() {
               style={{
                 marginTop: 30,
               }}
-              onClick={}
+              onClick={() => {
+                mapelState.submitMapel(
+                  handlePelajaran,
+                  handleGuru,
+                  handleKelas,
+                  Number(handleJadwalId),
+                  handleWaktu
+                );
+                console.log(handlePelajaran);
+                console.log(handleGuru);
+                console.log(handleKelas);
+                console.log(handleJadwalId);
+                console.log(handleWaktu);
+              }}
               variant="contained"
             >
               Submit

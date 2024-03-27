@@ -8,7 +8,7 @@ export const useAdminMapel = create((set, get) => ({
 
   getMapel: async () => {
     set({ mapel: [] });
-    await axiosNew.get(`/find-pelajaran?user_id=${1}`).then((res) => {
+    await axiosNew.get(`/admin/find-pelajaran`).then((res) => {
       if (res.status === 200) {
         set({ mapel: res.data.data });
       }
@@ -17,12 +17,12 @@ export const useAdminMapel = create((set, get) => ({
   submitMapel: async (nama_pelajaran, guruId, kelasId, jadwalId, jam) => {
     await axiosNew
       .post(
-        "/create-pelajaran",
+        "/admin/create-pelajaran",
         {
           nama: nama_pelajaran,
           guruId: guruId,
           kelasId: kelasId,
-          jadwalId: jadwalId,
+          jadwal: jadwalId,
           jam: jam,
           createdAt: new Date().toISOString(),
         },
