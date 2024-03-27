@@ -15,6 +15,7 @@ import AppAdmin from "../AppAdmin.jsx";
 import AdminGuru from "../pages/Admin/AdminGuru.jsx";
 import AdminKelas from "../pages/Admin/AdminKelas.jsx";
 import AdminSiswa from "../pages/Admin/AdminSiswa.jsx";
+import AdminMapel from "../pages/Admin/AdminMapel.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -61,12 +62,16 @@ export const router = createBrowserRouter([
       },
       {
         path: "kelas-adm",
-        element: <AdminKelas />
+        element: <AdminKelas />,
       },
       {
         path: "murid-adm",
-        element: <AdminSiswa />
-      }
+        element: <AdminSiswa />,
+      },
+      {
+        path: "mapel-adm",
+        element: <AdminMapel />,
+      },
     ],
   },
   {
