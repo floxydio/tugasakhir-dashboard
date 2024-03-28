@@ -7,6 +7,7 @@ export const useKelasAdmin = create((set, get) => ({
   kelas: [],
   guru: [],
   isLoading: false,
+  totalPageKelas: 0,
   addModalTrigger: false,
   editModalTrigger: false,
   deleteModalTrigger: false,
@@ -32,11 +33,11 @@ export const useKelasAdmin = create((set, get) => ({
     set({ deleteModalTrigger: false });
   },
 
-  getDataKelas: async () => {
+  getDataKelas: async (page) => {
     set({ isLoading: true });
     set({ kelas: [] });
     await axiosNew
-      .get(`/kelas`, {
+      .get(`/kelas?page=${page}`, {
         headers: {
           "x-access-token": localStorage.getItem("token"),
         },
@@ -44,6 +45,7 @@ export const useKelasAdmin = create((set, get) => ({
       .then((res) => {
         if (res.status === 200) {
           set({ isLoading: false });
+          set({ totalPageKelas: res.data.total_page });
           set({ kelas: res.data.data });
         }
       });

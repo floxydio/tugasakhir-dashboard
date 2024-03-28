@@ -3,7 +3,9 @@ import axiosNew from "../../components/AxiosConfig";
 import { toast } from "react-toastify";
 
 export const useAdminGuru = create((set, get) => ({
+
   guru: [],
+  totalPageGuru: 0,
   isLoading: false,
   addModalTrigger: false,
   editModalTrigger: false,
@@ -39,21 +41,23 @@ export const useAdminGuru = create((set, get) => ({
     set({ deleteModalTrigger: false });
   },
 
-  getGuru: async () => {
+  getGuru: async (page) => {
     set({ guru: [] });
     await axiosNew
-      .get("/admin/find-guru", {
+      .get(`/admin/find-guru?page=${page}`, {
         headers: {
           "x-access-token": localStorage.getItem("token"),
         },
       })
       .then((res) => {
         if (res.status === 200) {
-          set({ guru: res.data.data });
           set({ isLoading: false });
+          set({ totalPageGuru: res.data.total_page })
+          set({ guru: res.data.data });
         }
       });
   },
+
   createGuru: async (nama, username, password, user_agent) => {
     await axiosNew
       .post(
@@ -80,6 +84,7 @@ export const useAdminGuru = create((set, get) => ({
         toast.error(err.response.data.message ?? "Something Went Wrong");
       });
   },
+
   updateGuru: async (id, nama, username, status_user) => {
     await axiosNew
       .put(
@@ -105,6 +110,7 @@ export const useAdminGuru = create((set, get) => ({
         toast.error(err.response.data.message ?? "Something Went Wrong");
       });
   },
+
   deleteGuru: async (id) => {
     await axiosNew
       .delete(`/admin/delete-guru/${id}`, {
@@ -121,4 +127,5 @@ export const useAdminGuru = create((set, get) => ({
         toast.error(err.response.data.message ?? "Something Went Wrong");
       });
   },
+
 }));

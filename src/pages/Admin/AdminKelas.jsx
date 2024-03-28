@@ -4,8 +4,10 @@ import {
   FormControl,
   MenuItem,
   Modal,
+  Pagination,
   Paper,
   Select,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -34,7 +36,6 @@ const style = {
 };
 
 export default function AdminKelas() {
-
   // State Create
   const [handleGuru, setHandleGuru] = useState(999);
   const [addNomorKelas, setAddNomorKelas] = useState("");
@@ -79,8 +80,12 @@ export default function AdminKelas() {
     kelasStore.openDeleteModal();
   };
 
+  const handleChangePaginationKelas = (event, value) => {
+    kelasStore.getDataKelas(value)
+  }
+
   useEffect(() => {
-    kelasStore.getDataKelas();
+    kelasStore.getDataKelas(1);
     kelasStore.getGuruForAdmin();
   }, []);
 
@@ -104,15 +109,6 @@ export default function AdminKelas() {
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell
-                align="center"
-                style={{
-                  fontWeight: "bold",
-                  fontFamily: "Poppins",
-                }}
-              >
-                No
-              </TableCell>
               <TableCell
                 align="center"
                 style={{
@@ -176,11 +172,6 @@ export default function AdminKelas() {
                   key={i}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
-                  <TableCell align="center" component="th" scope="row">
-                    <Typography sx={{ fontFamily: "Poppins" }}>
-                      {i + 1}
-                    </Typography>
-                  </TableCell>
 
                   <TableCell align="center" component="th" scope="row">
                     <Typography sx={{ fontFamily: "Poppins" }}>
@@ -236,6 +227,19 @@ export default function AdminKelas() {
           </TableBody>
         </Table>
       </TableContainer>
+      <Stack
+        spacing={2}
+        sx={{
+          marginTop: 4,
+          alignItems: "center",
+        }}
+      >
+        <Pagination
+          count={kelasStore?.totalPageKelas}
+          color="primary"
+          onChange={handleChangePaginationKelas}
+        />
+      </Stack>
 
       {/* Modal Create */}
       <Modal

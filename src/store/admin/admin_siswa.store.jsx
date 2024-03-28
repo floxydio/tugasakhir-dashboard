@@ -32,20 +32,16 @@ export const useAdminSiswa = create((set, get) => ({
     set({ deleteModalTrigger: false });
   },
 
-
-
   fetchKelas: async () => {
     set({ kelas: [] });
     await axiosNew
-      .get("/kelas", {
+      .get("/kelas?limit=999", {
         headers: {
           "x-access-token": localStorage.getItem("token"),
         },
       })
       .then((res) => {
         if (res.status === 200) {
-          console.log(res.data)
-          set({ totalPageKelas: res.data.total_page })
           set({ kelas: res.data.data });
         }
       });
@@ -62,7 +58,6 @@ export const useAdminSiswa = create((set, get) => ({
       .then((res) => {
         if (res.status === 200) {
           set({ totalPageSiswa: res.data.total_page })
-
           set({ siswa: res.data.data });
         }
       });

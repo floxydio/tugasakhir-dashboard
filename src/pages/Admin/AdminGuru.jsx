@@ -11,8 +11,10 @@ import {
   InputAdornment,
   MenuItem,
   Modal,
+  Pagination,
   Paper,
   Select,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -140,8 +142,22 @@ export default function AdminGuru() {
     },
   ];
 
+  const handleChangePaginationGuru = (event, value) => {
+    guruState.getGuru(value);
+  };
+
+  function censorUsername(username) {
+    if (username.length > 6) {
+      return username.substring(0, 6) + "*".repeat(username.length - 6);
+    } else if (username.length > 3) {
+      return username.substring(0, 3) + "*".repeat(username.length - 3);
+    } else {
+      return username;
+    }
+  }
+
   useEffect(() => {
-    guruState.getGuru();
+    guruState.getGuru(1);
   }, []);
 
   return (
@@ -245,7 +261,7 @@ export default function AdminGuru() {
                     align="left"
                     sx={{ fontFamily: "Poppins" }}
                   >
-                    {data.username}
+                    {censorUsername(data.username)}
                   </TableCell>
                   <TableCell
                     component="th"
@@ -297,6 +313,20 @@ export default function AdminGuru() {
           </TableBody>
         </Table>
       </TableContainer>
+      <Stack
+        spacing={2}
+        sx={{
+          marginTop: 4,
+          alignItems: "center",
+        }}
+      >
+        <Pagination
+          count={guruState?.totalPageGuru}
+          color="primary"
+          onChange={handleChangePaginationGuru}
+        />
+      </Stack>
+
       {/* `Start Modal For Create Guru` */}
       <Modal
         open={guruState.addModalTrigger}

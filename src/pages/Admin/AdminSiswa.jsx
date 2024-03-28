@@ -18,8 +18,8 @@ import {
 } from "@mui/material";
 import { useAdminSiswa } from "../../store/admin/admin_siswa.store";
 import { ToastContainer } from "react-toastify";
-import Pagination from '@mui/material/Pagination';
-import Stack from '@mui/material/Stack';
+import Pagination from "@mui/material/Pagination";
+import Stack from "@mui/material/Stack";
 
 const boxStyle = {
   position: "absolute",
@@ -32,8 +32,6 @@ const boxStyle = {
   boxShadow: 24,
   p: 4,
 };
-
-
 
 export default function AdminSiswa() {
   // Store
@@ -64,13 +62,11 @@ export default function AdminSiswa() {
   };
 
   function censorUsername(username) {
-    // Check if the username length is more than 4 characters
-    if (username.length > 2) {
-      return username.substring(0, 2) + '*'.repeat(username.length - 2);
-    } else if (username.length > 6) {
-      return username.substring(0, 6) + '*'.repeat(username.length - 6);
+    if (username.length > 6) {
+      return username.substring(0, 6) + "*".repeat(username.length - 6);
+    } else if (username.length > 3) {
+      return username.substring(0, 3) + "*".repeat(username.length - 3);
     } else {
-      // If the username is 4 characters or less, return it as is
       return username;
     }
   }
@@ -81,7 +77,6 @@ export default function AdminSiswa() {
     setEditUsername(username);
     setEditPassword(password);
     setEditKelas(Number(kelas));
-    // siswaState.editSiswa();
     siswaState.openEditModal();
   };
 
@@ -96,8 +91,7 @@ export default function AdminSiswa() {
   }, []);
 
   const handleChangePaginationSiswa = (event, value) => {
-    console.log("value", value)
-    siswaState.fetchSiswa(value)
+    siswaState.fetchSiswa(value);
   };
 
   return (
@@ -238,13 +232,19 @@ export default function AdminSiswa() {
           </TableBody>
         </Table>
       </TableContainer>
-      <Stack spacing={2} sx={{
-        marginTop: 3
-      }}>
-        <Pagination count={siswaState?.totalPageSiswa} color="primary" onChange={handleChangePaginationSiswa} />
+      <Stack
+        spacing={2}
+        sx={{
+          marginTop: 4,
+          alignItems: "center",
+        }}
+      >
+        <Pagination
+          count={siswaState?.totalPageSiswa}
+          color="primary"
+          onChange={handleChangePaginationSiswa}
+        />
       </Stack>
-
-
 
       {/* Modal Create*/}
       <Modal
