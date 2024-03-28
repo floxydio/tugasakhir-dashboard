@@ -4,13 +4,15 @@ import { toast } from "react-toastify";
 
 export const useAdminMapel = create((set, get) => ({
   mapel: [],
+  totalPageMapel: 0,
   addModalTrigger: false,
 
   getMapel: async () => {
     set({ mapel: [] });
-    await axiosNew.get(`/find-pelajaran?user_id=${1}`).then((res) => {
+    await axiosNew.get(`/admin/find-pelajaran?page=${page}`).then((res) => {
       if (res.status === 200) {
         set({ mapel: res.data.data });
+        set({ totalPageMapel: res.data.total_page });
       }
     });
   },

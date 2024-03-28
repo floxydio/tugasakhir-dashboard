@@ -11,7 +11,9 @@ import {
   Button,
   FormControl,
   MenuItem,
+  Pagination,
   Select,
+  Stack,
   TextField,
 } from "@mui/material";
 import Modal from "@mui/material/Modal";
@@ -62,8 +64,12 @@ export default function AdminMapel() {
   }
 
   useEffect(() => {
-    mapelState.getMapel();
+    mapelState.getMapel(1);
   }, []);
+
+  const handleChangePaginationMapel = (event, value) => {
+    mapelState.getMapel(value);
+  };
 
   async function openModalApi() {
     setOpen(true);
@@ -199,6 +205,19 @@ export default function AdminMapel() {
           </TableBody>
         </Table>
       </TableContainer>
+      <Stack
+        spacing={2}
+        sx={{
+          marginTop: 4,
+          alignItems: "center",
+        }}
+      >
+        <Pagination
+          count={mapelState?.totalPageMapel}
+          color="primary"
+          onChange={handleChangePaginationMapel}
+        />
+      </Stack>
 
       <Modal
         open={open}
