@@ -18,6 +18,8 @@ import {
 } from "@mui/material";
 import { useAdminSiswa } from "../../store/admin/admin_siswa.store";
 import { ToastContainer } from "react-toastify";
+import Pagination from '@mui/material/Pagination';
+import Stack from '@mui/material/Stack';
 
 const boxStyle = {
   position: "absolute",
@@ -30,6 +32,8 @@ const boxStyle = {
   boxShadow: 24,
   p: 4,
 };
+
+
 
 export default function AdminSiswa() {
   // Store
@@ -59,6 +63,18 @@ export default function AdminSiswa() {
     siswaState.onCloseModal();
   };
 
+  function censorUsername(username) {
+    // Check if the username length is more than 4 characters
+    if (username.length > 2) {
+      return username.substring(0, 2) + '*'.repeat(username.length - 2);
+    } else if (username.length > 6) {
+      return username.substring(0, 6) + '*'.repeat(username.length - 6);
+    } else {
+      // If the username is 4 characters or less, return it as is
+      return username;
+    }
+  }
+
   const handleOpenEdit = (id, nama, username, password, kelas) => {
     setEditId(id);
     setEditNama(nama);
@@ -75,9 +91,14 @@ export default function AdminSiswa() {
   };
 
   useEffect(() => {
-    siswaState.fetchSiswa();
+    siswaState.fetchSiswa(1);
     siswaState.fetchKelas();
   }, []);
+
+  const handleChangePaginationSiswa = (event, value) => {
+    console.log("value", value)
+    siswaState.fetchSiswa(value)
+  };
 
   return (
     <>
@@ -108,7 +129,7 @@ export default function AdminSiswa() {
                 }}
                 align="center"
               >
-                No
+                User ID
               </TableCell>
               <TableCell
                 style={{
@@ -165,7 +186,7 @@ export default function AdminSiswa() {
               >
                 <TableCell align="center" component="th" scope="row">
                   <Typography sx={{ fontFamily: "Poppins" }}>
-                    {i + 1}
+                    {item.siswa_id}
                   </Typography>
                 </TableCell>
 
@@ -177,7 +198,7 @@ export default function AdminSiswa() {
 
                 <TableCell align="center" component="th" scope="row">
                   <Typography sx={{ fontFamily: "Poppins" }}>
-                    {item.username}
+                    {censorUsername(item.username)}
                   </Typography>
                 </TableCell>
 
@@ -217,6 +238,13 @@ export default function AdminSiswa() {
           </TableBody>
         </Table>
       </TableContainer>
+      <Stack spacing={2} sx={{
+        marginTop: 3
+      }}>
+        <Pagination count={siswaState?.totalPageSiswa} color="primary" onChange={handleChangePaginationSiswa} />
+      </Stack>
+
+
 
       {/* Modal Create*/}
       <Modal
